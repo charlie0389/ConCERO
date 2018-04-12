@@ -1,0 +1,106 @@
+file: Forenew7.shk
+ref_dir: .
+sets:
+  IND:
+    - SheepCattle
+    - DairyCattle
+    - OtherAnimals
+    - Crops
+    - OtherAg
+    - FishHuntTrap
+    - ForestryLogs
+    - AgSrv
+    - Coal
+    - Oil
+    - GAS
+    - LNG
+    - IronOre
+    - NonFeOres
+    - NonMetMins
+    - MiningSrv
+    - MeatProds
+    - DairyProds
+    - OtherFood
+    - Beverages
+    - TCF
+    - WoodProds
+    - PulpPaper
+    - Printing
+    - RefineProd
+    - Chemicals
+    - PlasticRub
+    - NonMetalMin
+    - CementLime
+    - IronSteel
+    - Aluminium
+    - OtherNonFeMt
+    - MetalProds
+    - MVPOtherTran
+    - OtherEquip
+    - OtherMan
+    - ElecCoal
+    - ElecGas
+    - ElecHydro
+    - ElecOther
+    - ElecNuclear
+    - ElecSupply
+    - GasSupply
+    - WaterDrains
+    - ResidCons
+    - NonResidCons
+    - ConsSrv
+    - WholeTrade
+    - RetailTrade
+    - AccomFood
+    - RoadFreight
+    - RoadPass
+    - RailFreight
+    - RailPass
+    - Pipeline
+    - WaterTrans
+    - AirTrans
+    - Commun
+    - Banking
+    - Finance
+    - Insurance
+    - DwellingLow
+    - DwellingHigh
+    - Rental
+    - RealEstate
+    - OthBusServ
+    - PubAdminReg
+    - Defence
+    - Education
+    - HealthSrv
+    - ResidCare
+    - Culture
+    - Gambling
+    - Repairs
+    - OtherSrv
+    - PrivTranServ
+  REGDST:
+    - NSW
+    - VIC
+    - QLD
+    - SA
+    - WA
+    - TAS
+    - NT
+    - ACT
+procedures:
+  - name: cap_t1
+    inputs:
+      - IND,REGDST
+    operations:
+      - func: replace_har_header_in_file
+        har_file: test_Forenew7.shk
+        new_har_file: Forenew7.shk
+        time_dim_name: TIME
+        names_of_sets:
+          - IND
+          - REGDST
+        arrays:
+          - IND,REGDST
+        header_name: CPT1
+        coeff_name: cap_t1
+    outputs:

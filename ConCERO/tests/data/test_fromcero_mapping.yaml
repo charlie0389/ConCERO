@@ -1,0 +1,21 @@
+ref_dir: .
+sets:
+  A_SET:
+    - A
+    - B
+    - C
+map:
+  D: G
+  E: H
+  F: I
+procedures:
+  - name: A_SET_TEST
+    inputs:
+      - A_SET
+    file: test_fromcero_mapping1.csv
+  - name: RENAME_MAPPING_TEST
+    inputs:
+      - G
+      - H
+      - I
+    file: test_fromcero_mapping2.csv

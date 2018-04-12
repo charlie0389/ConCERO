@@ -1,0 +1,14 @@
+ref_dir: .
+procedures:
+  - name: xlsx_export
+    file: auto_xlsx_export.xlsx
+    inputs:
+      - A
+      - B
+      - C
+  - name: csv_export
+    file: auto_csv_export.csv
+    inputs:
+      - A
+      - B
+      - C

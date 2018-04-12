@@ -1,0 +1,35 @@
+file: test_scen_outputs.har
+sets:
+  COM:
+    - SheepCattle
+    - DairyCattle
+    - OtherAnimals
+  ALLSRC:
+    - NSW
+    - VIC
+  IND:
+    - SheepCattle
+    - DairyCattle
+    - OtherAnimals
+  REGDST:
+    - NSW
+    - VIC
+  MARGCOM:
+    - ElecSupply
+    - GasSupply
+    - WholeTrade
+procedures:
+  - name: CAPS
+    inputs:
+      - IND,REGDST
+    outputs:
+    operations:
+      - func: replace_har_header_in_file
+        har_file: test_scen_outputs
+        names_of_sets:
+          - IND_TYPE
+          - REGIONS
+        arrays:
+          - IND,REGDST
+        header_name: CAPS
+

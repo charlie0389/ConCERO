@@ -1,0 +1,7 @@
+ref_dir: .
+name: procedureload
+inputs:
+  - A
+  - B
+  - C
+file: procedureload.csv

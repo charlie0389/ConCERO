@@ -1,0 +1,7 @@
+files:
+  - file: test_rename_2.xlsx
+    sheet: L Saving Tech Chg
+    series:
+      - name: MANAGERS
+        rename: 1,MANAGERS
+      - PROFESSIONALS

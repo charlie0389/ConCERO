@@ -1,0 +1,8 @@
+procedures:
+  - ref_dir: .
+    name: export_to_csv
+    inputs:
+      - A
+      - B
+      - C
+    file: csv_export.csv

@@ -1,0 +1,10 @@
+files:
+  - file: test_nrows_header_skiprows.xlsx
+    sheet: L Saving Tech Chg
+    index_col:
+      - 0
+      - 1
+    usecols: B,C,E:F
+    header: 0
+    skiprows: 5
+    nrows: 1

@@ -1,0 +1,9 @@
+type: har
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+search_paths: .
+files:
+  - file: test_timedim.har
+    headers:
+      - name: NDMS
+        time_dim: YEAR

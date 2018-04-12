@@ -1,0 +1,9 @@
+type: har
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+search_paths: .
+files:
+  - file: Mdatnew7.har
+    default_year: 2017
+    headers:
+      - DOMS

@@ -1,0 +1,37 @@
+type: csv
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+files:
+  - file: test_AEO annual projections2017_hi.csv
+    orientation: cols
+    header: 5
+    index_col: 0
+    series:
+      - name: Oil
+        rename: si,AnnOilConsDolBar
+      - name: Gas
+        rename: si,AnnGasConsDolGJ
+      - name: Coal
+        rename: si,AnnCoalConsDolGJ
+  - file: test_AgriculturalProductivity_R.csv
+    orientation: cols
+    header: 0
+    index_col: 0
+    series:
+      - name: R
+        rename: si,AggProdPercent
+  - file: test_SSP1_SPA0_RCP2p6_BiomassPrices.csv
+    header: 0
+    skip_cols: Notes
+    index_col:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+    nrows: 1
+    series:
+      - name: MESSAGE-GLOBIOM,SSP1-26-SPA0-V15,World,Price|Primary Energy|Biomass,US$2005/GJ
+        rename: si,WLD,Biomass,USDolGJ
+
+

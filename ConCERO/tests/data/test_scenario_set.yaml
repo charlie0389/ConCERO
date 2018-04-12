@@ -1,0 +1,151 @@
+# This file is used to define the set of all possible scenarios, *NOT* the scenarios themselves.
+# Each scenario must fit within the constraints specified in this file.
+# Do not modify this file unless you know what you're doing...
+
+  - id: P
+    long_name: Productivity and Services
+    issues:
+      - id: I
+        long_name: Investment Attraction
+        values:
+          - L
+          - M
+          - H
+      - id: R
+        long_name: Regulatory Environment
+        values:
+          - L
+          - H
+      - id: E
+        long_name: Education and support
+        values:
+          - L
+          - H
+      - id: S
+        long_name: Social Inclusion
+        values:
+          - L
+          - H
+      - id: W
+        long_name: Future of work
+        values:
+         - A
+         - E
+  - id: C
+    long_name: Cities and Infrastructure
+    issues:
+      - id: P
+        long_name: Population
+        values:
+          - X
+      - id: R
+        long_name: Regional Share
+        values:
+          - L
+          - H
+      - id: D
+        long_name: Urban Form and Density
+        values:
+          - L
+          - H
+      - id: L
+        long_name: Connectivity and Liveability
+        values:
+          - L
+          - H
+      - id: H
+        long_name: Housing Affordability
+        values:
+          - L
+          - H
+  - id: R
+    long_name: Natural Resources and Agriculture
+    issues:
+      - id: G
+        long_name: Electricity and gas governance
+        values:
+          - L
+          - H
+      - id: P
+        long_name: National emissions policy
+        values:
+          - E
+          - T
+      - id: T
+        long_name: National Emissions Targets
+        values:
+          - L
+          - M
+          - H
+      - id: A
+        long_name: Agricultural productivity
+        values:
+          - M
+          - H
+      - id: E
+        long_name: Ecosystems services and markets
+        values:
+          - D
+          - F
+          - L
+  - id: B
+    long_name: Boost
+    issues:
+      - id: G
+        long_name: Global industries
+        values:
+          - True
+          - False
+      - id: T
+        long_name: Tourism
+        values:
+          - True
+          - False
+      - id: S
+        long_name: Healthy and sustainable food boost
+        values:
+          - True
+          - False
+      - id: H
+        long_name: Healthy food boost
+        values:
+          - True
+          - False
+      - id: C
+        long_name: Low carbon energy boost
+        values:
+          - True
+          - False
+  - id: G
+    long_name: Global
+    issues:
+      - id: I
+        long_name: Geopolitics (International Relations)
+        values:
+          - P
+          - C
+      - id: P
+        long_name: Global population
+        values:
+          - M
+          - L
+      - id: M
+        long_name: Global Minerals demand
+        values:
+          - H
+          - L
+      - id: G
+        long_name: Global Climate action (Greenhouse)
+        values:
+          - H
+          - L
+      - id: W
+        long_name: Global work trends
+        values:
+          - X
+          - A
+          - E
+      - id: C
+        long_name: Consumption patterns
+        values:
+          - X

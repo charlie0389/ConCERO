@@ -1,0 +1,44 @@
+name: A1
+run_no: 1
+def:
+  P:
+    I: M
+    R: L
+    E: L
+    S: L
+    W: E
+  C:
+    P: X
+    R: L
+    D: L
+    L: L
+    H: L
+  R:
+    G: H
+    P: E
+    T: M
+    A: M
+    E: F
+  B:
+    G: False
+    T: False
+    S: False
+    H: False
+    C: False
+  G:
+    I: P
+    P: M
+    M: H
+    G: H
+    W: X
+    C: X
+input_conf: test_scen_inputs.yaml
+export_mod_xlsx: False
+export_int_xlsx: False
+models:
+  - name: VURM
+    exec_cmd: python dummy_model_run.py
+    input_conf: test_model_input.yaml
+    output_conf: test_model_output.yaml
+    export_mod_xlsx: False
+output_conf: test_scen_outputs.yaml

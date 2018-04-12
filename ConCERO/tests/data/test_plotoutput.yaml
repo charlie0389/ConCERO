@@ -1,0 +1,13 @@
+ref_dir: .
+procedures:
+  - name: test_plotoutput
+    inputs:
+      -
+        - 3
+        - ASSOCIATE PROFESSIONALS
+      -
+        - 2
+        - PROFESSIONALS
+    file: AssociateProfessionals.png
+    output_kwargs:
+      plottype: line

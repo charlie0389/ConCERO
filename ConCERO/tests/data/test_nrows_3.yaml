@@ -1,0 +1,7 @@
+files:
+  - file: test_nrows_header_skiprows.xlsx
+    sheet: Unemployment
+    index_col: 0
+    usecols: B,D:E
+    header: 5
+    nrows: 1

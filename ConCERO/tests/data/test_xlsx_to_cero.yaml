@@ -1,0 +1,93 @@
+type: xlsx
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+files:
+  - file: AgriculturalProductivity_S_true.xlsx
+    sheet: AgriculturalProductivity_S
+    time_series_regex: (\d{4})$
+    time_series_fmt: '%Y'
+    series:
+      - S
+  - file: AgriculturalProductivity_S_true.xlsx
+    sheet: IndTemplate
+    time_series_regex: .*(\d{4})$
+    time_series_fmt: '%Y'
+    series:
+      - 1 SheepCattle
+      - 2 DairyCattle
+      - 3 OtherAnimals
+      - 4 Crops
+      - 5 OtherAg
+      - 6 FishHuntTrap
+      - 7 ForestryLogs
+      - 8 AgSrv
+      - 9 Coal
+      - 10 Oil
+      - 11 GAS
+      - 12 LNG
+      - 13 IronOre
+      - 14 NonFeOres
+      - 15 NonMetMins
+      - 16 MiningSrv
+      - 17 MeatProds
+      - 18 DairyProds
+      - 19 OtherFood
+      - 20 Beverages
+      - 21 TCF
+      - 22 WoodProds
+      - 23 PulpPaper
+      - 24 Printing
+      - 25 RefineProd
+      - 26 Chemicals
+      - 27 PlasticRub
+      - 28 NonMetalMin
+      - 29 CementLime
+      - 30 IronSteel
+      - 31 Aluminium
+      - 32 OtherNonFeMt
+      - 33 MetalProds
+      - 34 MVPOtherTran
+      - 35 OtherEquip
+      - 36 OtherMan
+      - 37 ElecCoal
+      - 38 ElecGas
+      - 39 ElecHydro
+      - 40 ElecOther
+      - 41 ElecNuclear
+      - 42 ElecSupply
+      - 43 GasSupply
+      - 44 WaterDrains
+      - 45 ResidCons
+      - 46 NonResidCons
+      - 47 ConsSrv
+      - 48 WholeTrade
+      - 49 RetailTrade
+      - 50 AccomFood
+      - 51 RoadFreight
+      - 52 RoadPass
+      - 53 RailFreight
+      - 54 RailPass
+      - 55 Pipeline
+      - 56 WaterTrans
+      - 57 AirTrans
+      - 58 Commun
+      - 59 Banking
+      - 60 Finance
+      - 61 Insurance
+      - 62 DwellingLow
+      - 63 DwellingHigh
+      - 64 Rental
+      - 65 RealEstate
+      - 66 OthBusServ
+      - 67 PubAdminReg
+      - 68 Defence
+      - 69 Education
+      - 70 HealthSrv
+      - 71 ResidCare
+      - 72 Culture
+      - 73 Gambling
+      - 74 Repairs
+      - 75 OtherSrv
+      - 76 PrivTranServ
+
+

@@ -1,0 +1,39 @@
+file: gallme_input_data.gdx
+ref_dir: .
+operations:
+  - func: iter_and_norm
+    init:
+      - 1.0
+export_index: no
+procedures:
+  - name: DemandYearly
+    inputs:
+      - L_OUTPUT,Electricity,CAF
+      - L_OUTPUT,Electricity,NAF
+      - L_OUTPUT,Electricity,OSA
+      - L_OUTPUT,Electricity,ZAF
+      - qo,Electricity,CAF
+      - qo,Electricity,NAF
+      - qo,Electricity,OSA
+      - qo,Electricity,ZAF
+    operations:
+      - func: merge
+        arrays:
+          - L_OUTPUT,Electricity,CAF
+          - L_OUTPUT,Electricity,OSA
+          - L_OUTPUT,Electricity,NAF
+          - L_OUTPUT,Electricity,ZAF
+        rename: L_OUTPUT,afr
+      - func: merge
+        arrays:
+          - qo,Electricity,CAF
+          - qo,Electricity,OSA
+          - qo,Electricity,NAF
+          - qo,Electricity,ZAF
+        rename: qo,afr
+      - func: merge_multiply
+        arrays:
+          - qo,afr
+          - L_OUTPUT,afr
+    outputs:
+      - qo,afr

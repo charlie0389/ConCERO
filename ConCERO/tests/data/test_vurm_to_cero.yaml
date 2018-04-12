@@ -1,0 +1,12 @@
+type: csv
+header: 0
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+files:
+  - file: YearToYearBasecase_V7_R.csv
+    series:
+      - natp0a(Crops)
+      - natp0a(SheepCattle)
+      - natp0a(OtherAg)
+      - natp0a(DairyCattle)
+      - d_gastaxdom
