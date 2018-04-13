@@ -566,9 +566,7 @@ class FromCERO(dict):
 
         if self.output_procedures != {}:
             file_ext = os.path.splitext(self["file"])[1][1:]
-            if file_ext in ["gdx"]:
-                FromCERO._gdx_out(self["file"], self.output_procedures)
-            elif file_ext in ["csv", "xlsx", "excel", 'png', 'pdf', 'ps', 'eps', 'svg', 'npy']:
+            if file_ext in ["csv", "xlsx", "excel", 'png', 'pdf', 'ps', 'eps', 'svg', 'npy']:
                 out_df = CERO.combine_ceros(list(self.output_procedures.values()))
                 FromCERO._dataframe_out(out_df, self["file"], output_type=file_ext)
             elif file_ext in FromCERO.sup_output_types:
@@ -751,14 +749,16 @@ class FromCERO(dict):
     @staticmethod
     def _dataframe_out(df, output_file, output_type, output_kwargs: dict=None):
         output_file = output_file + "." + output_type if os.path.splitext(output_file)[1] == "" else output_file
-        if output_type in ['npy']:
+        if output_type.lower() in ['npy']:
             FromCERO._numpy_out(df.values, output_file, output_kwargs=output_kwargs)
-        elif output_type in ['png', 'pdf', 'ps', 'eps', 'svg']:
+        elif output_type.lower() in ['png', 'pdf', 'ps', 'eps', 'svg']:
             FromCERO._plot(df, output_file, output_kwargs=output_kwargs)
-        elif output_type in ["csv"]:
+        elif output_type.lower() in ["csv"]:
             FromCERO._csv_out(df, output_file, output_kwargs=output_kwargs)
-        elif output_type in ["xlsx", "excel"]:
+        elif output_type.lower() in ["xlsx", "excel"]:
             FromCERO.xlsx_out(df, output_file, output_kwargs=output_kwargs)
+        elif output_type.lower() in ["gdx"]:
+            FromCERO._gdx_out(df, output_file, output_kwargs=output_kwargs)
         else:
             raise TypeError("Output files of this type cannot be created from dataframes. It will be necessary " + \
                             "to create your own output function in ConCERO.libfuncs and call it as an operation.")
@@ -802,23 +802,23 @@ class FromCERO(dict):
         np.save(output_file, obj, **output_kwargs)
 
     @staticmethod
-    def _gdx_out(output_file: str, out_obj: 'Dict[str, pd.DataFrame]'):
+    def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str):
         if output_file[-4:] != '.gdx':
             output_file += '.gdx' # Add file extension if necessary
 
         # out_obj = copy.deepcopy(out_obj)
 
-        for out_ser, out_df in out_obj.items():
+        for out_ser, out_df in df.items():
             assert (isinstance(out_df, pd.DataFrame))
             libfuncs_wrappers._rename(out_df, out_df.index.values[0], "Value")
             out_df = out_df.transpose()
             out_df['Year'] = out_df.index.strftime('%Y') # Convert datetimes to strings
-            out_obj[out_ser] = out_df[['Year', 'Value']] # Reorder
+            df[out_ser] = out_df[['Year', 'Value']] # Reorder
 
 
         with gdxpds.gdx.GdxFile() as gdxf:
 
-            for out_ser, out_df in out_obj.items():
+            for out_ser, out_df in df.items():
                 # Create a new set with one dimension
                 gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
                 gdxf[-1].dataframe = out_df

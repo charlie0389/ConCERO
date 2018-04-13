@@ -813,7 +813,7 @@ class ToCERO(dict):
                 # Renames the initial columns to a number string...
                 col_labels = ["%d" % i for i in range(df.shape[1])]
                 col_labels[-1] = "Value"
-                col_labels[par["time_col"]] = "Date"
+                col_labels[par["time_col"]] = "Year"
                 df.columns = pd.Index(col_labels)
 
                 df.set_index(col_labels[:-1], inplace=True)
