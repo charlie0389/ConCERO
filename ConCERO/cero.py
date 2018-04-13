@@ -256,13 +256,12 @@ class CERO(object):
         """
 
         if not issubclass(type(map_dict), dict):
-            raise TypeError("The mapping dictionary must be of dict type.")
+            raise TypeError("The mapping dictionary must be a subclass of dict.")
 
         def f(x): # Copied from within pandas.core.generic.rename()
             if x in map_dict:
-                return map_dict[x]
-            else:
-                return x
+                return _Identifier.tupleize_name(map_dict[x])
+            return _Identifier.tupleize_name(x)
 
         if inplace:
             ret = None
