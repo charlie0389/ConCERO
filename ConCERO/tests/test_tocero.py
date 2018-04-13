@@ -115,6 +115,7 @@ class TestToCERO(DefaultTestCase):
         self.assertTrue(CERO.is_cero(cero))
         self.assertTrue(cero.equals(df))
 
+
     # TODO: Write test for time_regex
     # TODO: Write test for time_fmt
 

@@ -87,6 +87,17 @@ class TestToCERO_FileObj(DefaultTestCase):
 
         self.assertTrue(ToCERO._FileObj.run_checks(conf))
 
+    def test_har_repetitive_sets(self):
+
+        fo = ToCERO._FileObj({"file": "test.har",
+                "search_paths": TestToCERO_FileObj._dd,
+                "head_arrs": [{"name": "ARR7", "default_year": 2018}]})
+        cero = fo.import_file_as_cero()
+
+        df = DataTools.get_test_data(TestToCERO_FileObj._dd + "test_har_repetitive_sets.pickle")
+
+        self.assertTrue(cero.equals(df))
+
 
 if __name__ == "__main__":
     unittest.main()

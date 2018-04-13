@@ -700,8 +700,9 @@ class ToCERO(dict):
                     msg = "\'%s\' is an invalid header name for file \'%s\'." % (header["name"], self["file"])
                     raise ValueError(msg)
 
-                # Inherits time_dim from self if possible
+                # Inherits time_dim, default_year from self if possible
                 header["time_dim"] = header.get("time_dim", self.get("time_dim"))
+                header["default_year"] = header.get("default_year", self.get("default_year"))
 
                 header["obj"] = hfo.getHeaderArrayObj(header["name"])
 
@@ -731,25 +732,21 @@ class ToCERO(dict):
                         raise TypeError("Invalid 'time_dim' (for header %s) - integer (zero-indexed) is too large " +
                                         "for the number of sets." % header["obj"].HeaderName)
 
-                    for i, x in enumerate(header["obj"]["sets"]):
-                        if i != header["time_dim"]:  # type: List[list] # Wish to treat time_dim specially
-                            labels[x["name"]] = x["dim_desc"]
-
+                    labels = [(x["name"], x["dim_desc"]) for i, x in enumerate(header["obj"]["sets"]) if i != header["time_dim"]]
                     time_dim_labels = header["obj"]["sets"][header["time_dim"]]["dim_desc"]
 
                     # Move that dimension to be the last...
                     tspse_tup = tuple([i for i in range(len(header["obj"]["sets"])) if i != header["time_dim"]] + [
                         header["time_dim"]])
                 else:
-                    if not header.get("default_year", self.get("default_year")):
+                    if not header.get("default_year"):
                         raise ValueError(
                             "The 'default_year' option must be provided for har files that do not have a specified 'time_dim' (time dimension).")
 
                     # Assume we have to create time dimension...
-                    time_dim_labels = [self[
-                                           "default_year"]]  # TODO: Ask Thomas what year the data references if time_dim is not specified
-                    for x in header["obj"]["sets"]:
-                        labels[x["name"]] = x["dim_desc"]
+                    time_dim_labels = ["%d" % header.get("default_year")]  # TODO: Ask Thomas what year the data references if time_dim is not specified
+
+                    labels = [(x["name"], x["dim_desc"]) for x in header["obj"]["sets"]]
                     tspse_tup = tuple([i for i in range(len(header["obj"]["sets"]))])  # transpose-tuple
 
                 array = header["obj"]["array"].transpose(tspse_tup)
@@ -757,7 +754,7 @@ class ToCERO(dict):
                 # UPDATE: Checked with Florian that this assumption is correct.
 
                 # Reshape into 2-dimensional array
-                shape = [len(labs) for labs in labels.values()]
+                shape = [len(labs[1]) for labs in labels]
                 new_dims = 1
                 for i in range(len(shape)):
                     new_dims = new_dims * shape[i]
@@ -767,7 +764,7 @@ class ToCERO(dict):
                 array = array.reshape(new_dims)  # Note that reshaping is in C-order, which is itertools.product() order
                 columns = time_dim_labels
 
-                labels = list(it.product(*labels.values()))
+                labels = list(it.product(*[x[1] for x in labels]))
                 labels = [_Identifier.tupleize_name(name) for name in labels]
                 if self.get("har_auto_prepend"):
                     labels = [_Identifier.prepend_identifier(header["obj"]["coeff_name"], name) for name in labels]
