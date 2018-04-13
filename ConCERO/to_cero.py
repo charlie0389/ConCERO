@@ -793,7 +793,6 @@ class ToCERO(dict):
                 self["pars"] = []
                 for name, df in dfs_dict.items():
                     self["pars"].append({"name": name,
-                                           "id_cols": df.shape[1] - 1,
                                          "time_col": df.shape[1] - 2,
                                          })
             else:
@@ -805,14 +804,13 @@ class ToCERO(dict):
                         pars = self["pars"][idx]
 
                     dfs_dict.update(gdxpds.to_dataframe(self["file"], pars['name']))
-                    self["pars"][idx]["id_cols"] = self["pars"][idx].get("id_cols", dfs_dict[pars['name']].shape[1]-1)
                     self["pars"][idx]["time_col"] = self["pars"][idx].get("time_col", dfs_dict[pars['name']].shape[1] - 2)
 
             df_list = []
             for idx, par in enumerate(self["pars"]):
                 df = dfs_dict[par["name"]]
 
-                # Renames the first ``id_cols`` to a number...
+                # Renames the initial columns to a number string...
                 col_labels = ["%d" % i for i in range(df.shape[1])]
                 col_labels[-1] = "Value"
                 col_labels[par["time_col"]] = "Date"
