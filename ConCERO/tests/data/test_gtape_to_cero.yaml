@@ -1,11 +1,7 @@
-type: gdx
-time_series_regex: Y(\d{4})$
-time_series_fmt: '%Y'
 files:
   - file: test_gtape_output_testsize.gdx
-    series:
-      - name: L_OUTPUT
-        id_cols: 3
-      - name: pgdp
-        id_cols: 2
+    pars:
+      - L_EXPORT
+      - L_GAS_SOURCE
+      - pgdp
 

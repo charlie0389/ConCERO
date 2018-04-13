@@ -343,12 +343,12 @@ from ConCERO.cero import CERO
 
 class ToCERO(dict):
 
-    supported_file_types = ["har", "csv", "xlsx", "shk"]
+    # supported_file_types = ["har", "csv", "xlsx", "shk", "gdx"]
     _logger = ConCERO.conf.setup_logger(__name__)
 
     class _FileObj(dict):
 
-        supported_file_types = ["har", "csv", "xlsx", "shk"]
+        supported_file_types = ["har", "csv", "xlsx", "shk", "gdx"]
 
         def __init__(self, *args, parent: dict=None,
                      **kwargs):
@@ -782,22 +782,51 @@ class ToCERO(dict):
             return CERO.combine_ceros(header_dfs, overwrite=False, verify_cero=False)
 
         def _import_gdx(self) -> pd.DataFrame:
+            """
+            Import a gdx file. Some assumptions are made:
+
+                * Year index is always the lowest-level in column hierarchy
+                * gdxpds does not provide columns with distinct names (which is true at time of writing)
+
+            :return:
+            """
+
+            if not self.get("pars"):
+                dfs_dict = gdxpds.to_dataframes(self["file"])
+                self["pars"] = []
+                for name, df in dfs_dict.items():
+                    self["pars"].append({"name": name,
+                                           "id_cols": df.shape[1] - 1,
+                                         "time_col": df.shape[1] - 2,
+                                         })
+            else:
+                dfs_dict = OrderedDict()
+                for idx, pars in enumerate(self["pars"]):
+
+                    if isinstance(pars, str):
+                        self["pars"][idx] = {"name": pars}
+                        pars = self["pars"][idx]
+
+                    dfs_dict.update(gdxpds.to_dataframe(self["file"], pars['name']))
+                    self["pars"][idx]["id_cols"] = self["pars"][idx].get("id_cols", dfs_dict[pars['name']].shape[1]-1)
+                    self["pars"][idx]["time_col"] = self["pars"][idx].get("time_col", dfs_dict[pars['name']].shape[1] - 2)
+
             df_list = []
-            for series in self["series"]:
-                df = gdxpds.to_dataframe(self["file"], series['name'])[series['name']]
-                nic = series['id_cols']
-                df.columns = pd.Index([x for x in range(nic)] + df.columns.values[nic:].tolist())
-                df = df.set_index([x for x in range(nic)])
-                df = df.unstack(
-                    level=nic - 1).transpose()  #: Assumption: Year index is always the lowest-level in column hierarchy
-                df.index = df.index.droplevel()
-                if isinstance(df.columns, pd.MultiIndex):
-                    df.columns = pd.Index([tuple([series["name"]] + x) for x in df.columns.tolist()],
-                                          tupleize_cols=False)
-                    # df.columns = pd.Index([(series["name"], *x) for x in df.columns.tolist()], tupleize_cols=False) # Python >=3.5 required for this line...
-                else:
-                    # Ugly workaround given there can be no-such thing as 1-level multi-index...
-                    df.columns = pd.Index([(series["name"], x) for x in df.columns.tolist()])
+            for idx, par in enumerate(self["pars"]):
+                df = dfs_dict[par["name"]]
+
+                # Renames the first ``id_cols`` to a number...
+                col_labels = ["%d" % i for i in range(df.shape[1])]
+                col_labels[-1] = "Value"
+                col_labels[par["time_col"]] = "Date"
+                df.columns = pd.Index(col_labels)
+
+                df.set_index(col_labels[:-1], inplace=True)
+                new_level_order = [col_labels[par["time_col"]]] + [x for i, x in enumerate(col_labels[:-1]) if i != par["time_col"]]
+                df = df.reorder_levels(new_level_order) #: Assumption: Year index is always the lowest-level in column hierarchy
+                df = df.unstack(0)
+                df.columns = df.columns.droplevel()
+                df.index = pd.Index(df.index.tolist(), tupleize_cols=False)
                 df_list.append(df)
 
             return CERO.combine_ceros(df_list, overwrite=False, verify_cero=False)
