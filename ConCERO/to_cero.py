@@ -457,9 +457,9 @@ class ToCERO(dict):
                 ToCERO._logger.error(msg)
                 raise ImportError(msg)
             except Exception as e:
-                msg = e.__str__() + " Failed to import file '%s'." % self["file"]
+                msg = e.__str__() + ". Failed to import file '%s'." % self["file"]
                 ToCERO._logger.error(msg)
-                raise e.__class__()
+                raise e.__class__(msg)
 
             # Throw away unnecessary rows
             if self.get("series"):
@@ -643,12 +643,17 @@ class ToCERO(dict):
             #     pd_opts[k] = self[k]
 
             pd_op = getattr(pd, pd_op)  # Identify the correct pandas read OPeration
-            df = pd_op(file, **pd_opts)
-            # Program will fail on the line above if:
-            # - Pandas version <0.22 (failure observed when pandas = 0.20), AND
-            # - read_excel operation, AND
-            # - usecols is a string which has a column range in it, where one of the indices has more than
-            #   one letter - e.g. usecols="B,C,E:AW".
+            try:
+                df = pd_op(file, **pd_opts)
+                # Program will fail on the line above if:
+                # - Pandas version <0.22 (failure observed when pandas = 0.20), AND
+                # - read_excel operation, AND
+                # - usecols is a string which has a column range in it, where one of the indices has more than
+                #   one letter - e.g. usecols="B,C,E:AW".
+            except ValueError as e:
+                if re.match(r"^Passed header", e.__str__()):
+                    raise ValueError(e.__str__() + ". This is likely because a range has been specified with a '-' instead of a ':'")
+                raise e
 
             if self["type"] == 'xlsx' and self.get("nrows"):
                 df = df.iloc[:self["nrows"], :]
