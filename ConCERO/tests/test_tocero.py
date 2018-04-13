@@ -105,6 +105,16 @@ class TestToCERO(DefaultTestCase):
         self.assertTrue(ToCERO.run_checks({"files": [{"file": "test_csv.csv",
                                                      "search_paths": [TestToCERO._dd]}]}))
 
+    def test_complex_xlsx(self):
+
+        to_cero = ToCERO(conf=(TestToCERO._dd + r'test_complex_xlsx_import.yaml'))
+        cero = to_cero.create_cero()
+
+        df = DataTools.get_test_data(TestToCERO._dd + "test_complex_xlsx_result.pickle")
+
+        self.assertTrue(CERO.is_cero(cero))
+        self.assertTrue(cero.equals(df))
+
     # TODO: Write test for time_regex
     # TODO: Write test for time_fmt
 

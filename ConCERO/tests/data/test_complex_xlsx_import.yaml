@@ -1,0 +1,35 @@
+files:
+  - file: test_complex_xlsx.xlsx
+    sheet: comp_imp # 3 tables on this sheet - need to create 3 file objects to import them all
+    header: 2 # Python is zero-indexed whilst excel is not
+    nrows: 1
+    usecols: B:E # Note that colons are used to specify ranges (in excel style)
+  - file: test_complex_xlsx.xlsx
+    sheet: comp_imp
+    header: 5
+    nrows: 3
+    usecols: B:F
+    index_col: # note that zero-index is in reference to usecols
+      - 0
+      - 1
+  - file: test_complex_xlsx.xlsx
+    sheet: comp_imp
+    header: 10
+    nrows: 3
+    usecols: B:E # Don't want the 'Total' column
+#    index_col: 0 # Technically this line is not needed, but is included to highlight tat the index (despite being one column) will split into tuples of length 2 because ConCERO splits identifier strings on the comma.
+  - file: test_complex_xlsx.xlsx
+    sheet: comp_imp
+    header: 17
+    nrows: 3
+    usecols: B:E
+    time_regex: ^(\d{4}F) # The matching of the 'F' is completely unnecessary, but it's included to demonstrate the next option... With this regex '2018F' is returned as the first matching group.
+    time_fmt: "%YF" # '%Y' is interpreted as a 4-digit year
+  - file: test_complex_xlsx.xlsx
+    sheet: comp_imp
+    header: 23 # Note that no 'nrows' option is necessary because there is no irrelevant data below the header row
+    usecols: B:E
+    nrows: 3
+    orientation: cols
+    prepend: LastTable # Necessary to avoid index conflicts with a table imported earlier...
+
