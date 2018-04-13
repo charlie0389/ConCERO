@@ -10,7 +10,8 @@ Created on Mon Jan 15 11:31:57 2018
 import sys
 import os
 import unittest
-sys.path.append(os.path.relpath('../'))
+
+import ConCERO.conf
 from ConCERO.to_cero import ToCERO
 from ConCERO.tests.data_tools import DataTools, DefaultTestCase
 
@@ -18,6 +19,7 @@ from ConCERO.tests.data_tools import DataTools, DefaultTestCase
 class TestGTAPE2CERO(DefaultTestCase):
     '''Test the VURM to CERO conversion class.'''
 
+    @unittest.skipIf(not ConCERO.conf.gdxpds_installed, "gdxpds not installed")
     def test_gtape2cero(self):
         '''Tests VURM2CERO conversion process.'''
 

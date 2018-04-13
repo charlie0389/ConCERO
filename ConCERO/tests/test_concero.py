@@ -10,7 +10,7 @@ from ConCERO.tests.test_scenario import TestScenario
 from ConCERO.tests.test_vurm_to_cero import TestVURM2CERO
 from ConCERO.tests.test_sceninputs_to_cero import TestScenIn2CERO
 from ConCERO.tests.test_libfuncs import TestLibfuncs
-# from ConCERO.tests.test_gtape_to_cero import TestGTAPE2CERO
+from ConCERO.tests.test_gtape_to_cero import TestGTAPE2CERO
 from ConCERO.tests.test_cero_to_luto import TestCERO2LUTO
 from ConCERO.tests.test_cero_to_gallme import TestCERO2GALLME
 # from ConCERO.tests.test_cero_to_austimes import TestCERO2AusTIMES
@@ -33,7 +33,6 @@ class TestConCERO(unittest.TestSuite):
         for testcase in (TestPlotOutput, TestHAR2CERO, TestHARHeaderReplace, TestVURM2CERO, TestScenIn2CERO,
                          TestLibfuncs,
                          TestLibfuncsWrappers,
-                         TestCERO2LUTO, TestCERO2GALLME,
                          TestScenario,
                          TestCERO,
                          TestCERO2HAR,
@@ -43,6 +42,9 @@ class TestConCERO(unittest.TestSuite):
                          TestToCERO_FileObj,
                          TestFromCERO_Procedure,
                          TestMain,
+                         TestGTAPE2CERO,
+                         TestCERO2GALLME,
+                         TestCERO2LUTO,
                      ):
             self.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(testcase))
 
