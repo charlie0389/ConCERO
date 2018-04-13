@@ -264,19 +264,19 @@ File Independent Options:
 
 The options in this section are relevant to all input files, regardless of their type. They are:
 
-**time_series_regex: (str)**, **time_series_fmt: (str)** and **default_year: (int)**
+**time_regex: (str)**, **time_fmt: (str)** and **default_year: (int)**
 
 A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by \
-searching through the string, using the regular expression ``time_series_regex``. The default - ``'.*(\d{4})$'`` - will \
+searching through the string, using the regular expression ``time_regex``. The default - ``'.*(\d{4})$'`` - will \
 attempt to interpret the last four characters of the string as the year. Importantly, the match returns the \
-year as the 1st 'group' (regular expression lingo). It is the first group that ``time_series_fmt`` is used with to \
+year as the 1st 'group' (regular expression lingo). It is the first group that ``time_fmt`` is used with to \
 convert the string to a datetime object. The default - ``'%Y'`` assumes that the string is 4 digits \
 corresponding to the year.
 
 In the event that it date-time data isn't stored in the file \
 itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \
 
-What follows is an example, using the defaults of ``time_series_regex`` and ``time_series_fmt``, to \
+What follows is an example, using the defaults of ``time_regex`` and ``time_fmt``, to \
 demonstrate how this works...
 
 Let's assume the time index series is given, in CSV form, by:
@@ -298,8 +298,8 @@ following options are appropriate to include in the YAML configuration file.
 
     .. code-block:: yaml
 
-        time_series_regex: .*(\d{4})$
-        time_series_fmt: '%Y'
+        time_regex: .*(\d{4})$
+        time_fmt: '%Y'
 
 *Note*: if the default settings (as shown immediately above) are appropriate, specifying them is not necessary.
 
@@ -371,8 +371,8 @@ class ToCERO(dict):
             # Defaults
             _conf = {"header":0,
                         "index_col":0,
-                        "time_series_regex":r".*(\d{4})$",
-                        "time_series_fmt": r"%Y",
+                        "time_regex":r".*(\d{4})$",
+                        "time_fmt": r"%Y",
                         "search_paths": []}
 
             if parent is None:
@@ -486,13 +486,13 @@ class ToCERO(dict):
                 ts = pd.to_datetime(df.columns, format="%Y")
             else:
                 try:
-                    ts = pd.Series([re.match(self["time_series_regex"], x).group(1) for x in df.columns.tolist()])
+                    ts = pd.Series([re.match(self["time_regex"], x).group(1) for x in df.columns.tolist()])
                 except AttributeError as e:
                     msg = ("Error attempting to perform string matching on datetime values for file '%s'. A " +\
                           "likely cause is too few datetimes for the size of the data array.") % self["file"]
                     ToCERO._logger.error(msg)
                     raise e.__class__(msg)
-                ts = pd.to_datetime(ts, format=self["time_series_fmt"])  # Interpret as datetime
+                ts = pd.to_datetime(ts, format=self["time_fmt"])  # Interpret as datetime
 
             df.columns = ts
 
@@ -872,8 +872,8 @@ class ToCERO(dict):
         """
         _conf = {"header": 0,
                  "index_col": 0,
-                 "time_series_regex": r".*(\d{4})$",
-                 "time_series_fmt": r"%Y",
+                 "time_regex": r".*(\d{4})$",
+                 "time_fmt": r"%Y",
                  "search_paths": [],
                  "files": []}  # Defaults
 

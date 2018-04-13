@@ -105,6 +105,9 @@ class TestToCERO(DefaultTestCase):
         self.assertTrue(ToCERO.run_checks({"files": [{"file": "test_csv.csv",
                                                      "search_paths": [TestToCERO._dd]}]}))
 
+    # TODO: Write test for time_regex
+    # TODO: Write test for time_fmt
+
 
 if __name__ == "__main__":
     unittest.main()

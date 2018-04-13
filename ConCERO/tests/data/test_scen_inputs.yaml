@@ -4,5 +4,5 @@ time_series_fmt: '%Y'
 files:
   - file: test_scen_input.har
     default_year: 2017
-    headers:
+    head_arrs:
       - CAPS

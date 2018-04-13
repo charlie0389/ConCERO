@@ -4,6 +4,6 @@ time_series_fmt: '%Y'
 search_paths: . # Necessary because files are created in current working directory
 files:
   - file: test_model_output.har
-    headers:
+    head_arrs:
       - name: CAPS
         time_dim: TIME

@@ -4,6 +4,6 @@ time_series_fmt: '%Y'
 search_paths: .
 files:
   - file: test_timedim.har
-    headers:
+    head_arrs:
       - name: NDMS
         time_dim: YEAR
