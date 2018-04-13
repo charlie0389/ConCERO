@@ -27,14 +27,6 @@ class TestVURM2CERO(DefaultTestCase):
 
         self.assertTrue(cero.equals(df))
 
-    def test_vurm2cero_xlsx(self):
-
-        v2c = ToCERO(conf=(TestVURM2CERO._dd + r'test_vurm_to_cero_xlsx.yaml')) # This will possibly fail if xlrd version is not (>= 1.1.0) (seems to be Windows-specific problem)
-        cero = v2c.create_cero()
-        df = DataTools.get_test_data(TestVURM2CERO._dd + r'test_vurm_to_cero_xlsx_finaldata.pickle')
-
-        self.assertTrue(cero.equals(df))
-
 
 if __name__ == "__main__":
     unittest.main()
