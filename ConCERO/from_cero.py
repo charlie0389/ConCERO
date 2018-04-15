@@ -291,7 +291,7 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 class FromCERO(dict):
 
-    sup_output_types = ('csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg')
+    sup_output_types = {'csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
     sup_procedure_types = (dict, str)
 
     _logger = ConCERO.conf.setup_logger(__name__)
@@ -300,7 +300,7 @@ class FromCERO(dict):
         """_Procedure object class."""
 
         _sup_procedure_types = (dict, str)
-        _sup_procedure_output_types = ('csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg')
+        _sup_procedure_output_types = {'csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg', 'gdx'}
 
         def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
             super().__init__(procedure_dict, *args, **kwargs)
@@ -396,7 +396,6 @@ class FromCERO(dict):
 
             if "file" in self:
                 # If file is specified, all 'outputs' from this procedure go to its own file
-                # output_type = procedure.get("type", self.type)
                 output_type = os.path.splitext(self["file"])[1][1:]
                 FromCERO._dataframe_out(out_df, self["file"], output_type, self.get("output_kwargs"))
             else:
