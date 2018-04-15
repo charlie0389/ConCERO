@@ -1,4 +1,3 @@
-file: gallme_input_data.gdx
 ref_dir: .
 operations:
   - func: iter_and_norm
@@ -37,3 +36,4 @@ procedures:
           - L_OUTPUT,afr
     outputs:
       - qo,afr
+    file: gallme_input_data.gdx

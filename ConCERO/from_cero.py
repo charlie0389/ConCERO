@@ -291,34 +291,26 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 class FromCERO(dict):
 
-    sup_output_types = ('csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg')
-    sup_procedure_types = (dict, str)
+    sup_output_types = {'csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
 
     _logger = ConCERO.conf.setup_logger(__name__)
 
     class _Procedure(dict):
         """_Procedure object class."""
 
-        _sup_procedure_types = (dict, str)
-        _sup_procedure_output_types = ('csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg')
+        _sup_procedure_output_types = {'csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg', 'gdx'}
 
         def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
-            super().__init__(procedure_dict, *args, **kwargs)
 
             defaults = {} # Add default options here
 
             if parent is None:
                 parent = {}
-            self.parent = parent
 
-            for key in parent.keys():
-                if key not in self:
-                    # Inherit if not provided
-                    self[key] = self.parent[key]
+            defaults.update(parent)
+            defaults.update(procedure_dict)
 
-            for key in defaults.keys():
-                if key not in self:
-                    self[key] = defaults[key]
+            super().__init__(defaults, *args, **kwargs)
 
             if self.get("ref_dir") is None:
                 self["ref_dir"] = os.getcwd()
@@ -502,16 +494,18 @@ class FromCERO(dict):
 
         @staticmethod
         def from_obj(obj, *args, **kwargs):
-            if isinstance(obj, FromCERO._Procedure._sup_procedure_types):
                 # Code to convert procedure to dict type (the superset of supported types)
-                if isinstance(obj, str):
-                    obj = {"name": obj}
-                return FromCERO._Procedure(obj, *args, **kwargs)
-            else:
-                msg = 'Invalid configuration file - procedure is not of valid type. Valid types are: %s.' \
-                      % FromCERO.sup_procedure_types
+            if isinstance(obj, str):
+                obj = {"name": obj}
+            try:
+                assert issubclass(type(obj), dict)
+            except AssertionError:
+                msg = "Object provided can not be converted to a procedure. Objects provided must be a dict, or a subclass of."
                 FromCERO._logger.error(msg)
                 raise TypeError(msg)
+            proc = FromCERO._Procedure(obj, *args, **kwargs)
+            FromCERO._Procedure.is_valid(proc)
+            return proc
 
         def get_filepath(self, filename):
             filename = os.path.relpath(filename)
@@ -802,14 +796,28 @@ class FromCERO(dict):
         np.save(output_file, obj, **output_kwargs)
 
     @staticmethod
-    def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str):
+    def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str, output_kwargs: dict=None):
+        """
+        Note: output_kwargs is in signature for compatibility with other output functions. output_kwargs could be \
+        implemented but is not currently.
+
+        :param df:
+        :param output_file:
+        :param output_kwargs:
+        :return:
+        """
         if output_file[-4:] != '.gdx':
             output_file += '.gdx' # Add file extension if necessary
 
         # out_obj = copy.deepcopy(out_obj)
 
         for out_ser, out_df in df.items():
-            assert (isinstance(out_df, pd.DataFrame))
+            try:
+                assert (issubclass(type(out_df), pd.DataFrame))
+            except AssertionError as e:
+                print(out_df)
+                print(type(out_df))
+                raise e
             libfuncs_wrappers._rename(out_df, out_df.index.values[0], "Value")
             out_df = out_df.transpose()
             out_df['Year'] = out_df.index.strftime('%Y') # Convert datetimes to strings
