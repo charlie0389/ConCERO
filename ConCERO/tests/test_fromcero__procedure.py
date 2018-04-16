@@ -160,6 +160,9 @@ class TestFromCERO_Procedure(DefaultTestCase):
         """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
         proc.exec_ops(cero)
 
+        df = pd.read_csv("test_output_cero.csv", index_col=0)
+        self.assertTrue(df.shape[0] == 1)
+
         os.remove("test_output_cero.csv")
 
 
