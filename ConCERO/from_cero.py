@@ -298,54 +298,61 @@ class FromCERO(dict):
 
         _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'} # "gdx"
 
-        def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
+        def __init__(self, proc_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
 
-            # Add default options here
-            defaults = {"operations": [],
-                        "inputs": []}
+            proc = FromCERO._Procedure.load_config(proc_dict, parent=parent)
+            super().__init__(proc, *args, **kwargs)
+            FromCERO._Procedure.is_valid(self)
 
-            if parent is None:
-                parent = {}
-
-            defaults.update(parent)
-            defaults.update(procedure_dict)
-
-            super().__init__(defaults, *args, **kwargs)
-
-            if self.get("ref_dir") is None:
-                self["ref_dir"] = os.getcwd()
-            self["ref_dir"] = os.path.abspath(self["ref_dir"])
-
-            if self.get("file"):  # Change path to ref_dir relative path
-                self["file"] = self.get_filepath(self["file"])
-
-            fn = self.get('file')
-            if fn:
-                file_type = os.path.splitext(fn)[1][1:]  # get file extension without full stop
+            if self.get('file'):
+                file_type = os.path.splitext(self.get('file'))[1][1:]  # get file extension without full stop
 
                 if file_type not in self._sup_procedure_output_types:
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
-            if isinstance(self["inputs"], str):
-                self["inputs"] = [self["inputs"]]
-
             # Determine identifiers for all inputs
             expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
-            # expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self.get('inputs', [self["name"]])]
             self["inputs"] = list(it.chain(*expanded_inputs))
 
             if "lstrip" in self:
                 # TODO: Move this such that it can accomodate case that all inputs are imported
                 self["inputs"] = [_Identifier.lstrip_identifier(self["lstrip"], inp) for inp in self["inputs"]]
 
-            if "outputs" in self:
-                if isinstance(self["outputs"], list):
-                    self["outputs"] = [_Identifier.tupleize_name(name) for name in self["outputs"]]
-                elif self["outputs"] is None:
+        @staticmethod
+        def load_config(proc_dict: dict, parent: 'FromCERO' = None):
+
+            # Add default options here
+            defaults = {"operations": [],
+                        "inputs": [],
+                        "ref_dir": None}
+
+            if parent is None:
+                parent = {}
+
+            defaults.update(parent)
+            defaults.update(proc_dict)
+
+            if "outputs" in defaults:
+                if issubclass(type(defaults["outputs"]), list):
+                    defaults["outputs"] = [_Identifier.tupleize_name(name) for name in defaults["outputs"]]
+                elif defaults["outputs"] is None:
                     pass
                 else:
-                    raise ValueError("'outputs' must be provided as a list or None ('%s')." % self["name"])
+                    raise ValueError("'outputs' must be provided as a list or None.")
+
+            if defaults.get("ref_dir") is None:
+                defaults["ref_dir"] = os.getcwd()
+            defaults["ref_dir"] = os.path.abspath(defaults["ref_dir"])
+
+            if defaults.get("file"):
+                defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
+
+            if isinstance(defaults["inputs"], str):
+                defaults["inputs"] = [defaults["inputs"]]
+
+            return defaults
+
 
         def _set_inputs(self, cero: pd.DataFrame):
             """Copies each data series in ``cero`` indexed by the items in ``inp_list`` to an ``OrderedDict``. This \
@@ -519,7 +526,6 @@ class FromCERO(dict):
                 FromCERO._logger.error(msg)
                 raise TypeError(msg)
             proc = FromCERO._Procedure(obj, *args, **kwargs)
-            FromCERO._Procedure.is_valid(proc)
             return proc
 
         def get_filepath(self, filename):
