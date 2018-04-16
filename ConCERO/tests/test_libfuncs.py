@@ -43,5 +43,23 @@ class TestLibfuncs(DefaultTestCase):
 
         self.assertTrue(CERO.is_cero(df))
 
+    def test_apply_func(self):
+        df = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [3, 4, 5], "C": [6, 7, 8]},
+                                    orient="index",
+                                    dtype=pd.np.float32)
+        df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+        df.sort_index(inplace=True)
+        self.assertTrue(CERO.is_cero(df))
+
+        libfuncs.apply_func(df, numpy_func="square")
+
+        test_df = pd.DataFrame.from_dict({"A": [1, 4, 9], "B": [9, 16, 25], "C": [36, 49, 64]},
+                                    orient="index",
+                                    dtype=pd.np.float32)
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        self.assertTrue(df.equals(test_df))
+
 if __name__ == '__main__':
     unittest.main()

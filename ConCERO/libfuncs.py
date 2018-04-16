@@ -351,6 +351,14 @@ def fillna(df, *args, value=None, method=None, **kwargs):
     else:
         df.fillna(method="ffill", **kwargs)
 
+@dataframe_op
+def apply_func(df, *args, numpy_func: str=None, **kwargs):
+
+    defaults = {"axis": 1}
+    defaults.update(kwargs)
+
+    df.loc[:,:] = df.apply(getattr(np, numpy_func), **kwargs)
+
 @recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:
     res = prev + prev * inp / 100
