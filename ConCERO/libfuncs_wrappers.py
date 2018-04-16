@@ -382,7 +382,10 @@ def recursive_op(func):
     def wrapper(array: pd.Series, *args,
                 init: list = None,
                 post: list = None,
-                inplace: bool = True, **kwargs) -> pd.Series:
+                inplace: bool = True,
+                auto_init: bool = 0,
+                auto_post:  bool = 0,
+                **kwargs) -> pd.Series:
         '''
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.
         :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.
@@ -396,11 +399,20 @@ def recursive_op(func):
         properties of the provided ``pandas.Series`` object to the returned object.'''
 
         array_list = array.values.tolist()
-
         if init is None:
             init = []
         if post is None:
             post = []
+
+        if not isinstance(auto_init, int):
+            raise TypeError("'auto_init' keyword argument must be provided as an integer.")
+        if auto_init > 0 and init == []: # In the event of conflict ``init`` overrules ``auto_init``.
+            init = [array[0]]*auto_init
+        if not isinstance(auto_post, int):
+            raise TypeError("'auto_post' keyword argument must be provided as an integer.")
+        if auto_post > 0 and post == []: # In the event of conflict ``post`` overrules ``auto_post``.
+            post = [array[-1]]*auto_post
+
         before = len(init)
         after = len(post)
         array_list = init + array_list + post

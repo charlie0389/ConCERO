@@ -129,6 +129,23 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(np.allclose(df.iloc[1].values[1:], np.array([4.0, 9.0])))
         self.assertTrue(all(x == y for (x, y) in zip(df.iloc[1].isna().tolist(), [True, False, False])))
 
+    def test_autoinitpost(self):
+        """Ensures that NaNs are dropped from a series before a series operation is applied."""
+
+        @libfuncs_wrappers.recursive_op
+        def mv_avg_3(first, second, third):
+            return (first + second + third)/3
+
+        df = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [3, 4, 5], "C": [4, 5, 6]}, orient="index",
+                                    dtype=pd.np.float32)
+        df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+        df.sort_index(inplace=True)
+        self.assertTrue(CERO.is_cero(df))
+
+        mv_avg_3(df, ilocs=[1], auto_init=1, auto_post=1, inplace=False) # Only 'B' row is modified
+
+        self.assertTrue(np.allclose(df.iloc[1].values, np.array([10/3, 4.0, 14/3])))
+
 
 if __name__ == '__main__':
     unittest.main()
