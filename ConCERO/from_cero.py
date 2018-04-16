@@ -298,11 +298,13 @@ class FromCERO(dict):
     class _Procedure(dict):
         """_Procedure object class."""
 
-        _sup_procedure_output_types = {'csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg', 'gdx'}
+        _sup_procedure_output_types = {'csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'} # , 'gdx'
 
         def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
 
-            defaults = {} # Add default options here
+            # Add default options here
+            defaults = {"operations": [],
+                        "inputs": []}
 
             if parent is None:
                 parent = {}
@@ -327,10 +329,16 @@ class FromCERO(dict):
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
-            # Identify all inputs
-            expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self.get('inputs', [self["name"]])]
+            if isinstance(self["inputs"], str):
+                self["inputs"] = [self["inputs"]]
+
+            # Determine identifiers for all inputs
+            expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
+            # expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self.get('inputs', [self["name"]])]
             self["inputs"] = list(it.chain(*expanded_inputs))
+
             if "lstrip" in self:
+                # TODO: Move this such that it can accomodate case that all inputs are imported
                 self["inputs"] = [_Identifier.lstrip_identifier(self["lstrip"], inp) for inp in self["inputs"]]
 
             if "outputs" in self:
@@ -347,7 +355,13 @@ class FromCERO(dict):
                     """
 
             try:
-                self.inputs = copy.deepcopy(cero.loc[self["inputs"]]) # Reduce data frame to necessary data and copy
+                if self["inputs"] == []:
+                    # Get entire CERO if inputs is not specified
+                    self["inputs"] = cero.index.tolist()
+                    # self.inputs = copy.deepcopy(
+                    #     cero.loc[self["inputs"]])  # Reduce data frame to necessary data and copy
+                self.inputs = copy.deepcopy(cero.iloc[[cero.index.get_loc(loc) for loc in self["inputs"]]]) # Reduce data frame to necessary data and copy
+                assert issubclass(type(self.inputs), pd.DataFrame)
             except KeyError as e:
                 msg = ("Inputs do not exist. The most likely reason is that the configuration file is " +
                        "incorrectly specified, or lacks specification. If debugging level has been set to " +
@@ -375,16 +389,22 @@ class FromCERO(dict):
                 if ret is not None:
                     raise ValueError(("%s returned a value other than 'None' (when 'None' is expected).") % op["func"])
 
-            if "outputs" in self:
-                if self["outputs"] is None:
-                    # The result of this procedures operations is to be explicitly ignored
-                    return
-                else:
-                    # Select the rows for output
-                    out_df = self.inputs.loc[self["outputs"], :]
-            else:
-                out_df = self.inputs # Otherwise, all inputs
-            assert isinstance(out_df, pd.DataFrame)
+            if "outputs" in self and self["outputs"] is None:
+                # The result of this procedures operations is to be explicitly ignored, may be useful when objective is simply to plot data
+                return
+
+            if self.get("outputs", []) == []:
+                    # Get all rows if none specified
+                    self["outputs"] = self.inputs.index.tolist()
+
+            try:
+                out_df = self.inputs.iloc[[self.inputs.index.get_loc(o) for o in self["outputs"]]]
+            except KeyError as e:
+                print(self["outputs"])
+                print(self.inputs)
+                raise e
+
+            assert issubclass(type(out_df), pd.DataFrame)
 
             if "file" in self:
                 # If file is specified, all 'outputs' from this procedure go to its own file
@@ -541,9 +561,13 @@ class FromCERO(dict):
         CERO.rename_index_values(cero, self.get("map", {}))
 
         self.output_procedures = OrderedDict()
+
         for procedure in self["procedures"]:
 
-            ret = procedure.exec_ops(cero)
+            try:
+                ret = procedure.exec_ops(cero)
+            except Exception as e:
+                raise e.__class__(e.__str__() + " Error in procedure '%s'." % (procedure["name"]))
 
             if ret is None:
                 ret = {}
@@ -560,7 +584,7 @@ class FromCERO(dict):
 
         if self.output_procedures != {}:
             file_ext = os.path.splitext(self["file"])[1][1:]
-            if file_ext in ["csv", "xlsx", "excel", 'png', 'pdf', 'ps', 'eps', 'svg', 'npy']:
+            if file_ext in {"csv", "xlsx", "excel", 'png', 'pdf', 'ps', 'eps', 'svg', 'npy'}:
                 out_df = CERO.combine_ceros(list(self.output_procedures.values()))
                 FromCERO._dataframe_out(out_df, self["file"], output_type=file_ext)
             elif file_ext in FromCERO.sup_output_types:
@@ -751,7 +775,7 @@ class FromCERO(dict):
             FromCERO._csv_out(df, output_file, output_kwargs=output_kwargs)
         elif output_type.lower() in ["xlsx", "excel"]:
             FromCERO.xlsx_out(df, output_file, output_kwargs=output_kwargs)
-        elif output_type.lower() in ["gdx"]:
+        elif output_type.lower() in {"gdx"}:
             FromCERO._gdx_out(df, output_file, output_kwargs=output_kwargs)
         else:
             raise TypeError("Output files of this type cannot be created from dataframes. It will be necessary " + \
@@ -811,26 +835,26 @@ class FromCERO(dict):
 
         # out_obj = copy.deepcopy(out_obj)
 
-        for out_ser, out_df in df.items():
-            try:
-                assert (issubclass(type(out_df), pd.DataFrame))
-            except AssertionError as e:
-                print(out_df)
-                print(type(out_df))
-                raise e
-            libfuncs_wrappers._rename(out_df, out_df.index.values[0], "Value")
-            out_df = out_df.transpose()
-            out_df['Year'] = out_df.index.strftime('%Y') # Convert datetimes to strings
-            df[out_ser] = out_df[['Year', 'Value']] # Reorder
+        # for out_ser, out_df in df.items():
+        try:
+            assert (issubclass(type(df), pd.DataFrame))
+        except AssertionError as e:
+            print(df)
+            print(type(df))
+            raise e
+        libfuncs_wrappers._rename(df, df.index.values[0], "Value")
+        df = df.transpose()
+        df['Year'] = df.index.strftime('%Y') # Convert datetimes to strings
+        df[out_ser] = df[['Year', 'Value']] # Reorder
 
 
         with gdxpds.gdx.GdxFile() as gdxf:
 
-            for out_ser, out_df in df.items():
-                # Create a new set with one dimension
-                gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
-                gdxf[-1].dataframe = out_df
-                gdxf.write(output_file) # Create a new parameter with one dimension
+            # for out_ser, out_df in df.items():
+            # Create a new set with one dimension
+            gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
+            gdxf[-1].dataframe = df
+            gdxf.write(output_file) # Create a new parameter with one dimension
 
         FromCERO._logger.info("Exported to file \'%s\' successfully." % output_file)
 

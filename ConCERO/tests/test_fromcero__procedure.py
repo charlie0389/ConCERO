@@ -146,7 +146,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         os.remove("auto_xlsx_export.xlsx")
 
     def test_output_cero(self):
-        cero = pd.DataFrame.from_dict({("A", 1): [1], ("B", 2): [2], ("C", 3): [3]}, orient='index',
+        cero = pd.DataFrame.from_dict({("A", "1"): [1], ("B", "2"): [2], ("C", "3"): [3]}, orient='index',
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))

@@ -6,14 +6,19 @@ operations:
 export_index: no
 procedures:
   - name: natp0a(Crops)
+    inputs: natp0a(Crops)
     file: natp0a(Crops).npy
   - name: natp0a(SheepCattle)
+    inputs: natp0a(SheepCattle)
     file: natp0a(SheepCattle).npy
   - name: natp0a(OtherAg)
+    inputs: natp0a(OtherAg)
     file: natp0a(OtherAg).npy
   - name: natp0a(DairyCattle)
+    inputs: natp0a(DairyCattle)
     file: natp0a(DairyCattle).npy
   - name: d_gastaxdom
+    inputs: d_gastaxdom
     file: d_gastaxdom.npy
     operations:
       - func: carbon_price
