@@ -292,7 +292,6 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 class FromCERO(dict):
 
     sup_output_types = {'csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
-
     _logger = ConCERO.conf.setup_logger(__name__)
 
     class _Procedure(dict):
@@ -408,7 +407,6 @@ class FromCERO(dict):
 
             if "file" in self:
                 # If file is specified, all 'outputs' from this procedure go to its own file
-                # output_type = procedure.get("type", self.type)
                 output_type = os.path.splitext(self["file"])[1][1:]
                 FromCERO._dataframe_out(out_df, self["file"], output_type, self.get("output_kwargs"))
             else:
