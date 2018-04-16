@@ -373,7 +373,8 @@ class ToCERO(dict):
                         "index_col":0,
                         "time_regex":r".*(\d{4})$",
                         "time_fmt": r"%Y",
-                        "search_paths": []}
+                        "search_paths": [],
+                    "overwrite": False}
 
             if parent is None:
                 parent = {}
@@ -888,7 +889,8 @@ class ToCERO(dict):
             cero = file_obj.import_file_as_cero()
             cero_series.append(cero)
 
-        cero = CERO.combine_ceros(cero_series, overwrite=False)
+        cero = CERO.combine_ceros(cero_series, overwrite=[fo["overwrite"] for fo in self["files"]])
+        # cero = CERO.combine_ceros(cero_series, overwrite=False)
         return cero
 
     @staticmethod

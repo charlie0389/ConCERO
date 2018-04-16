@@ -230,9 +230,16 @@ class CERO(object):
                 except CERO.InvalidCERO as e:
                     raise CERO.InvalidCERO("The '%d'th CERO in the list (zero-indexed) is invalid." % i)
 
+        if isinstance(overwrite, bool):
+            overwrite = [overwrite]*len(ceros)
+
+        # In the case first value is neglected because it is ineffectual...
+        if issubclass(type(overwrite), list) and len(overwrite) == len(ceros) -1:
+            overwrite.insert(0, overwrite[0])
+
         cero = ceros[0]
-        for next_cero in ceros[1:]:
-            if not overwrite:
+        for next_cero, ow in zip(ceros[1:], overwrite[1:]):
+            if not ow:
                 # Check the intersection of indices
                 itsn = cero.index.intersection(next_cero.index)
                 if not itsn.empty:
@@ -241,7 +248,7 @@ class CERO(object):
 
             cero = next_cero.combine_first(cero)
             cero = cero.astype(np.float32, copy=False)
-            # combine_first can output array of different dtypes then inputs. I have not isolated the circumstances \
+            # #TODO: combine_first can output array of different dtypes then inputs. I have not isolated the circumstances \
             # that this occurs however...
 
         if verify_cero:

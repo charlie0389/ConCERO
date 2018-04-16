@@ -115,6 +115,16 @@ class TestToCERO(DefaultTestCase):
         self.assertTrue(CERO.is_cero(cero))
         self.assertTrue(cero.equals(df))
 
+    def test_stitch_time(self):
+
+        tc = ToCERO(TestToCERO._dd + "test_time_stitch.yaml")
+        cero = tc.create_cero()
+
+        fc =ToCERO({"files": [{"file": TestToCERO._dd + "test_time_stitch.xlsx", "sheet": "data_final"}]})
+        fin_cero = fc.create_cero()
+
+        self.assertTrue(cero.equals(fin_cero))
+
 
     # TODO: Write test for time_regex
     # TODO: Write test for time_fmt
