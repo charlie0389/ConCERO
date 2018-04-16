@@ -2,11 +2,8 @@ ref_dir: .
 sets:
   COM:
     - SheepCattle
-    - DairyCattle
-    - OtherAnimals
   ALLSRC:
     - NSW
-    - VIC
   IND:
     - SheepCattle
     - DairyCattle
@@ -15,13 +12,12 @@ sets:
     - NSW
     - VIC
   MARGCOM:
-    - ElecSupply
-    - GasSupply
     - WholeTrade
 procedures:
   - name: MAR1
     inputs:
       - COM,ALLSRC,IND,REGDST,MARGCOM
+    outputs:
     operations:
       - func: replace_har_header_in_file
         har_file: test_har_out.har

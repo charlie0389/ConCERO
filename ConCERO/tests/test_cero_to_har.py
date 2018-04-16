@@ -27,21 +27,19 @@ class TestCERO2HAR(unittest.TestCase):
         shutil.copy2(TestCERO2HAR._dd + "Mdatnew7.har", output_har)
 
         # CERO path
-        dd = os.path.dirname(__file__) + os.sep + "data" + os.sep
-        pickled_cero = dd + r'test_cero_to_har_initdata.pickle'
+        pickled_cero = TestCERO2HAR._dd + r'test_cero_to_har_initdata.pickle'
 
         df = DataTools.get_test_data(pickled_cero)
-        h2c = FromCERO(dd + r'test_cero_to_har.yaml')
+        h2c = FromCERO(TestCERO2HAR._dd + r'test_cero_to_har.yaml')
         h2c.exec_procedures(df)
 
         header = DataTools.get_test_data(output_har, header_name="MAR1")
-        self.assertTrue(np.isclose(header["array"][0, 0, 0, 0, 2, 0], 2.44571))
-        self.assertTrue(np.isclose(header["array"][0, 0, 0, 1, 2, 0], 0.637938))
-        self.assertTrue(np.isclose(header["array"][0, 0, 2, 0, 2, 0], 0.381556))
+        self.assertTrue(np.isclose(header["array"][0, 0, 0, 0, 0, 0], 2.44571))
+        self.assertTrue(np.isclose(header["array"][0, 0, 0, 1, 0, 0], 0.637938))
+        self.assertTrue(np.isclose(header["array"][0, 0, 2, 0, 0, 0], 0.381556))
 
         # Tidy up
         os.remove(output_har)
-        os.remove("output.csv")
 
 
 if script_run:

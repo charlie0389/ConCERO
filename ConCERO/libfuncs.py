@@ -282,19 +282,13 @@ def build_har_obj(df: pd.DataFrame,
     unique_labs = [OrderedDict([(lab, None) for lab in levlabs]) for levlabs in idx.labels]
     reord_labs = [[idx.levels[i][k] for k in unique_labs[i].keys()] for i in range(len(unique_labs))]
     sets = [{"name": name, "dim_desc": labs, "dim_type": "Set"} for (name, labs) in zip(names_of_sets, reord_labs)]
-    # sets = OrderedDict(zip(names_of_sets, reord_labs))
 
+    # Add time dimension
     sets.append({"name": time_dim_name, "dim_desc": df.columns.strftime(time_dim_fmt).tolist(), "dim_type": "Set"})
-    # sets[time_dim_name] = df.columns.strftime(time_dim_fmt).tolist()  # Add time dimension
     new_dims = tuple(len(s["dim_desc"]) for s in sets)
-    # new_dims = tuple(len(x) for x in sets.values())
     header_array = df.values.reshape(new_dims)
-
-    # sets = [set["name"] for set in header_arr_obj["sets"]]
-    # indexTypes = [set["dim_type"] for set in header_arr_obj["sets"]]
-    # Elements = [set["dim_desc"] for set in header_arr_obj["sets"]]
-
     header_kwargs = {'long_name': None, 'coeff_name': coeff_name,}
+
     # Update from arguments given
     for k in header_kwargs:
         if k in kwargs:

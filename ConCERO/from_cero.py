@@ -290,17 +290,13 @@ import ConCERO.libfuncs_wrappers as libfuncs_wrappers
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 class FromCERO(dict):
-
-    sup_output_types = {'csv','npy', 'gdx', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
-    sup_procedure_types = (dict, str)
-
+    sup_output_types = {'csv', 'xlsx', 'excel', 'npy', 'png', 'pdf', 'ps', 'eps', 'svg'}
     _logger = ConCERO.conf.setup_logger(__name__)
 
     class _Procedure(dict):
         """_Procedure object class."""
 
-        _sup_procedure_types = (dict, str)
-        _sup_procedure_output_types = {'csv', 'xlsx', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg', 'gdx'}
+        _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
 
         def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
             super().__init__(procedure_dict, *args, **kwargs)
@@ -354,8 +350,12 @@ class FromCERO(dict):
                     ensures that ``operations`` do not alter ``cero``.
                     """
 
+            if self["inputs"] == []:
+                # Input is entire CERO unless otherwise specified
+                self["inputs"] = cero.index.tolist()
+
             try:
-                self.inputs = copy.deepcopy(cero.loc[self["inputs"]]) # Reduce data frame to necessary data and copy
+                self.inputs = copy.deepcopy(cero.iloc[[cero.index.get_loc(loc) for loc in self["inputs"]]]) # Reduce data frame to necessary data and copy
             except KeyError as e:
                 msg = ("Inputs do not exist. The most likely reason is that the configuration file is " +
                        "incorrectly specified, or lacks specification. If debugging level has been set to " +
@@ -565,10 +565,10 @@ class FromCERO(dict):
 
         if self.output_procedures != {}:
             file_ext = os.path.splitext(self["file"])[1][1:]
-            if file_ext in ["csv", "xlsx", "excel", 'png', 'pdf', 'ps', 'eps', 'svg', 'npy']:
+            if file_ext in FromCERO.sup_output_types:
                 out_df = CERO.combine_ceros(list(self.output_procedures.values()))
                 FromCERO._dataframe_out(out_df, self["file"], output_type=file_ext)
-            elif file_ext in FromCERO.sup_output_types:
+            elif file_ext in FromCERO._Procedure.sup_output_types:
                 raise ValueError("This data type is not supported for general export, because it probably has a more than 2 dimensions - export using 'procedures' instead.")
             else:
                 raise ValueError("Unsupported data type detected for general export.")
