@@ -123,6 +123,8 @@ class CERO(object):
         :return:
         """
 
+        # TODO: Check index contains only valid identifiers
+
         try:
             assert isinstance(obj, pd.DataFrame)
         except AssertionError:

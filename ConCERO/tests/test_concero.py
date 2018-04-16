@@ -43,7 +43,7 @@ class TestConCERO(unittest.TestSuite):
                          TestFromCERO_Procedure,
                          TestMain,
                          TestGTAPE2CERO,
-                         TestCERO2GALLME,
+                         # TestCERO2GALLME,
                          TestCERO2LUTO,
                      ):
             self.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(testcase))

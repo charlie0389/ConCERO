@@ -296,25 +296,21 @@ class FromCERO(dict):
     class _Procedure(dict):
         """_Procedure object class."""
 
-        _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'}
+        _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'} # "gdx"
 
         def __init__(self, procedure_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
-            super().__init__(procedure_dict, *args, **kwargs)
 
-            defaults = {} # Add default options here
+            # Add default options here
+            defaults = {"operations": [],
+                        "inputs": []}
 
             if parent is None:
                 parent = {}
-            self.parent = parent
 
-            for key in parent.keys():
-                if key not in self:
-                    # Inherit if not provided
-                    self[key] = self.parent[key]
+            defaults.update(parent)
+            defaults.update(procedure_dict)
 
-            for key in defaults.keys():
-                if key not in self:
-                    self[key] = defaults[key]
+            super().__init__(defaults, *args, **kwargs)
 
             if self.get("ref_dir") is None:
                 self["ref_dir"] = os.getcwd()
@@ -331,10 +327,16 @@ class FromCERO(dict):
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
-            # Identify all inputs
-            expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self.get('inputs', [self["name"]])]
+            if isinstance(self["inputs"], str):
+                self["inputs"] = [self["inputs"]]
+
+            # Determine identifiers for all inputs
+            expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
+            # expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self.get('inputs', [self["name"]])]
             self["inputs"] = list(it.chain(*expanded_inputs))
+
             if "lstrip" in self:
+                # TODO: Move this such that it can accomodate case that all inputs are imported
                 self["inputs"] = [_Identifier.lstrip_identifier(self["lstrip"], inp) for inp in self["inputs"]]
 
             if "outputs" in self:
@@ -383,16 +385,22 @@ class FromCERO(dict):
                 if ret is not None:
                     raise ValueError(("%s returned a value other than 'None' (when 'None' is expected).") % op["func"])
 
-            if "outputs" in self:
-                if self["outputs"] is None:
-                    # The result of this procedures operations is to be explicitly ignored
-                    return
-                else:
-                    # Select the rows for output
-                    out_df = self.inputs.loc[self["outputs"], :]
-            else:
-                out_df = self.inputs # Otherwise, all inputs
-            assert isinstance(out_df, pd.DataFrame)
+            if "outputs" in self and self["outputs"] is None:
+                # The result of this procedures operations is to be explicitly ignored, may be useful when objective is simply to plot data
+                return
+
+            if self.get("outputs", []) == []:
+                    # Get all rows if none specified
+                    self["outputs"] = self.inputs.index.tolist()
+
+            try:
+                out_df = self.inputs.iloc[[self.inputs.index.get_loc(o) for o in self["outputs"]]]
+            except KeyError as e:
+                print(self["outputs"])
+                print(self.inputs)
+                raise e
+
+            assert issubclass(type(out_df), pd.DataFrame)
 
             if "file" in self:
                 # If file is specified, all 'outputs' from this procedure go to its own file
@@ -501,16 +509,18 @@ class FromCERO(dict):
 
         @staticmethod
         def from_obj(obj, *args, **kwargs):
-            if isinstance(obj, FromCERO._Procedure._sup_procedure_types):
                 # Code to convert procedure to dict type (the superset of supported types)
-                if isinstance(obj, str):
-                    obj = {"name": obj}
-                return FromCERO._Procedure(obj, *args, **kwargs)
-            else:
-                msg = 'Invalid configuration file - procedure is not of valid type. Valid types are: %s.' \
-                      % FromCERO.sup_procedure_types
+            if isinstance(obj, str):
+                obj = {"name": obj}
+            try:
+                assert issubclass(type(obj), dict)
+            except AssertionError:
+                msg = "Object provided can not be converted to a procedure. Objects provided must be a dict, or a subclass of."
                 FromCERO._logger.error(msg)
                 raise TypeError(msg)
+            proc = FromCERO._Procedure(obj, *args, **kwargs)
+            FromCERO._Procedure.is_valid(proc)
+            return proc
 
         def get_filepath(self, filename):
             filename = os.path.relpath(filename)
@@ -546,9 +556,13 @@ class FromCERO(dict):
         CERO.rename_index_values(cero, self.get("map", {}))
 
         self.output_procedures = OrderedDict()
+
         for procedure in self["procedures"]:
 
-            ret = procedure.exec_ops(cero)
+            try:
+                ret = procedure.exec_ops(cero)
+            except Exception as e:
+                raise e.__class__(e.__str__() + " Error in procedure '%s'." % (procedure["name"]))
 
             if ret is None:
                 ret = {}
@@ -756,7 +770,7 @@ class FromCERO(dict):
             FromCERO._csv_out(df, output_file, output_kwargs=output_kwargs)
         elif output_type.lower() in ["xlsx", "excel"]:
             FromCERO.xlsx_out(df, output_file, output_kwargs=output_kwargs)
-        elif output_type.lower() in ["gdx"]:
+        elif output_type.lower() in {"gdx"}:
             FromCERO._gdx_out(df, output_file, output_kwargs=output_kwargs)
         else:
             raise TypeError("Output files of this type cannot be created from dataframes. It will be necessary " + \
@@ -801,27 +815,41 @@ class FromCERO(dict):
         np.save(output_file, obj, **output_kwargs)
 
     @staticmethod
-    def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str):
+    def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str, output_kwargs: dict=None):
+        """
+        Note: output_kwargs is in signature for compatibility with other output functions. output_kwargs could be \
+        implemented but is not currently.
+
+        :param df:
+        :param output_file:
+        :param output_kwargs:
+        :return:
+        """
         if output_file[-4:] != '.gdx':
             output_file += '.gdx' # Add file extension if necessary
 
         # out_obj = copy.deepcopy(out_obj)
 
-        for out_ser, out_df in df.items():
-            assert (isinstance(out_df, pd.DataFrame))
-            libfuncs_wrappers._rename(out_df, out_df.index.values[0], "Value")
-            out_df = out_df.transpose()
-            out_df['Year'] = out_df.index.strftime('%Y') # Convert datetimes to strings
-            df[out_ser] = out_df[['Year', 'Value']] # Reorder
+        # for out_ser, out_df in df.items():
+        try:
+            assert (issubclass(type(df), pd.DataFrame))
+        except AssertionError as e:
+            print(df)
+            print(type(df))
+            raise e
+        libfuncs_wrappers._rename(df, df.index.values[0], "Value")
+        df = df.transpose()
+        df['Year'] = df.index.strftime('%Y') # Convert datetimes to strings
+        df[out_ser] = df[['Year', 'Value']] # Reorder
 
 
         with gdxpds.gdx.GdxFile() as gdxf:
 
-            for out_ser, out_df in df.items():
-                # Create a new set with one dimension
-                gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
-                gdxf[-1].dataframe = out_df
-                gdxf.write(output_file) # Create a new parameter with one dimension
+            # for out_ser, out_df in df.items():
+            # Create a new set with one dimension
+            gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
+            gdxf[-1].dataframe = df
+            gdxf.write(output_file) # Create a new parameter with one dimension
 
         FromCERO._logger.info("Exported to file \'%s\' successfully." % output_file)
 
