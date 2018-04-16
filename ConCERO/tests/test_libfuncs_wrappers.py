@@ -111,6 +111,24 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         self.assertTrue(np.allclose(df.iloc[1].values, np.array([4.0, 4.0, 5.0])))
 
+    def test_series_dropnans(self):
+        """Ensures that NaNs are dropped from a series before a series operation is applied."""
+
+        @libfuncs_wrappers.recursive_op
+        def fibonnaci(prev, next_val):
+            return prev + next_val
+
+        df = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [pd.np.nan, 4, 5], "C": [4, 5, 6]}, orient="index",
+                                    dtype=pd.np.float32)
+        df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+        df.sort_index(inplace=True)
+        self.assertTrue(CERO.is_cero(df))
+
+        fibonnaci(df, ilocs = [1], init = [0.0]) # Only 'B' row is modified
+
+        self.assertTrue(np.allclose(df.iloc[1].values[1:], np.array([4.0, 9.0])))
+        self.assertTrue(all(x == y for (x, y) in zip(df.iloc[1].isna().tolist(), [True, False, False])))
+
 
 if __name__ == '__main__':
     unittest.main()

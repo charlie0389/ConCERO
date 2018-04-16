@@ -353,17 +353,20 @@ def series_op(func):
         :param kwargs: Passed to the encapsulated function as keyword arguments.
         :return: Returns ``df`` with the first data series updated with the result of the encapsulated function.
         """
+
+        # TODO: Relax 1-row constraint - i.e. apply series operation to all rows in dataframe
+
         try:
             assert(df.shape[0] == 1)
         except:
             raise TypeError("Must be single series in pandas.DataFrame.")
-        series = df.iloc[0,:]
-        result = func(series, *args, **kwargs)
+        nans = (~df.iloc[0,:].isna()).tolist()
+        result = func(df.iloc[0, nans], *args, **kwargs)
         try:
             assert(isinstance(result, pd.Series))
         except AssertionError:
             raise TypeError("A \'series_op\' must return pandas.Series object.")
-        df.iloc[0, :] = result
+        df.iloc[0, nans] = result
         # return df
         return None
     return wrapper

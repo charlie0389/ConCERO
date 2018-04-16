@@ -351,24 +351,6 @@ def fillna(df, *args, value=None, method=None, **kwargs):
     else:
         df.fillna(method="ffill", **kwargs)
 
-# @dataframe_op
-# def name_map(df, mapping: dict, *args, **kwargs):
-#
-#     idx_vals = df.index.tolist()
-#
-#     map_key_in_df = [key in idx_vals for key in mapping.keys()]
-#     try:
-#         assert all(map_key_in_df)
-#     except AssertionError:
-#         raise ValueError("Unrecognised mapping key '%s' used." % idx_vals[map_key_in_df.index(False)])
-
-    # try:
-    #     assert set(df.index) == set(mapping.keys())
-    # except AssertionError:
-    #     raise ValueError("The mapping dictionary must specify every a value for every index value.")
-
-    pass
-
 @recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:
     res = prev + prev * inp / 100
