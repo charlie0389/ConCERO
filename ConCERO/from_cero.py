@@ -745,8 +745,6 @@ class FromCERO(dict):
         try:
             test_file = os.path.join(os.path.dirname(file), ".write_test.tmp")
             fp = open(test_file, "w")
-            fp.close()
-            os.remove(test_file)
         except PermissionError:
             msg = "User '%s' does not have write permissions in directory '%s'." % (getpass.getuser(),
                                                                                     os.path.dirname(file["file"]))
@@ -755,6 +753,9 @@ class FromCERO(dict):
                 raise PermissionError(msg)
             print(msg)
             return False
+        finally:
+            fp.close()
+            os.remove(test_file)
         return True
 
     @staticmethod
@@ -762,13 +763,8 @@ class FromCERO(dict):
         """Copies each data series in ``cero`` indexed by the items in ``inp_list`` to an ``OrderedDict``. This \
         ensures that ``operations`` do not alter ``cero``.
         """
-        # Reduce data frame to necessary data and copy
-        # FromCERO._logger.debug("Input list: ")
-        # FromCERO._logger.debug(inp_list)
-        # FromCERO._logger.debug("CERO:")
-        # FromCERO._logger.debug(cero)
-        # FromCERO._logger.debug(cero.index.values)
         try:
+            # Reduce data frame to necessary data and copy
             return copy.deepcopy(cero.loc[inp_list])
         except KeyError as e:
             msg = ("Inputs do not exist. The most likely reason is that the configuration file is " +
@@ -780,8 +776,6 @@ class FromCERO(dict):
                     " 3. Incorrect ordering of sets in the identifier."
             )
             FromCERO._logger.error(msg)
-            # FromCERO._logger.debug("Inputs: %s" % inp_list)
-            # FromCERO._logger.debug("Index: %s" % cero.index.values)
             raise KeyError(msg)
 
     @staticmethod

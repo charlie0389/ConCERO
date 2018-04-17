@@ -90,7 +90,26 @@ class TestFromCERO(DefaultTestCase):
                      ("I", "3")]
         self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
 
+        tc = ToCERO({"files": [{"file": "test_fromcero_complexmapping2.xlsx",
+                                "sheet": "CERO",
+                                "index_col": [0, 1]}]})
+        df1 = tc.create_cero()
+        test_list = list(range(1, 10))
+        df1_vals = [x[0] for x in df1.values.tolist()]
+        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_list, df1_vals)]))
+        test_list = [("A", "G"),
+                     ("A", "H"),
+                     ("A", "I"),
+                     ("B", "G"),
+                     ("B", "H"),
+                     ("B", "I"),
+                     ("C", "G"),
+                     ("C", "H"),
+                     ("C", "I")]
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
+
         os.remove("test_fromcero_complexmapping1.xlsx")
+        os.remove("test_fromcero_complexmapping2.xlsx")
 
 
 

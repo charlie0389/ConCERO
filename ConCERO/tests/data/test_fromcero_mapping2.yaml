@@ -23,11 +23,13 @@ procedures:
     file: test_fromcero_complexmapping1.xlsx
     output_kwargs:
       tupleize_cols: True
-#  - name: multi_set_test2
-#    inputs:
-#      - A_SET,C_SET
-#    map:
-#      - orig: C_SET
-#        new: B_SET
-#        idx: 1
-#    file: test_fromcero_complexmapping2.csv
+  - name: multi_set_test2
+    inputs:
+      - A_SET,C_SET
+    map:
+      - orig: C_SET
+        new: B_SET
+        idx: 1
+    file: test_fromcero_complexmapping2.xlsx
+    output_kwargs:
+      tupleize_cols: True
