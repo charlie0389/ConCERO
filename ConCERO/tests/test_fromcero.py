@@ -94,17 +94,5 @@ class TestFromCERO(DefaultTestCase):
 
 
 
-    # def test_csv_out(self):
-    #
-    #     cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3], "D": [4], "E": [5], "F": [6], }, orient='index',
-    #                                   dtype=pd.np.float32)
-    #     cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-    #     self.assertTrue(CERO.is_cero(cero))
-    #
-    #     fc = FromCERO(TestFromCERO._dd + "test_fromcero_mapping.yaml")
-    #     fc.exec_procedures(cero)
-
-
-
 if script_run:
     unittest.main()
