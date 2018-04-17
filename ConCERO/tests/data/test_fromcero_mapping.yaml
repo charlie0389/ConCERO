@@ -4,10 +4,14 @@ sets:
     - A
     - B
     - C
-map:
-  D: G
-  E: H
-  F: I
+  B_SET:
+    - G
+    - H
+    - I
+  C_SET:
+    - D
+    - E
+    - F
 procedures:
   - name: A_SET_TEST
     inputs:
@@ -15,7 +19,9 @@ procedures:
     file: test_fromcero_mapping1.csv
   - name: RENAME_MAPPING_TEST
     inputs:
-      - G
-      - H
-      - I
+      - C_SET
+    map:
+      - orig: C_SET
+        new: B_SET
+        idx: 0
     file: test_fromcero_mapping2.csv

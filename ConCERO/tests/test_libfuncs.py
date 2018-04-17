@@ -80,8 +80,10 @@ class TestLibfuncs(DefaultTestCase):
 
         test_list = ["a", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
         test_vals = [6, 2, 3, 4, 5]
+        # print(cero)
+        self.assertTrue(
+        all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
         self.assertTrue(all([x==y for (x,y)  in zip(test_list, cero.index.tolist())]))
-        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
 
         tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
                                 "sheet": "groupby",

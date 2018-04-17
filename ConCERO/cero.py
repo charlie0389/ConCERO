@@ -257,15 +257,22 @@ class CERO(object):
         return cero
 
     @staticmethod
-    def rename_index_values(cero: pd.DataFrame, map_dict: dict, inplace: bool=True):
+    def rename_index_values(cero: pd.DataFrame, map_dict: dict, inplace: bool=True, idx: "Union[int, List[int]]"=None):
         """
-        :param cero: The CERO object to rename the index values of.
+        :param cero: The CERO object to rename the index values of. The order of the CERO.index imposes order on the mapping operation - that is, the CERO retains its original order.
         :param map_dict: An `OrderedDict` where the keys are values of the old
         :return:
         """
 
         if not issubclass(type(map_dict), dict):
             raise TypeError("The mapping dictionary must be a subclass of dict.")
+
+        # def f(x): # Copied from within pandas.core.generic.rename()
+        #     if idx is None:
+        #         return _Identifier.tupleize_name(map_dict[x])
+        #     elif isinstance(idx, int) and (not isinstance(x, str)) and (x[idx] in map_dict):
+        #         return _Identifier.tupleize_name(x[:idx] + (map_dict[x[idx]],) + x[idx+1:])
+        #     return _Identifier.tupleize_name(x)
 
         def f(x): # Copied from within pandas.core.generic.rename()
             if x in map_dict:
@@ -278,7 +285,9 @@ class CERO(object):
             cero = cero.copy(deep=False)
             ret = cero
 
+        # print("cero.index: ", cero.index)
         cero.index = CERO._transform_index(cero.index, f, tupleize_cols=False)
+        # print("cero.index: ", cero.index)
 
         return ret
 

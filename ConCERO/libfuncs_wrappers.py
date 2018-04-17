@@ -367,7 +367,6 @@ def series_op(func):
         except AssertionError:
             raise TypeError("A \'series_op\' must return pandas.Series object.")
         df.iloc[0, nans] = result
-        # return df
         return None
     return wrapper
 

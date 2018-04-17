@@ -51,6 +51,47 @@ class TestFromCERO(DefaultTestCase):
         os.remove("test_fromcero_mapping1.csv")
         os.remove("test_fromcero_mapping2.csv")
 
+    def test_sets_and_mapping2(self):
+
+        cero = pd.DataFrame.from_dict({("A", "1"): [1],
+                                       ("A", "2"): [2],
+                                       ("A", "3"): [3],
+                                       ("B", "1"): [4],
+                                       ("B", "2"): [5],
+                                       ("B", "3"): [6],
+                                       ("C", "1"): [7],
+                                       ("C", "2"): [8],
+                                       ("C", "3"): [9],
+                                       },
+                                      orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+        self.assertTrue(CERO.is_cero(cero))
+
+        fc = FromCERO(TestFromCERO._dd + "test_fromcero_mapping2.yaml")
+        fc.exec_procedures(cero)
+
+        tc = ToCERO({"files": [{"file": "test_fromcero_complexmapping1.xlsx",
+                                "sheet": "CERO",
+                                 "index_col":[0, 1]}]})
+        df1 = tc.create_cero()
+        test_list = list(range(1,10))
+        df1_vals = [x[0] for x in df1.values.tolist()]
+        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_list, df1_vals)]))
+        test_list = [("G", "1"),
+                     ("G", "2"),
+                     ("G", "3"),
+                     ("H", "1"),
+                     ("H", "2"),
+                     ("H", "3"),
+                     ("I", "1"),
+                     ("I", "2"),
+                     ("I", "3")]
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
+
+        os.remove("test_fromcero_complexmapping1.xlsx")
+
 
 
     # def test_csv_out(self):

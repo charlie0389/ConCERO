@@ -311,6 +311,10 @@ class FromCERO(dict):
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
+            # Ensure sets are in string form
+            for k, v in self.get("sets", {}).items():
+                self["sets"][k] = [val for val in v]
+
             # Determine identifiers for all inputs
             expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
             self["inputs"] = list(it.chain(*expanded_inputs))
@@ -325,7 +329,9 @@ class FromCERO(dict):
             # Add default options here
             defaults = {"operations": [],
                         "inputs": [],
-                        "ref_dir": None}
+                        "ref_dir": None,
+                        "sets": {},
+                        "map": {}}
 
             if parent is None:
                 parent = {}
@@ -358,7 +364,6 @@ class FromCERO(dict):
             """Copies each data series in ``cero`` indexed by the items in ``inp_list`` to an ``OrderedDict``. This \
                     ensures that ``operations`` do not alter ``cero``.
                     """
-
             if self["inputs"] == []:
                 # Input is entire CERO unless otherwise specified
                 self["inputs"] = cero.index.tolist()
@@ -377,6 +382,25 @@ class FromCERO(dict):
                 FromCERO._logger.error(msg)
                 raise KeyError(msg)
             assert (isinstance(self.inputs, pd.DataFrame))
+
+            map_dict = {}
+            for map_op in self.get("map", []):
+
+                idx = map_op.get("idx")
+                orig_s = self["sets"][map_op["orig"]]
+                ns = self["sets"][map_op["new"]]
+
+                for val in self.inputs.index.values:
+
+                    new_val = val
+
+                    if idx is not None and (val[idx] in orig_s) and (not isinstance(val, str)):
+                        new_val = val[:idx] + (ns[orig_s.index(val[idx])],) + val[idx+1:]
+                    elif val in orig_s:
+                        new_val = ns[orig_s.index(val)]
+
+                    map_dict.update({val: new_val})
+                CERO.rename_index_values(self.inputs, map_dict, inplace=True)
 
         def exec_ops(self, cero):
             """
@@ -400,12 +424,7 @@ class FromCERO(dict):
                     # Get all rows if none specified
                     self["outputs"] = self.inputs.index.tolist()
 
-            try:
-                out_df = self.inputs.iloc[[self.inputs.index.get_loc(o) for o in self["outputs"]]]
-            except KeyError as e:
-                print(self["outputs"])
-                print(self.inputs)
-                raise e
+            out_df = self.inputs.iloc[[self.inputs.index.get_loc(o) for o in self["outputs"]]]
 
             assert issubclass(type(out_df), pd.DataFrame)
 
@@ -614,7 +633,7 @@ class FromCERO(dict):
 
         _conf = {"operations": [],
                  "file": "output.csv",
-                 "sets": [],
+                 "sets": {},
                  "map": {},
                  "ref_dir": None, # Type: str
                  "procedures": []}  # Defaults
@@ -804,13 +823,16 @@ class FromCERO(dict):
             return
 
         defaults = {"columns": df.columns.strftime("%Y"),
-                    "sheet_name": "CERO"}
+                    "sheet_name": "CERO",
+                    "tupleize_cols": False}
 
         # Update with given arguments
         if output_kwargs is None:
             output_kwargs = {}
         defaults.update(output_kwargs)
         output_kwargs = defaults
+
+        df.index = pd.Index(df.index.tolist(), tupleize_cols=defaults.pop("tupleize_cols")) # Convert to multi-index for nice formatting
 
         df.to_excel(output_file, **output_kwargs)
 

@@ -400,9 +400,12 @@ def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: 
         # Rename row
         rename_dict.update({row_loc: _Identifier.keep_only_fields(key[0], row_loc)})
 
+    # print("rename_dict: ", rename_dict)
     CERO.rename_index_values(df, rename_dict, inplace=True)
 
-
+@dataframe_op
+def map_index(df, orig: list, new: list= None, idx: int=0):
+    pass
 
 @recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:
