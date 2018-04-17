@@ -122,6 +122,8 @@ if getattr(conf, "harpy_installed", False):
     import harpy
 
 from ConCERO.libfuncs_wrappers import dataframe_op, series_op, recursive_op
+from ConCERO._identifier import _Identifier
+from ConCERO.cero import CERO
 
 seaborn.set() # Necessary from version 0.8.1 onwards to import colour palette
 
@@ -358,6 +360,49 @@ def apply_func(df, *args, numpy_func: str=None, **kwargs):
     defaults.update(kwargs)
 
     df.loc[:,:] = df.apply(getattr(np, numpy_func), **kwargs)
+
+@dataframe_op
+def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: str=None, **kwargs):
+
+    # TODO: Expand support to include multiple tuple fields as keys
+
+    if key is None:
+        raise TypeError("'key' must be provided to 'groupby' function as either an int or list of ints.")
+    elif key is not issubclass(type(key), list):
+        key = [key]
+
+    defaults = {"axis": 0,
+                "sort": False,
+                "group_keys": False}
+    defaults.update(kwargs)
+
+    m_ids = [match]
+    if match is None:
+        m_ids = _Identifier.unique_id_fields(df.index.values, key=key)
+
+
+    rename_dict = {}
+    for m in m_ids:
+
+        # Create func that identifies rows for grouping
+        def f(x):
+            # for k in key:
+            #     if x[k] != m[k]
+            return x[key[0]] == m
+
+        # Groupby and apply aggregation function
+        agg_df = df.groupby(by=f, **defaults).agg(agg)
+
+        # Put aggregated calculation in first row that meets the condition
+        row_loc = next(x for x in df.index.values if f(x))
+        df.iloc[df.index.get_loc(row_loc)] = agg_df.loc[True]
+
+        # Rename row
+        rename_dict.update({row_loc: _Identifier.keep_only_fields(key[0], row_loc)})
+
+    CERO.rename_index_values(df, rename_dict, inplace=True)
+
+
 
 @recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:

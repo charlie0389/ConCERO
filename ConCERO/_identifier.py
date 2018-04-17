@@ -83,3 +83,46 @@ class _Identifier(object):
             ident = tuple([x for x in ident[1:]])
 
         return _Identifier.tupleize_name(ident)
+
+    @staticmethod
+    def keep_only_fields(field_no: "Union[int, List[int]]",
+                         idents: "Union[tuple, List[tuple]]") -> "List[Union[str,tuple]]":
+
+        if not isinstance(idents, list):
+            idents = [idents]
+        if not issubclass(type(field_no), list):
+            field_no = [field_no]
+
+        if any([isinstance(id, str) for id in idents]):
+            raise TypeError("Cannot remove any fields from identifier that has only 1 field (%s)." % idents)
+
+        try:
+            idents = [_Identifier.tupleize_name(tuple([id[f] for f in field_no])) for id in idents]
+        except TypeError as e:
+            raise e
+
+        return _Identifier.tupleize_name(idents)
+
+    @staticmethod
+    def remove_id_field(field_no: int, idents: "Union[tuple, List[tuple]]") -> tuple:
+
+        if not isinstance(idents, list):
+            idents = [idents]
+
+        if any([isinstance(id, str) for id in idents]):
+            raise TypeError("Cannot remove field from identsifier that has only 1 field (%s)." % idents)
+
+        try:
+            idents = [_Identifier.tupleize_name(id[:field_no] + id[field_no+1:]) for id in idents]
+        except TypeError as e:
+            raise e
+
+        return _Identifier.tupleize_name(idents)
+
+    @staticmethod
+    def unique_id_fields(idents: list, key: int=None):
+
+        if key is not None:
+            idents = [id[key] for id in idents if issubclass(type(id), tuple)]
+
+        return list(set(idents))

@@ -5,16 +5,21 @@ Created on Feb 07 18:06:25 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 import unittest
+import os
 
 import pandas as pd
+import numpy as np
 
 import ConCERO.libfuncs as libfuncs
 from ConCERO.cero import CERO
+from ConCERO.to_cero import ToCERO
 from ConCERO.tests.data_tools import DefaultTestCase
 
 
 class TestLibfuncs(DefaultTestCase):
     '''Tests libfuncs methods.'''
+
+    _dd = os.path.join(os.path.dirname(__file__), "data", "")
 
     def test_libfuncs(self):
         '''Tests a scenario run.'''
@@ -60,6 +65,36 @@ class TestLibfuncs(DefaultTestCase):
         test_df.sort_index(inplace=True)
 
         self.assertTrue(df.equals(test_df))
+
+    def test_groupby_and_aggregate(self):
+        """ Dependent on ToCERO being functional.
+
+        :return:
+        """
+
+        tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
+                                "sheet": "groupby",
+                                "index_col": [0,1]}]})
+        cero = tc.create_cero()
+        libfuncs.groupby(cero, key=0, match="a", agg="sum")
+
+        test_list = ["a", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
+        test_vals = [6, 2, 3, 4, 5]
+        self.assertTrue(all([x==y for (x,y)  in zip(test_list, cero.index.tolist())]))
+        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+
+        tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
+                                "sheet": "groupby",
+                                "index_col": [0, 1]}]})
+        cero = tc.create_cero()
+        libfuncs.groupby(cero, key=1, match="b", agg="mean")
+
+        test_list = ["b", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
+        test_vals = [3.3333333333, 2, 3, 4, 5]
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
+        self.assertTrue(
+            all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+
 
 if __name__ == '__main__':
     unittest.main()
