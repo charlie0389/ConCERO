@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libfuncs_wrappers &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for libfuncs_wrappers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes of User-Specified Functions for operating on CEROs</span>
+<span class="sd">==========================================================</span>
+
+<span class="sd">The set of functions that *could* be applied to the CERO, and data series within the CERO, is infinitely large, \</span>
+<span class="sd">so it is obviously impossible to provide all these functions. It is therefore necessary that the user provide \</span>
+<span class="sd">functions as they are needed, by writing the appropriate python 3 code and including this function in ``libfuncs.py``. \</span>
+<span class="sd">To minimise the difficulty and complexity of achieving this, ConCERO includes 3 classes of *wrapper functions*, that \</span>
+<span class="sd">significantly reduce the difficulty for the user in extending the power of ``FromCERO``.</span>
+
+<span class="sd">A *wrapper function* is a function that encapsulates another function, and therefore has access to both the inputs \</span>
+<span class="sd">and outputs of the encapsulated function. Because the wrapper function has access to the inputs, it can provide \</span>
+<span class="sd">pre-processing on the input to reshape it into a specific form, and because it has access to the output of the \</span>
+<span class="sd">function, it can post-process the output of the function - mutating it into a desirable form.</span>
+
+<span class="sd">A wrapper function can be directed to encapsulate a function by preceding the function with a *decorator*. A \</span>
+<span class="sd">*decorator* is a simple one line statement that starts with the &#39;\@&#39; symbol and then the name of the wrapper \</span>
+<span class="sd">function. For example, to encapsulate ``func`` with the ``dataframe_op`` wrapper, the code is:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @dataframe_op</span>
+<span class="sd">    def func(*args, **kwargs):</span>
+<span class="sd">        ...</span>
+<span class="sd">        return None</span>
+
+
+<span class="sd">The wrapper functions themselves are stored in  the ``libfuncs_wrappers`` module, but the wrappers themselves should \</span>
+<span class="sd">*never* be altered by the user.</span>
+
+<span class="sd">What the 3 classes of wrappers are, and how to apply the function wrappers, are explained below, in addition to the \</span>
+<span class="sd">case where no wrapper/decorator is provided.</span>
+
+<span class="sd">Class 1 Functions - DataFrame Operations</span>
+<span class="sd">----------------------------------------</span>
+
+<span class="sd">Class 1 functions are the most general type of wrapper functions, and can be considered a superset of the other two. \</span>
+<span class="sd">Class 1 functions operate on a ``pandas.DataFrame`` object, and therefore can operate on an entire CERO if need be. \</span>
+<span class="sd">A class 1 function must have the following function signature:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @dataframe_op</span>
+<span class="sd">    def func_name(df, *args, **kwargs):</span>
+<span class="sd">        ...</span>
+<span class="sd">        return None</span>
+
+<span class="sd">Note the following key features:</span>
+
+<span class="sd">    * The function is proceeded by the @dataframe_op &#39;decorator&#39; (imported from ``libfuncs_wrappers``).</span>
+<span class="sd">    * The first argument provided to ``func_name`` - ``df`` - will be a CERO (an instance of a pandas.DataFrame), \</span>
+<span class="sd">    reduced by the ``arrays``/``inputs`` options.</span>
+<span class="sd">    * No parameters are to be returned (technically, the last line could be omitted).</span>
+
+<span class="sd">**What is not clear from the function definition above** is the **requirement** that all operations on \</span>
+<span class="sd">``df`` must occur inplace. In other words, all mutations/operations not applied to ``df`` will be ignored. \</span>
+<span class="sd">Note that if this constraint is violated, no exceptions/errors will be raised as it is impossible to detect this \</span>
+<span class="sd">&#39;failure to understand intention&#39;. As a rule of thumb, this can nearly always be achieved by restricting \</span>
+<span class="sd">operations to the types:</span>
+
+<span class="sd">    * ``df.loc[...] = ...``,</span>
+<span class="sd">    * ``df.iloc[...] = ...``, or</span>
+<span class="sd">    * ``df.func(*args, inplace=True, **kwargs)``.</span>
+
+<span class="sd">It is highly recommended to consult ``pandas`` documentation \</span>
+<span class="sd">(e.g. `&lt;https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy&gt;`_) and \</span>
+<span class="sd">``StackOverflow`` to develop a better understanding of what ``inplace`` operations are.</span>
+
+<span class="sd">The ``libfuncs`` function ``merge`` provides a simple example of how to apply this wrapper:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @dataframe_op</span>
+<span class="sd">    def merge(df, *args, **kwargs):</span>
+<span class="sd">        df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series</span>
+<span class="sd">        return</span>
+
+<span class="sd">Class 2 Functions - Series Operations</span>
+<span class="sd">-------------------------------------</span>
+
+<span class="sd">Class 2 functions operate on a single ``pandas.Series`` object - note that a single row of a ``pandas.DataFrame`` is \</span>
+<span class="sd">an instance of a ``pandas.Series``. The series operations class can be considered a subset of DataFrame operations, \</span>
+<span class="sd">and a superset of all recursive operations (discussed below).</span>
+
+<span class="sd">Similar to class 1 functions, class 2 functions must fit the form:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @series_op</span>
+<span class="sd">    def func(series, *args, **kwargs):</span>
+<span class="sd">        ...</span>
+<span class="sd">        return pandas_series</span>
+
+<span class="sd">With similar features:</span>
+
+<span class="sd">    * The function is proceeded by the @series_op wrapper (imported from ``libfuncs_wrappers``).</span>
+<span class="sd">    * The first argument (``series``) must be of pandas.Series type.</span>
+
+<span class="sd">However, *dissimilar to class 1 functions*, class 2 functions must:</span>
+
+<span class="sd">    * Return an object of ``pandas.Series`` type (``pandas_series``). ``pandas_series`` must be of the \</span>
+<span class="sd">    same ``shape`` as ``series``.</span>
+
+<span class="sd">Class 3 Functions - Recursive Operations</span>
+<span class="sd">----------------------------------------</span>
+
+<span class="sd">Recursive operations must fit the form:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @recursive_op</span>
+<span class="sd">    def func(*args, **kwargs):</span>
+<span class="sd">        ...</span>
+<span class="sd">        return calc</span>
+
+<span class="sd">Noting that:</span>
+
+<span class="sd">    * Positional arguments are provided in the same order as their sequence in the data series.</span>
+<span class="sd">    * The return value ``calc`` must be a single floating-point value.</span>
+
+<span class="sd">Note that options can be provided to an operation object to alter the behaviour of the recursive operation. Those \</span>
+<span class="sd">options are:</span>
+
+<span class="sd">    * ``init: list(float)`` - values that precede the data series that serve as initialisation values.</span>
+<span class="sd">    * ``post: list(float)`` - values that follow the data series for non-causal recursive functions.</span>
+<span class="sd">    * ``inplace: bool`` - If ``True``, then the recursive operation will be applied on the array \</span>
+<span class="sd">        inplace, such that the result from a previous iteration is used in subsequent \</span>
+<span class="sd">        iterations. If ``False``, the operation proceeds ignorant of the results of \</span>
+<span class="sd">        previous iterations. ``True`` by default.</span>
+
+<span class="sd">How these items are to be applied is probably best explained with an example - consider the recursive operation is \</span>
+<span class="sd">a 3 sample moving point averaging filter. This can be implemented by including ``mv_avg_3()`` (below) in \</span>
+<span class="sd">``libfuncs.py``:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    @recursive_op</span>
+<span class="sd">    def mv_avg_3(a, b, c):</span>
+<span class="sd">        return (a + b + c)/3</span>
+
+<span class="sd">It is also necessary to provide the arguments, ``init`` and ``post`` in the configuration file, so the operation \</span>
+<span class="sd">object looks somthing like:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    func: mv_avg_3</span>
+<span class="sd">    init:</span>
+<span class="sd">        - 1</span>
+<span class="sd">    post:</span>
+<span class="sd">        - 2</span>
+
+<span class="sd">This operation would transform the data series ``[2, 1, 3]`` to the values \</span>
+<span class="sd">``[1.3333, 1.7777, 2.2593]`` - i.e. ``[(1+2+1)/3, (1.333+1+3)/3, (1.7777+3+2)/3]``. If, instead, the configuration \</span>
+<span class="sd">file looks like:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    func: mv_avg_3</span>
+<span class="sd">    init:</span>
+<span class="sd">        - 1</span>
+<span class="sd">    post:</span>
+<span class="sd">        - 2</span>
+<span class="sd">    inplace: False</span>
+
+<span class="sd">Then the output of the same series would be ``[1.3333, 2, 2]`` - that is, ``[(1+2+1)/3, (2+1+3)/3, (1+3+2)/3]``.</span>
+
+<span class="sd">Wrapper-less Functions</span>
+<span class="sd">----------------------</span>
+
+<span class="sd">A function that is defined in ``libfuncs`` can be accessed by ``FromCERO``, though there are some constraints \</span>
+<span class="sd">necessary to enable ``FromCERO`` to act in a programmatic way. A function (in ``libfuncs.py``) *that is called upon \</span>
+<span class="sd">by* ``FromCERO`` must have the following function signature:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    def plotdf(df, *args, locs=None, **kwargs):</span>
+<span class="sd">        ...</span>
+<span class="sd">        return None</span>
+
+<span class="sd">Where ``df`` is the entire CERO provided to the calling class (so is therefore of ``pandas.DataFrame`` type), and \</span>
+<span class="sd">``locs``, if provided, is a list of all identifiers specifying which series of the CERO have been specified.</span>
+
+<span class="sd">**Note that any changes made to** ``df`` **will be applied in the calling class (i.e. the** ``FromCERO`` **class).**</span>
+
+<span class="sd">Use of wrapper-less functions for use with ``FromCERO`` is **not recommended**, though if it is none-the-less \</span>
+<span class="sd">desirable, ``libfuncs.plotdf()`` serves as an example.</span>
+
+<span class="sd">Other Notes</span>
+<span class="sd">-----------</span>
+
+<span class="sd">    * Avoid trying to create a renaming function - use ``libfuncs._rename`` - it has been designed to work \</span>
+<span class="sd">    around a bug in Pandas (Issue #19497).</span>
+<span class="sd">    * ``libfuncs`` also serves as a source of examples for how to use the function wrappers.</span>
+
+<span class="sd">Technical Specifications of Decorators</span>
+<span class="sd">--------------------------------------</span>
+
+<span class="sd">.. autofunction:: dataframe_op</span>
+<span class="sd">.. autofunction:: series_op</span>
+<span class="sd">.. autofunction:: recursive_op</span>
+<span class="sd">.. autofunction:: log_func</span>
+
+<span class="sd">Created on Thu Dec 21 16:36:02 2017</span>
+
+<span class="sd">@author: Lyle Collins</span>
+<span class="sd">@email: Lyle.Collins@csiro.au</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">concero.conf</span> <span class="k">as</span> <span class="nn">conf</span>
+<span class="kn">from</span> <span class="nn">concero._identifier</span> <span class="k">import</span> <span class="n">_Identifier</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="log_func"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.log_func">[docs]</a><span class="k">def</span> <span class="nf">log_func</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Logging decorator - for debugging purposes. To apply to function ``func``:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @log_func</span>
+<span class="sd">        def func(*args, **kwargs):</span>
+<span class="sd">            ...</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Returned: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">result</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+<div class="viewcode-block" id="dataframe_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.dataframe_op">[docs]</a><span class="k">def</span> <span class="nf">dataframe_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This decorator is designed to provide ``func`` (the encapsulated function) with a restricted form \</span>
+<span class="sd">    of ``df`` (a CERO). A \</span>
+<span class="sd">    *restricted* ``df`` is the original ``df`` limited to a subset of rows and/or columns. All of the key-word \</span>
+<span class="sd">    arguments, with the exception of ``rename``, define the restriction. Note that a restriction on ``df.columns`` \</span>
+<span class="sd">    will be *compact*, but this is not necessarily the case for restriction on ``df.index``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                <span class="n">locs</span><span class="p">:</span> <span class="s2">&quot;List[Union[tuple, str]]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">ilocs</span><span class="p">:</span> <span class="s2">&quot;List[int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">start_year</span><span class="p">:</span> <span class="s2">&quot;Union[pd.datetime, int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">end_year</span><span class="p">:</span> <span class="s2">&quot;Union[pd.datetime, int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">rename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param df: An CERO, which may or may not be a strict superset of data to perform the operation on.</span>
+<span class="sd">        :param args: Passed to the encapsulated function as positional arguments, immediately after the restricted \</span>
+<span class="sd">        ``df``.</span>
+<span class="sd">        :param locs: ``locs``, if provided, must be a list of identifiers that correspond to values of ``df.index``. \</span>
+<span class="sd">        It is ``df``, reduced to these specific indices, that a wrapped function will receive as an argument. An \</span>
+<span class="sd">        error is raised if both ``locs`` and ``ilocs`` is specified.</span>
+<span class="sd">        :param ilocs: Identical in nature to ``locs``, though instead a list of integers (zero-indexed) is \</span>
+<span class="sd">        provided (corresponding to the row number of ``df``). An \</span>
+<span class="sd">        error is raised if both ``locs`` and ``ilocs`` is specified.</span>
+<span class="sd">        :param start_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \</span>
+<span class="sd">        ``start_year`` restricts the CERO to years after *and including* ``start_year``.</span>
+<span class="sd">        :param end_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \</span>
+<span class="sd">        ``end_year`` restricts the CERO to years before, *but excluding* ``end_year``.</span>
+<span class="sd">        :param rename: The first data series of ``df`` (&#39;first&#39; is defined by ``locs`` or ``ilocs``) can be \</span>
+<span class="sd">        renamed by providing this argument. ``rename`` alters the original ``df``, after the encapsulated \</span>
+<span class="sd">        function has been executed.</span>
+<span class="sd">        :param kwargs: Keyword arguments to be passed to the encapsulated function.</span>
+<span class="sd">        :return: The return value of the encapsulated function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;First function argument must be of pandas.DataFrame type.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert integer to datetime type</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start_year</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">start_year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">start_year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end_year</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">end_year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">end_year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Get index locations</span>
+        <span class="k">if</span> <span class="n">start_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_year</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">start_year</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end_year</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">end_year</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">locs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ilocs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Only one of &#39;locs&#39; or &#39;ilocs&#39; can be provided (not both).&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">locs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ilocs</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">locs</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ilocs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ilocs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">IndexSlice</span><span class="p">[</span><span class="mi">0</span><span class="p">:]</span>
+
+        <span class="n">df_cp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ilocs</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span><span class="n">end_year</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># df_cp is always different object to df</span>
+        <span class="n">df_cp_idx</span> <span class="o">=</span> <span class="n">df_cp</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">df_cp</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">df_cp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">df_cp_idx</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">df_cp</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+            <span class="c1"># Index has been altered in operation</span>
+            <span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">old_names</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ilocs</span><span class="p">],</span>
+                        <span class="n">new_names</span><span class="o">=</span><span class="n">df_cp</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+                    <span class="n">old_names</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ilocs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">new_names</span><span class="o">=</span><span class="n">rename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<span class="k">def</span> <span class="nf">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">old_names</span><span class="p">:</span> <span class="s2">&quot;Union[List[Union[tuple, str]], tuple, str]&quot;</span><span class="p">,</span>
+            <span class="n">new_names</span><span class="p">:</span> <span class="s2">&quot;Union[List[Union[tuple, str]], tuple, str]&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;If list provided for ``old_names`` and ``new_names``, must be of equal length. This method is an \</span>
+<span class="sd">    obtuse way to do this in comparison to `rename` method, but pandas has a bug that this method is designed to \</span>
+<span class="sd">    work around... (GitHub pandas issue #19497)&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_names</span><span class="p">,(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">old_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">old_names</span><span class="p">]</span>
+        <span class="n">new_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_names</span><span class="p">]</span>
+
+    <span class="n">old_index_name</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">old_names</span><span class="p">,</span> <span class="n">new_names</span><span class="p">):</span>
+        <span class="n">labels</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">old_name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span>
+        <span class="c1"># The line below *should* work when the bug is fixed (obviously untested)</span>
+        <span class="c1"># df.rename({old_name: new_name}, axis=&quot;index&quot;, inplace=True)</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">old_index_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="series_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.series_op">[docs]</a><span class="k">def</span> <span class="nf">series_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This decorator provides ``func`` (the encapsulated function) with the first ``pandas.Series`` \</span>
+<span class="sd">    in a ``pandas.DataFrame`` (i.e. the first row in ``df``). Note that this wrapper is encapsulated within \</span>
+<span class="sd">    the ``dataframe_op`` wrapper.&quot;&quot;&quot;</span>
+
+    <span class="nd">@dataframe_op</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param df: A dataframe with a single row. ``df`` must be of CERO type.</span>
+<span class="sd">        :param args: Passed to the encapsulated function as positional arguments immediately after the \</span>
+<span class="sd">        ``pandas.Series`` object.</span>
+<span class="sd">        :param kwargs: Passed to the encapsulated function as keyword arguments.</span>
+<span class="sd">        :return: Returns ``df`` with the first data series updated with the result of the encapsulated function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: Relax 1-row constraint - i.e. apply series operation to all rows in dataframe</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Must be single series in pandas.DataFrame.&quot;</span><span class="p">)</span>
+        <span class="n">nans</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nans</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;A </span><span class="se">\&#39;</span><span class="s2">series_op</span><span class="se">\&#39;</span><span class="s2"> must return pandas.Series object.&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nans</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="recursive_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.recursive_op">[docs]</a><span class="k">def</span> <span class="nf">recursive_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the encapsulated function (``func``) iteratively to the elements of \</span>
+<span class="sd">        ``array`` from left to right, with ``init`` prepended to ``array`` \</span>
+<span class="sd">        and ``post`` postpended.&quot;&quot;&quot;</span>
+
+    <span class="nd">@series_op</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                <span class="n">init</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">post</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">auto_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">auto_post</span><span class="p">:</span>  <span class="nb">bool</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.</span>
+<span class="sd">        :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.</span>
+<span class="sd">        :param list post: ``post`` is post-pended to ``array`` before the recursive operation is applied.</span>
+<span class="sd">        :arg (bool) inplace: If ``True``, the operation will be applied on the array \</span>
+<span class="sd">        inplace, such that the result from a previous iteration is used in subsequent \</span>
+<span class="sd">        iterations. If ``False``, the operation proceeds ignorant of the results of \</span>
+<span class="sd">        previous iterations. ``True`` by default.</span>
+<span class="sd">        :returns (pandas.Series): Returns the result of the recursively-\</span>
+<span class="sd">        applied function. Will copy ``name`` and ``index`` \</span>
+<span class="sd">        properties of the provided ``pandas.Series`` object to the returned object.&#39;&#39;&#39;</span>
+
+        <span class="n">array_list</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">init</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_init</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;auto_init&#39; keyword argument must be provided as an integer.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auto_init</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">init</span> <span class="o">==</span> <span class="p">[]:</span> <span class="c1"># In the event of conflict ``init`` overrules ``auto_init``.</span>
+            <span class="n">init</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_init</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_post</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;auto_post&#39; keyword argument must be provided as an integer.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auto_post</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">post</span> <span class="o">==</span> <span class="p">[]:</span> <span class="c1"># In the event of conflict ``post`` overrules ``auto_post``.</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_post</span>
+
+        <span class="n">before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">after</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+        <span class="n">array_list</span> <span class="o">=</span> <span class="n">init</span> <span class="o">+</span> <span class="n">array_list</span> <span class="o">+</span> <span class="n">post</span>
+
+        <span class="n">new_array</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_list</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">before</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_list</span><span class="p">)</span> <span class="o">-</span> <span class="n">after</span><span class="p">):</span>
+            <span class="n">rec_args</span> <span class="o">=</span> <span class="n">array_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">before</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">after</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">rec_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># tmp = func(*array_list[i - before:i + after + 1], # This form can only be used for Python 3.5 onwards...</span>
+            <span class="c1">#            *args,</span>
+            <span class="c1">#            **kwargs)</span>
+            <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;recursive_op&#39; functions must return a floating point value.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+                <span class="n">array_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">new_array</span> <span class="o">=</span> <span class="n">array_list</span>
+
+        <span class="n">new_array</span> <span class="o">=</span> <span class="n">new_array</span><span class="p">[</span><span class="n">before</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">new_array</span><span class="p">)</span> <span class="o">-</span> <span class="n">after</span><span class="p">]</span>
+
+        <span class="c1"># Copy names and index to new series</span>
+        <span class="n">new_array</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">new_array</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_array</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

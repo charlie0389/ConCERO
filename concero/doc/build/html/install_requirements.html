@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Install Requirements and Assumed Knowledge &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
+    <link rel="next" title="Running Tests" href="tests.html" />
+    <link rel="prev" title="ConCERO’s Design Philosophy" href="design_philosophy.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="install-requirements-and-assumed-knowledge">
+<span id="install-requirements"></span><h1>Install Requirements and Assumed Knowledge<a class="headerlink" href="#install-requirements-and-assumed-knowledge" title="Permalink to this headline">¶</a></h1>
+<p>This documentation assumes the reader is familiar with basic python data types, particularly:</p>
+<blockquote>
+<div><ul class="simple">
+<li>integers (<code class="docutils literal"><span class="pre">int</span></code>)</li>
+<li>floating-point numbers (<code class="docutils literal"><span class="pre">float</span></code>)</li>
+<li>booleans (<code class="docutils literal"><span class="pre">bool</span></code>)</li>
+<li>strings (<code class="docutils literal"><span class="pre">str</span></code>)</li>
+<li>lists (<code class="docutils literal"><span class="pre">list</span></code>)</li>
+<li>dictionaries (<code class="docutils literal"><span class="pre">dict</span></code>)</li>
+</ul>
+</div></blockquote>
+<p>To run this program, the user will need</p>
+<blockquote>
+<div><ul class="simple">
+<li>python 3 (&gt;= 3.4),</li>
+<li>pandas (&gt;= 0.22),</li>
+<li>matplotlib,</li>
+<li>xlrd (&gt;= 1.1.0),</li>
+<li>pyyaml and</li>
+<li>seaborn</li>
+</ul>
+</div></blockquote>
+<p>installed. <code class="docutils literal"><span class="pre">matplotlib</span></code> provides plotting functionality and <code class="docutils literal"><span class="pre">seaborn</span></code> is a plotting library that basically &#8216;makes matplotlib plots look nice&#8217;. PyYAML provides YAML read functionality (necessary to read all the configuration files). No attempt has been made to make ConCERO backwards compatible with python 2. Unfortunately, it may be necessary to go through a rather arduous install process if it is necessary to have support for gdx file reading and/or har files (described below).</p>
+<p><code class="docutils literal"><span class="pre">xlrd</span></code> is an excel spreadsheet file-reading program. It will be installed by default with <code class="docutils literal"><span class="pre">pandas</span></code>, but may not be of a sufficiently high version. On Windows, a bug in older versions may cause an exception to be raised when reading legitimate excel files. To upgrade <code class="docutils literal"><span class="pre">xlrd</span></code>, run the command:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xlrd</span> <span class="pre">--upgrade</span></code></div></blockquote>
+<div class="section" id="install-gams-python-api-incomplete">
+<h2>Install GAMS Python API (Incomplete)<a class="headerlink" href="#install-gams-python-api-incomplete" title="Permalink to this headline">¶</a></h2>
+<p>The instructions in this section are only relevant if it is necessary to interact with GAMS <code class="docutils literal"><span class="pre">.gdx</span></code> files.</p>
+<ul class="simple">
+<li>Supported platforms for the GAMS Python API can be found at &#8216;Supported Platforms&#8217; at <a class="reference external" href="https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS">https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS</a>.</li>
+<li>Install instructions and tutorial for GAMS Python API can be found at <a class="reference external" href="https://www.gams.com/latest/docs/API_PY_TUTORIAL.html">https://www.gams.com/latest/docs/API_PY_TUTORIAL.html</a>.</li>
+<li>Installing is dramatically simpler if you use a python interpreter that matches the version of the installed GAMS python API. The &#8216;bitness&#8217; (i.e. 32 bit or 64 bit) of your python interpreter has to match that of the installed GAMS Python API.</li>
+<li>If your runtime version of python is <em>greater</em> than that of the installed version of GAMS, the necessary files to be symlinked into corresponding directories are contained in &lt;GAMS install directory&gt;/apifiles/Python/api_&lt;version&gt;/build/lib.</li>
+</ul>
+<p>You may get warnings regarding the python version mismatch.</p>
+</div>
+<div class="section" id="installing-gdxpds-necessary-for-gdx-files">
+<h2>Installing gdxpds (necessary for gdx files)<a class="headerlink" href="#installing-gdxpds-necessary-for-gdx-files" title="Permalink to this headline">¶</a></h2>
+<p>If working with the <code class="docutils literal"><span class="pre">.gdx</span></code> data type, in addition to the previous install requirements, it is necessary to install:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>GAMS python API - more details of which can be found at <span class="xref std std-ref">install_gams</span> - and</li>
+<li>gdxpds,</li>
+</ol>
+</div></blockquote>
+<p><em>in that order</em>.</p>
+<p>Installing/using the GAMS API is much easier (and probably more reliable) if the version of the python interpreter matches the version of the installed GAMS API files. That is, using Python 3.4 interpreter with Python 3.4 GAMS API. GAMS will complain even if the interpreter is more recent than that - for example, a version 3.5 interpreter with a 3.4 GAMS API. It is possible to install it anyway and link libraries manually, but that is a non-trivial process.</p>
+<p><em>gdxpds</em> will complain if it is not imported before pandas. Where possible, this program intends to heed this warning, but this may not always be the case, and so far, no adverse affects have been discovered by failing to heed the warning. Future versions of this program may remove this dependency.</p>
+</div>
+<div class="section" id="installing-harpy-necessary-for-har-or-shk-files">
+<h2>Installing harpy (necessary for har or shk files)<a class="headerlink" href="#installing-harpy-necessary-for-har-or-shk-files" title="Permalink to this headline">¶</a></h2>
+<p>Installing harpy is a simple process. It is necessary to install a fork of the harpy project that breaks backwards compatibility. The fork can be found (on the master branch) at <a class="reference external" href="https://github.com/charlie0389/HARPY">github</a>. Future development will attempt to integrate this with the mainstream harpy project, or removing the dependency on harpy altogether. To install harpy, download the zip archive (&#8216;Clone or Download&#8217; -&gt; &#8216;Download ZIP&#8217;), extract into a directory, change into that directory, and run the command:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
+<p>If you have both python 2 and python 3 on your system, the install command may instead be:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
+</div>
+<div class="section" id="installing-matplotlib">
+<h2>Installing Matplotlib<a class="headerlink" href="#installing-matplotlib" title="Permalink to this headline">¶</a></h2>
+<p>Matplotlib is necessary if you wish to use ConCERO&#8217;s plotting integration. Instructions can be found at <a class="reference external" href="https://matplotlib.org/users/installing.html#install-requirements">https://matplotlib.org/users/installing.html#install-requirements</a>.</p>
+</div>
+<div class="section" id="installing-concero">
+<h2>Installing ConCERO<a class="headerlink" href="#installing-concero" title="Permalink to this headline">¶</a></h2>
+<p>Similar to harpy, the install command is either:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
+<p>or</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
+<p>depending which command corresponds to the python 3 interpreter. To check that the installation was successful, run the test suite:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">concero.tests.test_concero</span></code></div></blockquote>
+<p>Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options, with the command:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">concero.main</span> <span class="pre">-h</span></code></div></blockquote>
+<table class="docutils footnote" frame="void" id="id1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>To check whether this library (<code class="docutils literal"><span class="pre">lib</span></code>) is installed (correctly), the simplest way is to open python on the command line. For example - <code class="docutils literal"><span class="pre">python</span></code>. Then, in the python interpreter, execute <code class="docutils literal"><span class="pre">import</span> <span class="pre">lib</span></code>, where <code class="docutils literal"><span class="pre">lib</span></code> is the relevant library. If no errors are raised, then the program is installed correctly.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Install Requirements and Assumed Knowledge</a><ul>
+<li><a class="reference internal" href="#install-gams-python-api-incomplete">Install GAMS Python API (Incomplete)</a></li>
+<li><a class="reference internal" href="#installing-gdxpds-necessary-for-gdx-files">Installing gdxpds (necessary for gdx files)</a></li>
+<li><a class="reference internal" href="#installing-harpy-necessary-for-har-or-shk-files">Installing harpy (necessary for har or shk files)</a></li>
+<li><a class="reference internal" href="#installing-matplotlib">Installing Matplotlib</a></li>
+<li><a class="reference internal" href="#installing-concero">Installing ConCERO</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="design_philosophy.html" title="previous chapter">ConCERO&#8217;s Design Philosophy</a></li>
+      <li>Next: <a href="tests.html" title="next chapter">Running Tests</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install_requirements.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/install_requirements.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>to_cero &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for to_cero</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. to_cero:</span>
+
+<span class="sd">The ToCERO class provides methods for converting data files **to** the CERO format.</span>
+
+<span class="sd">Critical to the successful use of this class is a configuration file in YAML format. \</span>
+<span class="sd">Do not be intimidated by the acronym - the YAML format is very simple and human readable. Typically, \</span>
+<span class="sd">study [1]_ of the YAML format should be unnecessary - copying a working configuration file and then \</span>
+<span class="sd">altering it for the desired purpose should satisfy most users (the ``tests/data`` subdirectory provides many examples). This documentation will show you how to build a YAML \</span>
+<span class="sd">configuration file for use with the `ToCERO` class in a gradual, example-by-example process. A technical reference to the ``ToCERO`` class \</span>
+<span class="sd">will follows.</span>
+
+<span class="sd">Building a YAML file from scratch to convert *TO* the CERO format</span>
+<span class="sd">-----------------------------------------------------------------</span>
+
+<span class="sd">The configuration file can differ significantly depending on the type of file from which data is \</span>
+<span class="sd">imported, but one aspect that all configuration files **must** have in common is the ``files`` field. As the \</span>
+<span class="sd">name suggests, ``files`` specifies the input files that are sources of data for the conversion process. \</span>
+<span class="sd">It therefore follows that a minimal (albeit useless) YAML configuration file will look like this:</span>
+
+<span class="sd">    ``files:``</span>
+
+<span class="sd">That is, a single line that doesn&#39;t specify anything. This simple file is interpreted as a `dict` with the key ``&quot;files&quot;`` with a corresponding value of `None` - the ``:`` identifies the key-value nature of the data. That is:</span>
+
+<span class="sd">    ``{&quot;files&quot;: None}``</span>
+
+<span class="sd">This top-level dictionary object - is referred to as a *ToCERO* object. The obvious next step is to specify some input files to convert. \</span>
+<span class="sd">This is done by adding **indented** [2]_ subsequent lines with a hyphen followed by the relevant data. For example:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    files:</span>
+<span class="sd">        - &lt;File Object A&gt;</span>
+<span class="sd">        - &lt;File Object B&gt;</span>
+<span class="sd">        - &lt;File Object C&gt;</span>
+<span class="sd">        - etc.</span>
+
+<span class="sd">The hyphens (followed by a space) on subsequent lines identify separate items that collectively are interpreted as a python `list`. The indented nature of the list identifies that this list is the value for the key in the line above. Basically the previous example is interpreted as the python object:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    {&quot;files&quot;: [&lt;Python interpretation of File Object A&gt;,</span>
+<span class="sd">                      &lt;Python interpretation of File Object B&gt;,</span>
+<span class="sd">                      &lt;Python interpretation of File Object C&gt;,</span>
+<span class="sd">                      &lt;etc.&gt;]}</span>
+
+<span class="sd">Note that each item of the ``&quot;files&quot;`` list can be either a `str` or a `dict`. If a `str`, the string must refer to a YAML file containing a `dict` defining a *file* object. If a `dict`, then that dict must be a file object. A file object is a dictionary with one mandatory key-value pair - that is, (in YAML form):</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    file: name_of_file</span>
+
+<span class="sd">Where ``name_of_file`` is a file path *relative to the configuration file*. The option \</span>
+<span class="sd">``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</span>
+
+<span class="sd">Without further specification, if the file *type* is comma-separated-values (``CSV``) and the file name has the</span>
+<span class="sd">``.csv`` extension and if the data is of the default format, ConCERO can import the entire file. The \</span>
+<span class="sd">&#39;default format&#39; is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:</span>
+
+<span class="sd">    1. by the key-value pair ``type: &lt;ext&gt;`` in the *file object*, and if not provided then</span>
+<span class="sd">    2. by the key-value pair ``type: &lt;ext&gt;`` in the *definition object*, and if not provided then</span>
+<span class="sd">    3. by determining the extension of the value of ``file`` in the *file object*, and then if not determined</span>
+<span class="sd">    4. an error is raised.</span>
+
+<span class="sd">Providing the ``type`` option allows the user to potentially extend the program to import files that the \</span>
+<span class="sd">program author was not aware existed, and are of a similar format to one of the known and supported formats. \</span>
+<span class="sd">For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them),\</span>
+<span class="sd">``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, \</span>
+<span class="sd">``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on \</span>
+<span class="sd">whether the underlying library allows importing that file type.</span>
+
+<span class="sd">With respect to step 2, it can be said that the file object *inherits* from the ToCERO \</span>
+<span class="sd">object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant \</span>
+<span class="sd">information in the case that some properties apply to all the input files. Given that every key-value pair \</span>
+<span class="sd">has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an \</span>
+<span class="sd">example of a YAML file including all points discussed so far is:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    input_files:</span>
+<span class="sd">        - file: a_file.csv</span>
+<span class="sd">        - file: b_file</span>
+<span class="sd">          type: &#39;csv&#39;</span>
+
+<span class="sd">In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported. \</span>
+<span class="sd">The file extension can be discerned with respect to ``a_file.csv``, and \</span>
+<span class="sd">``b_file`` has the corresponding ``type`` specified. Note that the ``type`` option (for ``b_file`` is indented at \</span>
+<span class="sd">the same level as file option, *not* the list).</span>
+
+<span class="sd">A minimal configuration form that demonstrates inheritance (and assuming ``c_file`` is of ``csv`` type) is:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    type: &#39;csv&#39;</span>
+<span class="sd">    input_files:</span>
+<span class="sd">        - file: a_file.csv</span>
+<span class="sd">        - file: b_file</span>
+<span class="sd">        - file: c_file</span>
+
+<span class="sd">Note that, alternatively, the file name of c_file could be changed to include a file extension. \</span>
+<span class="sd">An important point is that the inheritance of ``type`` does not \</span>
+<span class="sd">mean you - the user - can lazily drop the file extensions. The file extension is part of the file name, and so it \</span>
+<span class="sd">must be provided, if it exists, to find the correct file.</span>
+
+<span class="sd">In most cases, more specification in the file object is necessary to import data. \</span>
+<span class="sd">The necessary and additional options in the file object depend on the type of the file - whether it be \</span>
+<span class="sd">`CSV files`_, `Excel files`_, `HAR files`_ or `GDX files`_. That is, the supported types are \</span>
+<span class="sd">``ToCERO.supported_file_types`` - a set of:</span>
+
+<span class="sd">    * ``&quot;csv&quot;``</span>
+<span class="sd">    * ``&quot;xlsx&quot;``</span>
+<span class="sd">    * ``&quot;har&quot;``</span>
+<span class="sd">    * ``&quot;shk&quot;``</span>
+<span class="sd">..    * ``&quot;gdx&quot;``</span>
+
+<span class="sd">.. _CSV files:</span>
+
+<span class="sd">File Objects - CSV files</span>
+<span class="sd">--------------------------</span>
+
+<span class="sd">CSV files can be considered the simplest case with respect to data import. &#39;Under the hood&#39; ConCERO uses the \</span>
+<span class="sd">``pandas.read_csv()`` method to implement data import from CSVs (documentation for which can be found \</span>
+<span class="sd">`here &lt;http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html&gt;`_ ). Any option \</span>
+<span class="sd">available for the ``pandas.read_csv()`` method is also available to ConCERO by including that option \</span>
+<span class="sd">in the file object.</span>
+
+<span class="sd">There are also a few additional options that can be provided that provide specific functionality for ConCERO. These \</span>
+<span class="sd">options are:</span>
+
+<span class="sd">**series: (list)**</span>
+
+<span class="sd">the list specifies the series in the index that are \</span>
+<span class="sd">    relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to \</span>
+<span class="sd">    as a *series object*, which is a dictionary with the following options:</span>
+
+<span class="sd">        **name: (str)**</span>
+
+<span class="sd">        ``name`` identifies the elements of the index that will be converted into a CERO. ``name`` is a mandatory option.</span>
+
+<span class="sd">        **rename: (str)**</span>
+
+<span class="sd">        If provided, after export into the CERO changes ``name`` to value provided by ``rename``.</span>
+
+<span class="sd">A series object can be provided as a string, but this is equivalent to the series object ``{&#39;name&#39;: series_name}``.</span>
+
+<span class="sd">**orientation: (str)**</span>
+
+<span class="sd">``&#39;rows&#39;`` by default. If the data is in columns with respect to time, change this \</span>
+<span class="sd">    option to ``&#39;cols&#39;``, (and therefore effectively calling a transposition operation).</span>
+
+<span class="sd">**skip_cols: (str|list)**</span>
+
+<span class="sd">    A column name, or a list of column names to ignore.</span>
+
+<span class="sd">And other ``pandas.read_csv()`` options that are regularly used include:</span>
+
+<span class="sd">**usecols: (list)**</span>
+
+<span class="sd">From pandas documentation - Return a subset of the columns. If array-like, all \</span>
+<span class="sd">    elements must either be positional (i.e. integer indices into the document columns) or strings that \</span>
+<span class="sd">    correspond to column names provided either by the user in names or inferred from the document header \</span>
+<span class="sd">    row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’].</span>
+<span class="sd">Note that ``usecols`` will take precedence over ``skip_cols``, and that the argument format for ``usecols`` \</span>
+<span class="sd">    for a ``csv`` file differs slightly to that for an ``xlsx`` file.</span>
+
+<span class="sd">**index_col: (int|list)**</span>
+
+<span class="sd">The column or list of columns (zero-indexed) in which the identifiers \</span>
+<span class="sd">    reside or, if ``orientation==&quot;cols&quot;``, the column with the date index.</span>
+
+<span class="sd">**header: (int|list)**</span>
+
+<span class="sd">The row or list of rows (zero-indexed) in which the date index resides or, if \</span>
+<span class="sd">    ``orientation==&quot;cols&quot;``, the rows with the data identifiers.</span>
+
+<span class="sd">**nrows: (int)**</span>
+
+<span class="sd">Number of rows of the file to read. May be useful with very large ``csv`` files that have a \</span>
+<span class="sd">    lot of irrelevant data.</span>
+
+<span class="sd">For further documentation, please consult the \</span>
+<span class="sd">`pandas documentation &lt;http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html&gt;`_ \</span>
+<span class="sd">documentation.</span>
+
+<span class="sd">.. _Excel files:</span>
+
+<span class="sd">File Objects - Excel files</span>
+<span class="sd">--------------------------</span>
+
+<span class="sd">The process for importing Excel files is very similar to that of csv files. Underneath, the ``pandas.read_excel()`` \</span>
+<span class="sd">method is used, with virtually identical options with identical meanings. Consequently, not all the standard options \</span>
+<span class="sd">will be mentioned here - just the differences in contrast to those for ``csv`` files. For a complete list of available \</span>
+<span class="sd">options, please consult `the pandas documentation &lt;https://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_excel.html&gt;`_.</span>
+
+<span class="sd">**sheet: (str)** or **sheet_name: (str)**</span>
+
+<span class="sd">The name of the sheet in the workbook to be imported.</span>
+
+<span class="sd">**usecols: (list[int]|str)**</span>
+
+<span class="sd">Similar to the ``csv`` form of the option, ``usecols`` accepts a list of zero-indexed integers to identify the \</span>
+<span class="sd">columns to be imported. Unlike the csv option, ``usecols`` will **not** accept a ``list`` of ``str``, but will accept \</span>
+<span class="sd">a single ``str`` with an excel-like specification of columns. For example, ``usecols: A,C,E:H`` specifies the \</span>
+<span class="sd">import of columns ``A``, ``C`` and all columns between ``E`` and ``H`` *inclusive*.</span>
+
+<span class="sd">.. _HAR files:</span>
+
+<span class="sd">File Objects - HAR (or SHK) files</span>
+<span class="sd">-----------------------------------</span>
+
+<span class="sd">In reading this section of the documentation, ``shk`` files can be considered equivalent to ``har`` files, so \</span>
+<span class="sd">references to ``shk`` files can be dropped.</span>
+
+<span class="sd">``har`` files contain one or more *header arrays*, and with each header array is an array of one or more dimensions \</span>
+<span class="sd">(to a maximum of 7). Each dimension of each array has an associated *set*. Note that the terminology *set* can \</span>
+<span class="sd">be considered misleading because, unlike the mathematical concept of a set, HAR sets *have an order*. \</span>
+<span class="sd">The order of the set corresponds to the placement of items within the array.</span>
+
+<span class="sd">To specify the import of a har file, only one option in the file object is necessary - that is, ``head_arrs`` with \</span>
+<span class="sd">an associated list of strings specifying the names of header arrays to import from the file. Therefore, an example configuration file that specifies the import of a ``har`` file could \</span>
+<span class="sd">look like:</span>
+
+<span class="sd">.. code-block:: yaml</span>
+
+<span class="sd">    input_files:</span>
+<span class="sd">      - file: har_file.har</span>
+<span class="sd">        head_arrs:</span>
+<span class="sd">          - HEA1</span>
+<span class="sd">          - HEA2</span>
+
+<span class="sd">With the example configuration, header arrays ``HEA1`` and ``HEA2`` would be imported from file ``har_file.har``. *Note* \</span>
+<span class="sd">that it is a restriction of the ``har`` format itself that header names can not be longer than 4 characters.</span>
+
+<span class="sd">In the example above, each header array name is interpreted as a string. The more general format for a header definition is \</span>
+<span class="sd">a ``dict``, referred to as ``header_dict``. Each ``header_dict`` *must* have the option:</span>
+
+<span class="sd">    * ``name: header_name``, where ``header_name`` is the name of the header.</span>
+
+<span class="sd">``header_dict`` *must* also have the following option *if one of the dimensions of the array is to be interpreted as a time \</span>
+<span class="sd">dimension*:</span>
+
+<span class="sd">    * ``time_dim: (str)``, where the string is the name of the set indexing the time-dimension (note that the \</span>
+<span class="sd">    format/data-type of the time dimension is irrelevant).</span>
+
+<span class="sd">If the data has no time dimension (which *definitely should be avoided*) and therefore ``time_dim`` is not specified, \</span>
+<span class="sd">then ``default_year`` **must** be provided (or inherited from the file object) - otherwise a ValueError will be \</span>
+<span class="sd">thrown.</span>
+
+<span class="sd">Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format \</span>
+<span class="sd">that deviates from the default. Please see `File independent options`_ for more information.</span>
+
+
+<span class="sd">.. _GDX files:</span>
+
+<span class="sd">File Objects - GDX files</span>
+<span class="sd">------------------------</span>
+
+<span class="sd">Currently, ``GDX`` files are not supported (though large amounts of the framework is in place).</span>
+
+<span class="sd">.. _File independent options:</span>
+
+<span class="sd">File Independent Options:</span>
+<span class="sd">-------------------------</span>
+
+<span class="sd">The options in this section are relevant to all input files, regardless of their type. They are:</span>
+
+<span class="sd">**time_regex: (str)**, **time_fmt: (str)** and **default_year: (int)**</span>
+
+<span class="sd">A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by \</span>
+<span class="sd">searching through the string, using the regular expression ``time_regex``. The default - ``&#39;.*(\d{4})$&#39;`` - will \</span>
+<span class="sd">attempt to interpret the last four characters of the string as the year. Importantly, the match returns the \</span>
+<span class="sd">year as the 1st &#39;group&#39; (regular expression lingo). It is the first group that ``time_fmt`` is used with to \</span>
+<span class="sd">convert the string to a datetime object. The default - ``&#39;%Y&#39;`` assumes that the string is 4 digits \</span>
+<span class="sd">corresponding to the year.</span>
+
+<span class="sd">In the event that it date-time data isn&#39;t stored in the file \</span>
+<span class="sd">itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \</span>
+
+<span class="sd">What follows is an example, using the defaults of ``time_regex`` and ``time_fmt``, to \</span>
+<span class="sd">demonstrate how this works...</span>
+
+<span class="sd">Let&#39;s assume the time index series is given, in CSV form, by:</span>
+
+<span class="sd">    .. code-block:: text</span>
+
+<span class="sd">        bs1b-2017,bs1b-br1r-pl1p-2018,bs1b-br1r-pl1p-2019,...</span>
+
+<span class="sd">which is typically seen with VURM-related data. The last four digits is obviously the year, so the default \</span>
+<span class="sd">setting is appropriate. The regex essentially simplifies the data to a list of strings:</span>
+
+<span class="sd">    ``[&#39;2017&#39;, &#39;2018&#39;, &#39;2019&#39;, etc...]``</span>
+
+<span class="sd">However, ConCERO needs to convert these strings to ``pandas.datetime`` format. This is done by the \</span>
+<span class="sd">`pandas.datetime.strftime() &lt;https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior&gt;`_ \</span>
+<span class="sd">method, which relies on matching the strings with a pattern. The default - ``&#39;%Y&#39;`` - \</span>
+<span class="sd">will interpret the strings as four digits corresponding to the year - an obviously satisfactory result. Hence, the \</span>
+<span class="sd">following options are appropriate to include in the YAML configuration file.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+
+<span class="sd">        time_regex: .*(\d{4})$</span>
+<span class="sd">        time_fmt: &#39;%Y&#39;</span>
+
+<span class="sd">*Note*: if the default settings (as shown immediately above) are appropriate, specifying them is not necessary.</span>
+
+<span class="sd">.. [1] For a more thorough yet simple introduction to YAML files, `&lt;http://docs.ansible.com/ansible/latest/YAMLSyntax.html&gt;`_\</span>
+<span class="sd"> is recommended.</span>
+<span class="sd">.. [2] *&#39;Indented&#39;* can refer to a tab, 4 spaces or any combination of tabs/spaces. It is however critical that the \</span>
+<span class="sd">indentation pattern *remains consistent* (which is a requirement in common with python).</span>
+
+<span class="sd">ToCERO Technical Specification</span>
+<span class="sd">------------------------------</span>
+
+<span class="sd">.. autoclass:: ToCERO</span>
+<span class="sd">    :members:</span>
+
+<span class="sd">Created on Fri Jan 19 11:49:23 2018</span>
+
+<span class="sd">.. sectionauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">.. codeauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">concero.conf</span>
+<span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;gdxpds_installed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">gdxpds</span> <span class="c1">#: Warning given if not imported before pandas</span>
+<span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;harpy_installed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">harpy</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">builtins</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xlrd</span>
+
+<span class="kn">from</span> <span class="nn">concero.format_convert_tools</span> <span class="k">import</span> <span class="n">read_yaml</span>
+<span class="kn">from</span> <span class="nn">concero._identifier</span> <span class="k">import</span> <span class="n">_Identifier</span>
+<span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
+
+
+<div class="viewcode-block" id="ToCERO"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO">[docs]</a><span class="k">class</span> <span class="nc">ToCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+    <span class="c1"># supported_file_types = [&quot;har&quot;, &quot;csv&quot;, &quot;xlsx&quot;, &quot;shk&quot;, &quot;gdx&quot;]</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">_FileObj</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+        <span class="n">supported_file_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;har&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;shk&quot;</span><span class="p">,</span> <span class="s2">&quot;gdx&quot;</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            :param args: Passed to the superclass (`dict`) at initialisation.</span>
+<span class="sd">            :param dict parent: Inherits at initialisation from parent.</span>
+<span class="sd">            :param kwargs: Passed to the superclass (`dict`) at initialisation.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            :param &#39;Union[dict,str]&#39; conf: The configuration dict, or if a `str`, the path (relative to the current working directory) of a YAML-format file containing the configuration dict.</span>
+<span class="sd">            :return dict:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="c1"># Defaults</span>
+            <span class="n">_conf</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;index_col&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span><span class="s2">r&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="s2">r&quot;%Y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">sp</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search_paths&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="p">:</span>
+                    <span class="n">sp</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)]</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">_find_file</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+            <span class="n">_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+            <span class="c1"># search_paths initialisation, if not inherited</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">])]</span>
+            <span class="k">if</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]:</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Identify file type by extension if not given - the type determines which import function to use</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+
+            <span class="c1"># Series limits the data import to only those data series specified</span>
+            <span class="k">if</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;series&quot;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">])):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="c1"># Attempt to convert to dict...</span>
+                        <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]}</span>
+
+                    <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rename&quot;</span><span class="p">):</span>
+                        <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;rename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;rename&quot;</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="n">_conf</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Key-value pair </span><span class="se">\&quot;</span><span class="s2">file: FILE_NAME</span><span class="se">\&quot;</span><span class="s2"> must be provided for all &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&#39;</span><span class="s2">files</span><span class="se">\&#39;</span><span class="s2">.&quot;</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">_find_file</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">_check_permissions</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">runtime</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">import_file_as_cero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Executes the import process.</span>
+<span class="sd">            :return pandas.DataFrame: The CERO.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">_find_file</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">])</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_file</span><span class="p">()</span> <span class="c1"># _import_file documents the state of df.</span>
+            <span class="k">except</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">biffh</span><span class="o">.</span><span class="n">XLRDError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39; - invalid sheet name.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># Throw away unnecessary rows</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;series&quot;</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">_filter_series</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[</span><span class="n">series</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">]])</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;series&quot;</span><span class="p">]:</span>
+
+                    <span class="c1"># Rename rows if specified</span>
+                    <span class="k">if</span> <span class="s2">&quot;rename&quot;</span> <span class="ow">in</span> <span class="n">series</span><span class="p">:</span>
+                        <span class="n">ds</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">series</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],]</span>
+                        <span class="n">ds</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">series</span><span class="p">[</span><span class="s2">&quot;rename&quot;</span><span class="p">]</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> <span class="c1"># Note that this will move data series to the end of dataframe.</span>
+                        <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">series</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">assert</span> <span class="p">(</span><span class="n">series</span><span class="p">[</span>
+                                    <span class="s2">&quot;rename&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>  <span class="c1"># Check new name has been properly added to the series</span>
+
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+
+            <span class="c1"># Find year in strings</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Int64Index</span><span class="p">):</span>
+                <span class="c1"># Assumption: If column names are interpreted as integers, the integers must be years</span>
+                <span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_regex&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()])</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Error attempting to perform string matching on datetime values for file &#39;</span><span class="si">%s</span><span class="s2">&#39;. A &quot;</span> <span class="o">+</span>\
+                          <span class="s2">&quot;likely cause is too few datetimes for the size of the data array.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+                    <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_fmt&quot;</span><span class="p">])</span>  <span class="c1"># Interpret as datetime</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">ts</span>
+
+            <span class="k">if</span> <span class="s2">&quot;prepend&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">new_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">prepend_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;prepend&quot;</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_cero_index</span><span class="p">(</span><span class="n">new_values</span><span class="p">)</span>
+
+            <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="c1"># Will raise exception if invalid CERO</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">_find_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">search_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Locates first occurance of ``file`` on ``search_paths`` and returns relative OS-specific path.</span>
+
+<span class="sd">            :return str:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">orig_filename</span> <span class="o">=</span> <span class="n">file</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">search_paths</span><span class="p">:</span>
+                <span class="n">test_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;ToCERO.find_file(): testing path: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">test_path</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test_path</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">test_path</span><span class="p">)</span>
+                    <span class="c1"># return test_path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; not found on any of the paths </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orig_filename</span><span class="p">,</span> <span class="n">search_paths</span><span class="p">)</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">_check_permissions</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Current user - &#39;</span><span class="si">%s</span><span class="s2">&#39; - does not have permissions to read file &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">(),</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">_import_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Executes appropriate function depending on file type, returning a ``pandas.DataFrame`` that is not necessarily of CERO type.</span>
+<span class="sd">            :return: ``pandas.DataFrame``. ``df`` (the returned dataframe) must be of have identifiers as the index and the time-based data in columns. The index should be of CERO type, which can be ensured by using the ``CERO.create_CERO_index()`` method.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">supported_file_types</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s2">&quot;</span><span class="se">\&#39;</span><span class="s2">type</span><span class="se">\&#39;</span><span class="s2"> for input file </span><span class="si">%s</span><span class="s2"> is either: (a), not provided/inherited/deduced; &quot;</span> <span class="o">+</span>
+                                 <span class="s2">&quot;or (b), not supported. Supported types are </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span>
+                                                                                      <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">supported_file_types</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;csv&#39;</span><span class="p">]:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_csv_or_xlsx</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;gdx&#39;</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_gdx</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;har&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;shk&#39;</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_har</span><span class="p">()</span>
+
+            <span class="c1"># If df does not fit these requirements, must be error in import...</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="s2">&quot;Invalid dataframe type detected. One possible reason is invalid columns - &quot;</span> <span class="o">+</span>
+                                  <span class="s2">&quot;for example, columns that do not refer to a year when other columns do.&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+
+        <span class="k">def</span> <span class="nf">_import_csv_or_xlsx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <span class="c1"># CSV/XLSX specific operations</span>
+
+            <span class="n">pd_opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">pd_opts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
+
+            <span class="c1"># This is messy, but there&#39;s not a neat way to select only pandas-relevant options</span>
+            <span class="n">read_csv_kwargs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;filepath_or_buffer&quot;</span><span class="p">,</span> <span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="s2">&quot;delimiter&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="s2">&quot;index_col&quot;</span><span class="p">,</span> <span class="s2">&quot;usecols&quot;</span><span class="p">,</span> <span class="s2">&quot;squeeze&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;mangle_dupe_cols&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;engine&quot;</span><span class="p">,</span> <span class="s2">&quot;converters&quot;</span><span class="p">,</span> <span class="s2">&quot;true_values&quot;</span><span class="p">,</span> <span class="s2">&quot;false_values&quot;</span><span class="p">,</span> <span class="s2">&quot;skipinitialspace&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;skiprows&quot;</span><span class="p">,</span> <span class="s2">&quot;nrows&quot;</span><span class="p">,</span> <span class="s2">&quot;na_values&quot;</span><span class="p">,</span> <span class="s2">&quot;keep_default_na&quot;</span><span class="p">,</span> <span class="s2">&quot;na_filter&quot;</span><span class="p">,</span> <span class="s2">&quot;verbose&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;skip_blank_lines&quot;</span><span class="p">,</span> <span class="s2">&quot;parse_dates&quot;</span><span class="p">,</span> <span class="s2">&quot;infer_datetime_format&quot;</span><span class="p">,</span> <span class="s2">&quot;keep_date_col&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;date_parser&quot;</span><span class="p">,</span> <span class="s2">&quot;dayfirst&quot;</span><span class="p">,</span> <span class="s2">&quot;iterator&quot;</span><span class="p">,</span> <span class="s2">&quot;chunksize&quot;</span><span class="p">,</span> <span class="s2">&quot;compression&quot;</span><span class="p">,</span> <span class="s2">&quot;thousands&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;decimal&quot;</span><span class="p">,</span> <span class="s2">&quot;lineterminator&quot;</span><span class="p">,</span> <span class="s2">&quot;quotechar&quot;</span><span class="p">,</span> <span class="s2">&quot;quoting&quot;</span><span class="p">,</span> <span class="s2">&quot;escapechar&quot;</span><span class="p">,</span> <span class="s2">&quot;comment&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="s2">&quot;tupleize_cols&quot;</span><span class="p">,</span> <span class="s2">&quot;error_bad_lines&quot;</span><span class="p">,</span> <span class="s2">&quot;warn_bad_lines&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;skipfooter&quot;</span><span class="p">,</span> <span class="s2">&quot;skip_footer&quot;</span><span class="p">,</span> <span class="s2">&quot;doublequote&quot;</span><span class="p">,</span> <span class="s2">&quot;delim_whitespace&quot;</span><span class="p">,</span> <span class="s2">&quot;as_recarray&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;compact_ints&quot;</span><span class="p">,</span> <span class="s2">&quot;use_unsigned&quot;</span><span class="p">,</span> <span class="s2">&quot;low_memory&quot;</span><span class="p">,</span> <span class="s2">&quot;buffer_lines&quot;</span><span class="p">,</span> <span class="s2">&quot;memory_map&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;float_precision&quot;</span><span class="p">])</span>
+            <span class="n">read_excel_kwargs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;io&quot;</span><span class="p">,</span> <span class="s2">&quot;sheet_name&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="s2">&quot;skiprows&quot;</span><span class="p">,</span> <span class="s2">&quot;skip_footer&quot;</span><span class="p">,</span> <span class="s2">&quot;index_col&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="s2">&quot;usecols&quot;</span><span class="p">,</span> <span class="s2">&quot;parse_dates&quot;</span><span class="p">,</span> <span class="s2">&quot;date_parser&quot;</span><span class="p">,</span> <span class="s2">&quot;na_values&quot;</span><span class="p">,</span> <span class="s2">&quot;thousands&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;convert_float&quot;</span><span class="p">,</span> <span class="s2">&quot;converters&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="s2">&quot;true_values&quot;</span><span class="p">,</span> <span class="s2">&quot;false_values&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;engine&quot;</span><span class="p">,</span> <span class="s2">&quot;squeeze&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+                <span class="n">pandas_kwargs</span> <span class="o">=</span> <span class="n">read_csv_kwargs</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">:</span>
+                <span class="n">pandas_kwargs</span> <span class="o">=</span> <span class="n">read_excel_kwargs</span>
+
+            <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd_opts</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pandas_kwargs</span><span class="p">:</span>
+                    <span class="n">pd_opts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Get rid of pandas-irrelevant options. Some of the options ^^ may \</span>
+                    <span class="c1"># refer to other file types.</span>
+
+            <span class="n">pd_op</span> <span class="o">=</span> <span class="s2">&quot;read_csv&quot;</span>  <span class="c1"># Changed later to read_excel if necessary</span>
+
+            <span class="k">if</span> <span class="s2">&quot;usecols&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip_cols&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">]:</span>
+                        <span class="c1"># Need this parameter to skip irrelevant columns of data</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;skip_cols&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;skip_cols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;skip_cols&quot;</span><span class="p">]]</span>
+                        <span class="n">sk_col_list</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;skip_cols&quot;</span><span class="p">]</span>
+                        <span class="n">pd_opts</span><span class="p">[</span><span class="s2">&quot;usecols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sk_col_list</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;skip_cols&#39; is a valid option for files of &#39;csv&#39; type only.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">:</span>
+                <span class="c1"># Check excel-specific requirements</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sheet&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Key-value pair </span><span class="se">\&quot;</span><span class="s2">sheet: SHEET</span><span class="se">\&quot;</span><span class="s2"> must be specified for file </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pd_opts</span><span class="p">[</span><span class="s2">&quot;sheet_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sheet&quot;</span><span class="p">]</span>
+                    <span class="n">pd_op</span> <span class="o">=</span> <span class="s2">&quot;read_excel&quot;</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skiprows&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;skiprows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pd_opts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;converters&quot;</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pd_opts</span><span class="p">[</span><span class="s2">&quot;converters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">pd_opts</span><span class="p">[</span><span class="s2">&quot;converters&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+            <span class="c1"># for k in [&quot;header&quot;, &quot;index_col&quot;, &quot;nrows&quot;, &quot;usecols&quot;]:</span>
+            <span class="c1">#     # Grab pandas-relevant options</span>
+            <span class="c1">#     pd_opts[k] = self[k]</span>
+
+            <span class="n">pd_op</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">pd_op</span><span class="p">)</span>  <span class="c1"># Identify the correct pandas read OPeration</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd_op</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">pd_opts</span><span class="p">)</span>
+                <span class="c1"># Program will fail on the line above if:</span>
+                <span class="c1"># - Pandas version &lt;0.22 (failure observed when pandas = 0.20), AND</span>
+                <span class="c1"># - read_excel operation, AND</span>
+                <span class="c1"># - usecols is a string which has a column range in it, where one of the indices has more than</span>
+                <span class="c1">#   one letter - e.g. usecols=&quot;B,C,E:AW&quot;.</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;^Passed header&quot;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. This is likely because a range has been specified with a &#39;-&#39; instead of a &#39;:&#39;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nrows&quot;</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orientation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;cols&quot;</span><span class="p">:</span>
+                <span class="c1"># Put into CERO orientation if necessary</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_cero_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+
+        <span class="k">def</span> <span class="nf">_import_har</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+            <span class="c1"># Load file using harpy</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hfo</span> <span class="o">=</span> <span class="n">harpy</span><span class="o">.</span><span class="n">HarFileObj</span><span class="o">.</span><span class="n">loadFromDisk</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">PermissionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+            <span class="n">har_headers_list</span> <span class="o">=</span> <span class="n">hfo</span><span class="o">.</span><span class="n">getRealHeaderArrayNames</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head_arrs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">)):</span> <span class="c1"># &quot;headers&quot; is for backwards compatibility</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;head_arrs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">har_headers_list</span>  <span class="c1"># If &quot;headers&quot; not specified, get all headers</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Option &#39;headers&#39; has been depracated in favour of &#39;head_arrs&#39;.&quot;</span><span class="p">)</span>
+
+            <span class="n">header_dfs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head_arrs&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">)):</span> <span class="c1"># &quot;headers&quot; is for backwards compatibility</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="c1"># If string, convert to dictionary</span>
+                    <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">header</span><span class="p">}</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid header format (can be either str or dict).&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Checks valid header name</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">har_headers_list</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2"> is an invalid header name for file </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># Inherits time_dim, default_year from self if possible</span>
+                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_dim&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_dim&quot;</span><span class="p">))</span>
+                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;default_year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_year&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_year&quot;</span><span class="p">))</span>
+
+                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hfo</span><span class="o">.</span><span class="n">getHeaderArrayObj</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+                <span class="c1"># ASSUMPTION: User wants to retrieve entire tensor</span>
+                <span class="c1"># func = lambda x: header[&quot;obj&quot;].SetElements[x]</span>
+
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_dim&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="c1"># time_dim is positional index</span>
+                        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">]):</span>
+                            <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]:</span>
+                                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+                                <span class="k">break</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;time_dim&#39; does not exist in har file.&quot;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;time_dim&#39; (for header </span><span class="si">%s</span><span class="s2">) must be provided as an &#39;int&#39; or &#39;str&#39; - &quot;</span> <span class="o">+</span>
+                                        <span class="s2">&quot;an int if indexing the dimension in the header name list, or a str if &quot;</span> <span class="o">+</span>
+                                        <span class="s2">&quot;naming the time set.&quot;</span> <span class="o">%</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">]))</span>
+                    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid &#39;time_dim&#39; (for header </span><span class="si">%s</span><span class="s2">) - integer (zero-indexed) is too large &quot;</span> <span class="o">+</span>
+                                        <span class="s2">&quot;for the number of sets.&quot;</span> <span class="o">%</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">HeaderName</span><span class="p">)</span>
+
+                    <span class="n">labels</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;dim_desc&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]]</span>
+                    <span class="n">time_dim_labels</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]][</span><span class="s2">&quot;dim_desc&quot;</span><span class="p">]</span>
+
+                    <span class="c1"># Move that dimension to be the last...</span>
+                    <span class="n">tspse_tup</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">]))</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span>
+                        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time_dim&quot;</span><span class="p">]])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_year&quot;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;The &#39;default_year&#39; option must be provided for har files that do not have a specified &#39;time_dim&#39; (time dimension).&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Assume we have to create time dimension...</span>
+                    <span class="n">time_dim_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_year&quot;</span><span class="p">)]</span>  <span class="c1"># TODO: Ask Thomas what year the data references if time_dim is not specified</span>
+
+                    <span class="n">labels</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;dim_desc&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">]]</span>
+                    <span class="n">tspse_tup</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;sets&quot;</span><span class="p">]))])</span>  <span class="c1"># transpose-tuple</span>
+
+                <span class="n">array</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;array&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tspse_tup</span><span class="p">)</span>
+                <span class="c1"># ^^ ASSUMPTION: Sets and Elements in array have the same order as that HAR.Header.SetNames, SetElements</span>
+                <span class="c1"># UPDATE: Checked with Florian that this assumption is correct.</span>
+
+                <span class="c1"># Reshape into 2-dimensional array</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">labs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">labs</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+                <span class="n">new_dims</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)):</span>
+                    <span class="n">new_dims</span> <span class="o">=</span> <span class="n">new_dims</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">new_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_dims</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_dim_labels</span><span class="p">))</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;new_dims: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_dims</span><span class="p">,))</span>
+
+                <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_dims</span><span class="p">)</span>  <span class="c1"># Note that reshaping is in C-order, which is itertools.product() order</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="n">time_dim_labels</span>
+
+                <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]))</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;har_auto_prepend&quot;</span><span class="p">):</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">prepend_identifier</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">][</span><span class="s2">&quot;coeff_name&quot;</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+
+                <span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_cero_index</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;index: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">index</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">array</span><span class="p">,</span>
+                                  <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                                  <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+                <span class="n">header_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">header_dfs</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verify_cero</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_import_gdx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Import a gdx file. Some assumptions are made:</span>
+
+<span class="sd">                * Year index is always the lowest-level in column hierarchy</span>
+<span class="sd">                * gdxpds does not provide columns with distinct names (which is true at time of writing)</span>
+
+<span class="sd">            :return:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pars&quot;</span><span class="p">):</span>
+                <span class="n">dfs_dict</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                                         <span class="s2">&quot;time_col&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span>
+                                         <span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dfs_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pars</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]):</span>
+
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">pars</span><span class="p">}</span>
+                        <span class="n">pars</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+
+                    <span class="n">dfs_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">pars</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;time_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_col&quot;</span><span class="p">,</span> <span class="n">dfs_dict</span><span class="p">[</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">par</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">dfs_dict</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span>
+
+                <span class="c1"># Renames the initial columns to a number string...</span>
+                <span class="n">col_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="n">col_labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Value&quot;</span>
+                <span class="n">col_labels</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;Year&quot;</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">col_labels</span><span class="p">)</span>
+
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">col_labels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">new_level_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_labels</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">col_labels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reorder_levels</span><span class="p">(</span><span class="n">new_level_order</span><span class="p">)</span> <span class="c1">#: Assumption: Year index is always the lowest-level in column hierarchy</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">droplevel</span><span class="p">()</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verify_cero</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">_filter_series</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Throws away unnecessary rows in ``df`` object.&quot;&quot;&quot;</span>
+            <span class="n">s_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">name</span><span class="p">,),]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Ugly, but pandas isn&#39;t friendly with tuple index values</span>
+                    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># print(df.index.values)</span>
+                    <span class="c1"># print(names)</span>
+                    <span class="c1"># print(name in df.index.values)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;. There are several likely reasons: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                                         <span class="s2">&quot;1. File orientation is in columns and this has not been specified.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                                         <span class="s2">&quot;2. Series names do not match those given in the file. Remember to &quot;</span> <span class="o">+</span>
+                                         <span class="s2">&quot;comma-separate the values if multiple columns are used as the index.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                         <span class="s2">&quot;3. Pandas is automatically converting the index values to a datatype other than &quot;</span> <span class="o">+</span>
+                                         <span class="s2">&quot;a string. Consider adding &#39;converters: {column_name: data_type}&#39; to the configuration &quot;</span> <span class="o">+</span>
+                                         <span class="s2">&quot;file.&quot;</span>
+                                         <span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># print(name)</span>
+                    <span class="c1"># print(df.index.values)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Invalid series identifier. A cause for this error may be &quot;</span> <span class="o">+</span>
+                           <span class="s2">&quot;a lack of uniqueness in series identifier (consider expanding &quot;</span> <span class="o">+</span>
+                           <span class="s2">&quot;the number index columns).&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+                <span class="n">s_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">s_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+        <span class="sd">&quot;&quot;&quot;Loads a ToCERO configuration, suitable for creating CEROs from data files.</span>
+
+<span class="sd">        :param &#39;Union[dict,str]&#39; conf: The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an obsolute path, or relative to the current working directory.</span>
+<span class="sd">        :param args: Passed to the superclass (`dict`) at initialisation.</span>
+<span class="sd">        :param kwargs: Passed to the superclass (`dict`) at initialisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Loaded ToCERO configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">_conf</span>
+        <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ToCERO.create_cero"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.create_cero">[docs]</a>    <span class="k">def</span> <span class="nf">create_cero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a CERO from the configuration (defined by ``self``).</span>
+
+<span class="sd">        :return pd.DataFrame: A CERO is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cero_series</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file_obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">file_obj</span><span class="o">.</span><span class="n">import_file_as_cero</span><span class="p">()</span>
+            <span class="n">cero_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">cero_series</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="p">[</span><span class="n">fo</span><span class="p">[</span><span class="s2">&quot;overwrite&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">fo</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]])</span>
+        <span class="c1"># cero = CERO.combine_ceros(cero_series, overwrite=False)</span>
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.load_config"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param &#39;Union[dict,str]&#39; conf: A configuration dictionary, or a `str` to a path containing a configuration dictionary.</span>
+<span class="sd">        :param dict parent: A dict from which to inherit.</span>
+<span class="sd">        :return dict: The configuration dictionary (suitable as a ToCERO object).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_conf</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span> <span class="s2">r&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="s2">r&quot;%Y&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                 <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[]}</span>  <span class="c1"># Defaults</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+                    <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">conf</span><span class="p">))</span>
+
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> <span class="c1"># If conf is a configuration file, this will succeed</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="c1"># Try auto-import (i.e. assumes that file is of default format) - not supported for all import formats</span>
+                <span class="c1"># Works by feeding in appropriate kwargs</span>
+                <span class="n">conf_file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">conf</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+                <span class="k">if</span> <span class="n">conf_file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">]:</span>
+                    <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="p">})</span>
+                <span class="k">elif</span> <span class="n">conf_file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xlsx&quot;</span><span class="p">]:</span>
+                    <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;sheet&quot;</span><span class="p">:</span> <span class="s2">&quot;CERO&quot;</span><span class="p">})</span>
+
+        <span class="n">conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="n">_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> <span class="c1"># Arguments provided at initialisation supercede configuration file values</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span> <span class="c1"># Search in working directory if a dict is provided...</span>
+
+        <span class="n">par_dict</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">par_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">)</span>  <span class="c1"># Prevents infinite recursive inheritance</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">file_obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">par_dict</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;files&#39; must be provided as a list.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_conf</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests the validity of ``conf`` as a ``ToCERO`` object.</span>
+
+<span class="sd">        :param dict conf: An object, which may or may not suitable as a ToCERO object.</span>
+<span class="sd">        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) `False` is returned.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Files must be specified as a list (or a single item).&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;For example:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;files:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;    - file: FILE_A</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;      [properties of FILE_A] </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;    - file: FILE_B</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;      [properties of FILE_B] </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                                 <span class="s1">&#39;    - ... &#39;</span>
+            <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">file_obj</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">file_obj</span><span class="p">),</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Object &#39;</span><span class="si">%s</span><span class="s2">&#39; is of &#39;</span><span class="si">%s</span><span class="s2">&#39; type, not &#39;_FileObj&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">file_obj</span><span class="p">))</span>
+                <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">file_obj</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">_conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">runtime</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_find_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">search_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Locates first occurance of ``file`` on ``search_paths`` and returns relative OS-specific path.</span>
+
+<span class="sd">        :return str:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">orig_filename</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">search_paths</span><span class="p">:</span>
+            <span class="n">test_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;ToCERO.find_file(): testing path: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">test_path</span>
+            <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test_path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">test_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; not found on any of the paths </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orig_filename</span><span class="p">,</span> <span class="n">search_paths</span><span class="p">)</span>
+            <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

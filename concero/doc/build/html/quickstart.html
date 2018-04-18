@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Common ConCERO-Related Commands &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
+    <link rel="next" title="ConCERO’s Design Philosophy" href="design_philosophy.html" />
+    <link rel="prev" title="Welcome to ConCERO!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="common-concero-related-commands">
+<h1>Common ConCERO-Related Commands<a class="headerlink" href="#common-concero-related-commands" title="Permalink to this headline">¶</a></h1>
+<p>This page serves to present some example commands on how to download, install and use ConCERO. To install ConCERO requires the installing git (a version control program).</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Clone the source directory into <code class="docutils literal"><span class="pre">DIR</span></code>:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://col530&#64;bitbucket.csiro.au/scm/energy/concero.git</span> <span class="pre">DIR</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Change to the directory:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">cd</span> <span class="pre">DIR</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">To get the latest version of the repository (if the first step was done a while ago):</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">git</span> <span class="pre">pull</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Check that your python interpreter is version 3.4 or above:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">python</span> <span class="pre">--version</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Install ConCERO (may require administrator privileges):</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Test installation has been successful:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">cd</span> <span class="pre">..</span></code>
+<code class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">concero.tests.test_concero</span></code></p>
+</div></blockquote>
+<p>Note the for this example, the parent directory is chosen as the directory to run the tests. In practice, this could be any directory. Whatever directory is chosen, you must have write permissions.</p>
+</li>
+<li><p class="first">Find help on how to use the ConCERO program:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">concero</span> <span class="pre">--help</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Run the ConCERO scenario defined in <code class="docutils literal"><span class="pre">scenario.yaml</span></code>:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">concero</span> <span class="pre">scenario.yaml</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any &#8216;obvious&#8217; errors with configuration files) ...</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">concero</span> <span class="pre">--fake_run</span> <span class="pre">scenario.yaml</span></code></p>
+</div></blockquote>
+<p>Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).</p>
+</li>
+</ol>
+</div></blockquote>
+<div class="section" id="for-jupyter-notebooks">
+<h2>For Jupyter Notebooks<a class="headerlink" href="#for-jupyter-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>Create a cero from a configuration file to_cero.yaml:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">ToCERO</span><span class="p">(</span><span class="n">to_cero</span><span class="o">.</span><span class="n">yaml</span><span class="p">)</span>
+<span class="n">cero</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">create_cero</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Export the cero (or parts thereof) to a file, using the configuration in from_cero.yaml:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">fc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">FromCERO</span><span class="p">(</span><span class="n">from_cero</span><span class="o">.</span><span class="n">yaml</span><span class="p">)</span>
+<span class="n">fc</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Common ConCERO-Related Commands</a><ul>
+<li><a class="reference internal" href="#for-jupyter-notebooks">For Jupyter Notebooks</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to ConCERO!</a></li>
+      <li>Next: <a href="design_philosophy.html" title="next chapter">ConCERO&#8217;s Design Philosophy</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/quickstart.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/quickstart.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

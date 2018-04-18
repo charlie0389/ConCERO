@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ConCERO’s Design Philosophy &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
+    <link rel="next" title="Install Requirements and Assumed Knowledge" href="install_requirements.html" />
+    <link rel="prev" title="Common ConCERO-Related Commands" href="quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="concero-s-design-philosophy">
+<span id="design-philosophy"></span><h1>ConCERO&#8217;s Design Philosophy<a class="headerlink" href="#concero-s-design-philosophy" title="Permalink to this headline">¶</a></h1>
+<p>ConCERO was built to achieve two objectives:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>automate the conversion of data formats between models, and</li>
+<li>automate the execution of models,</li>
+</ol>
+</div></blockquote>
+<p>where a <em>model</em> is a computer program that calculates a prediction on some aspect of the Australian economy (given input data).</p>
+<p>How, in general terms, the program accomplishes this is discussed below.</p>
+<div class="section" id="automating-data-format-conversion">
+<h2>Automating Data Format Conversion<a class="headerlink" href="#automating-data-format-conversion" title="Permalink to this headline">¶</a></h2>
+<p>A core concept in the data conversion process is that the data exchanged between any two of the economic models is one or more instances of a single <em>fundamental data type</em> - that is, a named time-indexed series of floating-point values. The data comes in many forms (e.g. <code class="docutils literal"><span class="pre">csv</span></code>, <code class="docutils literal"><span class="pre">xlsx</span></code>, <code class="docutils literal"><span class="pre">har</span></code> files), but is, conceptually, a set of one or more instances of the fundamental data types.</p>
+<p>For example, consider a spreadsheet table with a list of names in the first column (column <code class="docutils literal"><span class="pre">A</span></code>) that <em>names</em> the remainder of the row of data. Each of those values in the rows have <em>meaning</em> with respect to time, so therefore it can be said that each row is a instance of the fundamental data type - each row is a named, time-indexed series of floating point values. Sometimes, it may be the case that the time-index values do not reside in the same file as the values, but the fact remains that the <em>values have meaning with respect to time</em>.</p>
+<p><strong>A set of one or more of these fundamental data types is referred to as a CERO - a Collins Economic Results Object</strong>. </p>
+<p>Conveniently, in the python (version 3) programming language, <code class="xref py py-obj docutils literal"><span class="pre">pandas.DataFrame</span></code> objects (as defined in the <code class="docutils literal"><span class="pre">pandas</span></code> library) are ideally suited for storing CEROs. Consequently, ConCERO uses the <code class="docutils literal"><span class="pre">pandas</span></code> python library extensively, and stores CEROs as <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> objects, and the terms <em>CERO</em> and <em>DataFrame</em> are considered interchangeable in this documentation. For the purposes of ConCERO and data format conversion, a CERO is a special type of <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> - in addition to the defining requirements of a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code>, a CERO is required to have:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">the columns indexed by a <code class="docutils literal"><span class="pre">pandas.DatetimeIndex</span></code> object, and</p>
+</li>
+<li><p class="first">the rows indexed by a <code class="docutils literal"><span class="pre">pandas.Index</span></code> object, where each value is either a</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a>, where each <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a> does not have any commas (<code class="docutils literal"><span class="pre">,</span></code>), or a</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a>, where each element of the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a> (also without any commas).</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">all values are of a floating-point type <a class="footnote-reference" href="#id2" id="id1">[1]</a> (specifically, the values must be a subclass of <code class="docutils literal"><span class="pre">numpy.float32</span></code> type), and</p>
+</li>
+<li><p class="first">all column values must be unique, and</p>
+</li>
+<li><p class="first">all index values must be unique.</p>
+</li>
+</ol>
+</div></blockquote>
+<p>Currently, ConCERO does not enforce requirements 2.1 or 2.2, but successful program operation is not guaranteed if those requirements are not adhered to.</p>
+<p>By using the CERO format, data can be converted between any two data formats by a simple two-step process:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Mutating the data into the CERO format.</li>
+<li>Mutating the data from the CERO format into another format.</li>
+</ol>
+</div></blockquote>
+<p>These two processes are captured respectively by the <code class="docutils literal"><span class="pre">ToCERO</span></code> and <code class="docutils literal"><span class="pre">FromCERO</span></code> classes, in the <code class="docutils literal"><span class="pre">to_cero.py</span></code> and <code class="docutils literal"><span class="pre">from_cero.py</span></code> modules respectively. For a more technical overview, please see <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a> and <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a>.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The values can be of <code class="docutils literal"><span class="pre">numpy.nan</span></code> (not-a-number) type, to be interpreted as &#8216;the lack of a value&#8217;. However, there is a type of <code class="docutils literal"><span class="pre">numpy.nan</span></code> that is a subclass <code class="docutils literal"><span class="pre">numpy.float32</span></code>, so this is not a breach of the technical requirement.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="automating-the-execution-of-models">
+<span id="automating-execution"></span><h2>Automating the Execution of Models<a class="headerlink" href="#automating-the-execution-of-models" title="Permalink to this headline">¶</a></h2>
+<p>Before an overview of how the models are executed, it is first necessary to provide an introduction to the context in which ConCERO was built. As part of the <em>&#8216;Australian National Outlook&#8217;</em> (ANO) project, it was necessary to run a variety of <em>scenarios</em>. A &#8216;scenario&#8217;, with respect to the ANO project, is a collection of <em>stances</em> on particular <em>issues</em> that ultimately determine how predictions (regarding the state of the future Australian economy) are calculated. For example, one particular <em>issue</em> is the &#8216;future of work&#8217;. All of the scenarios conducted as part of the ANO project took 1 of 2 <em>stances</em> on this issue. That is, &#8216;automation would destroy work&#8217; or &#8216;jobs would evolve&#8217;.</p>
+<dl class="docutils">
+<dt>For the purposes of ConCERO, a <em>scenario</em> refers to a specific collection of <em>stances</em>, but also references:</dt>
+<dd><ul class="first last simple">
+<li>the associated models,</li>
+<li>the input data to each of these models,</li>
+<li>the output data from each of these models,</li>
+<li>the procedure to execute each of the models, and</li>
+<li>the order of execution, of each model (with respect to the other models).</li>
+</ul>
+</dd>
+</dl>
+<p>Where, as described previously, a <em>model</em> <a class="footnote-reference" href="#id5" id="id3">[2]</a> refers to the computer program that calculates a prediction (on some aspect of the Australian economy) based on the given input data.</p>
+<p>Given this information, ConCERO was designed to run in accordance with the following procedure:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Retrieve as much input data as possible to run all of the models, and convert this into a &#8216;scenario-level&#8217; CERO. Refer to <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a>.</li>
+<li>Convert selected parts of the &#8216;scenario-level&#8217; CERO into a suitable format as input for the first model (where &#8216;first&#8217; refers to its order of execution). Refer to <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a>.</li>
+<li>Execute/run the first model.</li>
+<li>Convert any output data - that is necessary as input for subsequent <a class="footnote-reference" href="#id6" id="id4">[3]</a> models - into a CERO and combine with the &#8216;scenario-level&#8217; CERO. Refer to <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a>.</li>
+<li>Repeat steps 2-4 for any subsequent models.</li>
+<li>After all models have been executed/run, convert data in the scenario-level CERO into a format suitable for plotting, visualisation etc. Refer to <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a>.</li>
+</ol>
+</div></blockquote>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Given the economic nature of the models, sometimes the term <em>&#8216;models&#8217;</em> may be used interchangeably with the term <em>&#8216;economic models&#8217;</em>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td>&#8216;Subsequent&#8217; refers to the order of execution.</td></tr>
+</tbody>
+</table>
+<p><em>Section author: Lyle Collins &lt;<a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a>&gt;</em></p>
+<p><em>Code author: Lyle Collins &lt;<a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a>&gt;</em></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ConCERO&#8217;s Design Philosophy</a><ul>
+<li><a class="reference internal" href="#automating-data-format-conversion">Automating Data Format Conversion</a></li>
+<li><a class="reference internal" href="#automating-the-execution-of-models">Automating the Execution of Models</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Common ConCERO-Related Commands</a></li>
+      <li>Next: <a href="install_requirements.html" title="next chapter">Install Requirements and Assumed Knowledge</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/design_philosophy.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/design_philosophy.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

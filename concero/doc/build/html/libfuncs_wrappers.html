@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Classes of User-Specified Functions for operating on CEROs &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
+    <link rel="next" title="Scenarios" href="scenarios.html" />
+    <link rel="prev" title="Converting FROM the Collins Economics Result Object (CERO) format" href="from_cero.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-libfuncs_wrappers"><span id="func-classes"></span></span><div class="section" id="classes-of-user-specified-functions-for-operating-on-ceros">
+<h1>Classes of User-Specified Functions for operating on CEROs<a class="headerlink" href="#classes-of-user-specified-functions-for-operating-on-ceros" title="Permalink to this headline">¶</a></h1>
+<p>The set of functions that <em>could</em> be applied to the CERO, and data series within the CERO, is infinitely large, so it is obviously impossible to provide all these functions. It is therefore necessary that the user provide functions as they are needed, by writing the appropriate python 3 code and including this function in <code class="docutils literal"><span class="pre">libfuncs.py</span></code>. To minimise the difficulty and complexity of achieving this, ConCERO includes 3 classes of <em>wrapper functions</em>, that significantly reduce the difficulty for the user in extending the power of <code class="docutils literal"><span class="pre">FromCERO</span></code>.</p>
+<p>A <em>wrapper function</em> is a function that encapsulates another function, and therefore has access to both the inputs and outputs of the encapsulated function. Because the wrapper function has access to the inputs, it can provide pre-processing on the input to reshape it into a specific form, and because it has access to the output of the function, it can post-process the output of the function - mutating it into a desirable form.</p>
+<p>A wrapper function can be directed to encapsulate a function by preceding the function with a <em>decorator</em>. A <em>decorator</em> is a simple one line statement that starts with the &#8216;&#64;&#8217; symbol and then the name of the wrapper function. For example, to encapsulate <code class="docutils literal"><span class="pre">func</span></code> with the <code class="docutils literal"><span class="pre">dataframe_op</span></code> wrapper, the code is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>The wrapper functions themselves are stored in  the <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code> module, but the wrappers themselves should <em>never</em> be altered by the user.</p>
+<p>What the 3 classes of wrappers are, and how to apply the function wrappers, are explained below, in addition to the case where no wrapper/decorator is provided.</p>
+<div class="section" id="class-1-functions-dataframe-operations">
+<h2>Class 1 Functions - DataFrame Operations<a class="headerlink" href="#class-1-functions-dataframe-operations" title="Permalink to this headline">¶</a></h2>
+<p>Class 1 functions are the most general type of wrapper functions, and can be considered a superset of the other two. Class 1 functions operate on a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> object, and therefore can operate on an entire CERO if need be. A class 1 function must have the following function signature:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
+<span class="k">def</span> <span class="nf">func_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>Note the following key features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The function is proceeded by the &#64;dataframe_op &#8216;decorator&#8217; (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
+<li>The first argument provided to <code class="docutils literal"><span class="pre">func_name</span></code> - <code class="docutils literal"><span class="pre">df</span></code> - will be a CERO (an instance of a pandas.DataFrame),     reduced by the <code class="docutils literal"><span class="pre">arrays</span></code>/<code class="docutils literal"><span class="pre">inputs</span></code> options.</li>
+<li>No parameters are to be returned (technically, the last line could be omitted).</li>
+</ul>
+</div></blockquote>
+<p><strong>What is not clear from the function definition above</strong> is the <strong>requirement</strong> that all operations on <code class="docutils literal"><span class="pre">df</span></code> must occur inplace. In other words, all mutations/operations not applied to <code class="docutils literal"><span class="pre">df</span></code> will be ignored. Note that if this constraint is violated, no exceptions/errors will be raised as it is impossible to detect this &#8216;failure to understand intention&#8217;. As a rule of thumb, this can nearly always be achieved by restricting operations to the types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">df.loc[...]</span> <span class="pre">=</span> <span class="pre">...</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">df.iloc[...]</span> <span class="pre">=</span> <span class="pre">...</span></code>, or</li>
+<li><code class="docutils literal"><span class="pre">df.func(*args,</span> <span class="pre">inplace=True,</span> <span class="pre">**kwargs)</span></code>.</li>
+</ul>
+</div></blockquote>
+<p>It is highly recommended to consult <code class="docutils literal"><span class="pre">pandas</span></code> documentation (e.g. <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy">https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy</a>) and <code class="docutils literal"><span class="pre">StackOverflow</span></code> to develop a better understanding of what <code class="docutils literal"><span class="pre">inplace</span></code> operations are.</p>
+<p>The <code class="docutils literal"><span class="pre">libfuncs</span></code> function <code class="docutils literal"><span class="pre">merge</span></code> provides a simple example of how to apply this wrapper:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
+<span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Replaces the first series with the sum of all the series</span>
+    <span class="k">return</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-2-functions-series-operations">
+<h2>Class 2 Functions - Series Operations<a class="headerlink" href="#class-2-functions-series-operations" title="Permalink to this headline">¶</a></h2>
+<p>Class 2 functions operate on a single <code class="docutils literal"><span class="pre">pandas.Series</span></code> object - note that a single row of a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> is an instance of a <code class="docutils literal"><span class="pre">pandas.Series</span></code>. The series operations class can be considered a subset of DataFrame operations, and a superset of all recursive operations (discussed below).</p>
+<p>Similar to class 1 functions, class 2 functions must fit the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@series_op</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">pandas_series</span>
+</pre></div>
+</div>
+<p>With similar features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The function is proceeded by the &#64;series_op wrapper (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
+<li>The first argument (<code class="docutils literal"><span class="pre">series</span></code>) must be of pandas.Series type.</li>
+</ul>
+</div></blockquote>
+<p>However, <em>dissimilar to class 1 functions</em>, class 2 functions must:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Return an object of <code class="docutils literal"><span class="pre">pandas.Series</span></code> type (<code class="docutils literal"><span class="pre">pandas_series</span></code>). <code class="docutils literal"><span class="pre">pandas_series</span></code> must be of the     same <code class="docutils literal"><span class="pre">shape</span></code> as <code class="docutils literal"><span class="pre">series</span></code>.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="class-3-functions-recursive-operations">
+<h2>Class 3 Functions - Recursive Operations<a class="headerlink" href="#class-3-functions-recursive-operations" title="Permalink to this headline">¶</a></h2>
+<p>Recursive operations must fit the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@recursive_op</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">calc</span>
+</pre></div>
+</div>
+<p>Noting that:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Positional arguments are provided in the same order as their sequence in the data series.</li>
+<li>The return value <code class="docutils literal"><span class="pre">calc</span></code> must be a single floating-point value.</li>
+</ul>
+</div></blockquote>
+<p>Note that options can be provided to an operation object to alter the behaviour of the recursive operation. Those options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">init:</span> <span class="pre">list(float)</span></code> - values that precede the data series that serve as initialisation values.</li>
+<li><code class="docutils literal"><span class="pre">post:</span> <span class="pre">list(float)</span></code> - values that follow the data series for non-causal recursive functions.</li>
+<li><code class="docutils literal"><span class="pre">inplace:</span> <span class="pre">bool</span></code> - If <code class="docutils literal"><span class="pre">True</span></code>, then the recursive operation will be applied on the array         inplace, such that the result from a previous iteration is used in subsequent         iterations. If <code class="docutils literal"><span class="pre">False</span></code>, the operation proceeds ignorant of the results of         previous iterations. <code class="docutils literal"><span class="pre">True</span></code> by default.</li>
+</ul>
+</div></blockquote>
+<p>How these items are to be applied is probably best explained with an example - consider the recursive operation is a 3 sample moving point averaging filter. This can be implemented by including <code class="docutils literal"><span class="pre">mv_avg_3()</span></code> (below) in <code class="docutils literal"><span class="pre">libfuncs.py</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@recursive_op</span>
+<span class="k">def</span> <span class="nf">mv_avg_3</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>It is also necessary to provide the arguments, <code class="docutils literal"><span class="pre">init</span></code> and <code class="docutils literal"><span class="pre">post</span></code> in the configuration file, so the operation object looks somthing like:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">mv_avg_3</span>
+<span class="l l-Scalar l-Scalar-Plain">init</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="l l-Scalar l-Scalar-Plain">post</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+</pre></div>
+</div>
+<p>This operation would transform the data series <code class="docutils literal"><span class="pre">[2,</span> <span class="pre">1,</span> <span class="pre">3]</span></code> to the values <code class="docutils literal"><span class="pre">[1.3333,</span> <span class="pre">1.7777,</span> <span class="pre">2.2593]</span></code> - i.e. <code class="docutils literal"><span class="pre">[(1+2+1)/3,</span> <span class="pre">(1.333+1+3)/3,</span> <span class="pre">(1.7777+3+2)/3]</span></code>. If, instead, the configuration file looks like:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">mv_avg_3</span>
+<span class="l l-Scalar l-Scalar-Plain">init</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="l l-Scalar l-Scalar-Plain">post</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="l l-Scalar l-Scalar-Plain">inplace</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+</pre></div>
+</div>
+<p>Then the output of the same series would be <code class="docutils literal"><span class="pre">[1.3333,</span> <span class="pre">2,</span> <span class="pre">2]</span></code> - that is, <code class="docutils literal"><span class="pre">[(1+2+1)/3,</span> <span class="pre">(2+1+3)/3,</span> <span class="pre">(1+3+2)/3]</span></code>.</p>
+</div>
+<div class="section" id="wrapper-less-functions">
+<h2>Wrapper-less Functions<a class="headerlink" href="#wrapper-less-functions" title="Permalink to this headline">¶</a></h2>
+<p>A function that is defined in <code class="docutils literal"><span class="pre">libfuncs</span></code> can be accessed by <code class="docutils literal"><span class="pre">FromCERO</span></code>, though there are some constraints necessary to enable <code class="docutils literal"><span class="pre">FromCERO</span></code> to act in a programmatic way. A function (in <code class="docutils literal"><span class="pre">libfuncs.py</span></code>) <em>that is called upon by</em> <code class="docutils literal"><span class="pre">FromCERO</span></code> must have the following function signature:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plotdf</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal"><span class="pre">df</span></code> is the entire CERO provided to the calling class (so is therefore of <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> type), and <code class="docutils literal"><span class="pre">locs</span></code>, if provided, is a list of all identifiers specifying which series of the CERO have been specified.</p>
+<p><strong>Note that any changes made to</strong> <code class="docutils literal"><span class="pre">df</span></code> <strong>will be applied in the calling class (i.e. the</strong> <code class="docutils literal"><span class="pre">FromCERO</span></code> <strong>class).</strong></p>
+<p>Use of wrapper-less functions for use with <code class="docutils literal"><span class="pre">FromCERO</span></code> is <strong>not recommended</strong>, though if it is none-the-less desirable, <code class="docutils literal"><span class="pre">libfuncs.plotdf()</span></code> serves as an example.</p>
+</div>
+<div class="section" id="other-notes">
+<h2>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Avoid trying to create a renaming function - use <code class="docutils literal"><span class="pre">libfuncs._rename</span></code> - it has been designed to work     around a bug in Pandas (Issue #19497).</li>
+<li><code class="docutils literal"><span class="pre">libfuncs</span></code> also serves as a source of examples for how to use the function wrappers.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="technical-specifications-of-decorators">
+<h2>Technical Specifications of Decorators<a class="headerlink" href="#technical-specifications-of-decorators" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libfuncs_wrappers.dataframe_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">dataframe_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#dataframe_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.dataframe_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator is designed to provide <code class="docutils literal"><span class="pre">func</span></code> (the encapsulated function) with a restricted form     of <code class="docutils literal"><span class="pre">df</span></code> (a CERO). A     <em>restricted</em> <code class="docutils literal"><span class="pre">df</span></code> is the original <code class="docutils literal"><span class="pre">df</span></code> limited to a subset of rows and/or columns. All of the key-word     arguments, with the exception of <code class="docutils literal"><span class="pre">rename</span></code>, define the restriction. Note that a restriction on <code class="docutils literal"><span class="pre">df.columns</span></code>     will be <em>compact</em>, but this is not necessarily the case for restriction on <code class="docutils literal"><span class="pre">df.index</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.series_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">series_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#series_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.series_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator provides <code class="docutils literal"><span class="pre">func</span></code> (the encapsulated function) with the first <code class="docutils literal"><span class="pre">pandas.Series</span></code>     in a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> (i.e. the first row in <code class="docutils literal"><span class="pre">df</span></code>). Note that this wrapper is encapsulated within     the <code class="docutils literal"><span class="pre">dataframe_op</span></code> wrapper.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.recursive_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">recursive_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#recursive_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.recursive_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the encapsulated function (<code class="docutils literal"><span class="pre">func</span></code>) iteratively to the elements of         <code class="docutils literal"><span class="pre">array</span></code> from left to right, with <code class="docutils literal"><span class="pre">init</span></code> prepended to <code class="docutils literal"><span class="pre">array</span></code>         and <code class="docutils literal"><span class="pre">post</span></code> postpended.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.log_func">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">log_func</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#log_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.log_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logging decorator - for debugging purposes. To apply to function <code class="docutils literal"><span class="pre">func</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@log_func</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>Created on Thu Dec 21 16:36:02 2017</p>
+<p>&#64;author: Lyle Collins
+&#64;email: <a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Classes of User-Specified Functions for operating on CEROs</a><ul>
+<li><a class="reference internal" href="#class-1-functions-dataframe-operations">Class 1 Functions - DataFrame Operations</a></li>
+<li><a class="reference internal" href="#class-2-functions-series-operations">Class 2 Functions - Series Operations</a></li>
+<li><a class="reference internal" href="#class-3-functions-recursive-operations">Class 3 Functions - Recursive Operations</a></li>
+<li><a class="reference internal" href="#wrapper-less-functions">Wrapper-less Functions</a></li>
+<li><a class="reference internal" href="#other-notes">Other Notes</a></li>
+<li><a class="reference internal" href="#technical-specifications-of-decorators">Technical Specifications of Decorators</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="from_cero.html" title="previous chapter">Converting FROM the Collins Economics Result Object (CERO) format</a></li>
+      <li>Next: <a href="scenarios.html" title="next chapter">Scenarios</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/libfuncs_wrappers.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/libfuncs_wrappers.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

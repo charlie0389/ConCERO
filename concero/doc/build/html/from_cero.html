@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Converting FROM the Collins Economics Result Object (CERO) format &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
+    <link rel="next" title="Classes of User-Specified Functions for operating on CEROs" href="libfuncs_wrappers.html" />
+    <link rel="prev" title="Converting TO the Collins Economics Result Object (CERO) format" href="to_cero.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-from_cero">
+<span id="converting-from-the-collins-economics-result-object-cero-format"></span><span id="from-cero"></span><h1>Converting FROM the Collins Economics Result Object (CERO) format<a class="headerlink" href="#module-from_cero" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="output-independent-instructions">
+<h2>Output-Independent Instructions<a class="headerlink" href="#output-independent-instructions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setting-up-a-fromcero-configuration-file">
+<h3>Setting up a FromCERO configuration file<a class="headerlink" href="#setting-up-a-fromcero-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>Like all other configuration files for this program, the configuration file must be in YAML format. The highest hierarchical level (i.e. with the least/no indentation) is referred to as a <em>FromCERO object</em>).
+It is <strong>necessary</strong> (for the configuration to output anything meaningful) to define the option:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">procedures:</span> <span class="pre">(list[dict|str])</span></code>, where <code class="docutils literal"><span class="pre">procedures</span></code> is a list of one or more <em>procedure</em> objects.     <a class="reference internal" href="#procedure-objects"><span class="std std-ref">Procedure Objects</span></a> are explained below .</li>
+</ul>
+</div></blockquote>
+<p>Procedures define the mutation and, if desired, the export of the mutated data to a file. It a procedure does not specify a file to export data to, then ConCERO will, by default, output the procedure to a <code class="docutils literal"><span class="pre">file</span></code> specified as part of the FromCERO object, if given. If <code class="docutils literal"><span class="pre">file</span></code> is not defined for the FromCERO object, then ConCERO will output the procedure to <code class="docutils literal"><span class="pre">output.csv</span></code> in the current working directory.</p>
+<p>It is <em>recommended</em> that the following option be specified:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">file:</span> <span class="pre">(str)</span></code> - Names the file for which all procedure objects are exported into. Procedure objects will export      into this file unless a procedure-object-specific <code class="docutils literal"><span class="pre">file</span></code> has been defined. The extension of <code class="docutils literal"><span class="pre">file</span></code> determines      the exported file type. Supported file types are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Numpy arrays - <code class="docutils literal"><span class="pre">npy</span></code></li>
+<li>GAMS Data eXchange format -<code class="docutils literal"><span class="pre">gdx</span></code> (temporarily unsupported)</li>
+<li>HAR files - <code class="docutils literal"><span class="pre">har</span></code></li>
+<li>Shock files - <code class="docutils literal"><span class="pre">shk</span></code></li>
+<li>Portable Network Graphics format - <code class="docutils literal"><span class="pre">png</span></code></li>
+<li>Portable Document Format - <code class="docutils literal"><span class="pre">pdf</span></code></li>
+<li>PostScript - <code class="docutils literal"><span class="pre">ps</span></code></li>
+<li>Encapsulated PostScript - <code class="docutils literal"><span class="pre">eps</span></code></li>
+<li>Scalable Vector Graphics - <code class="docutils literal"><span class="pre">svg</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>Other options include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">sets:</span> <span class="pre">(dict:</span> <span class="pre">str</span> <span class="pre">-&gt;</span> <span class="pre">List[str])</span></code> - sets is a dictionary mapping <code class="docutils literal"><span class="pre">str</span></code> to a <code class="docutils literal"><span class="pre">list</span></code> of  <code class="docutils literal"><span class="pre">str</span></code>. <code class="docutils literal"><span class="pre">sets</span></code> provides     an easy and convenient way to select groups of CERO identifiers (see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>), as opposed to simply listing     all the identifiers that are of interest for output. More detail about sets is provided below - <a class="reference internal" href="#sets"><span class="std std-ref">Sets</span></a>.</li>
+<li><code class="docutils literal"><span class="pre">map:</span> <span class="pre">(dict:</span> <span class="pre">str</span> <span class="pre">-&gt;</span> <span class="pre">str)</span></code> - key-value pairs that maps the &#8220;old&#8221; identifier to a &#8220;new&#8221; identifier.</li>
+<li><code class="docutils literal"><span class="pre">ref_dir:</span> <span class="pre">(str)</span></code> where <code class="docutils literal"><span class="pre">ref_dir</span></code> is a file path relative to the current working directory. By default, all     file names are interpreted as being relative to the configuration file. Providing this option overrides the default.</li>
+<li><code class="docutils literal"><span class="pre">auto_lstrip:</span> <span class="pre">(str)</span></code> where <code class="docutils literal"><span class="pre">str</span></code>, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a <cite>str</cite>), or the first field of the identifier (if the identifier is a <cite>tuple</cite>), then a <cite>ValueError</cite> is raised. This option is designed to correspond to CEROs generated using ToCERO with the <code class="docutils literal"><span class="pre">auto_prepend</span></code> option provided.</li>
+</ul>
+</div></blockquote>
+<p>Note that, in general, properties at a lower level (i.e. more indentation) &#8216;inherit&#8217; from a higher level.</p>
+<p>So, an example configuration, in YAML format, is:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_csv_file.csv</span>
+<span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Procedure Object A&gt;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Procedure Object B&gt;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Procedure Object C&gt;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;etc.&gt;</span>
+</pre></div>
+</div>
+<p>Examples of complete configuration files can be found in the <code class="docutils literal"><span class="pre">tests/data</span></code> subdirectory of the ConCERO install path.</p>
+<div class="section" id="procedure-objects">
+<span id="id1"></span><h4>Procedure Objects<a class="headerlink" href="#procedure-objects" title="Permalink to this headline">¶</a></h4>
+<p>Conceptually, procedure objects provide the instructions to select data from a CERO, mutate that data (if necessary), and then either, (a): output this data into a file, or (b): return outputs for later export into a global file (specified by the <code class="docutils literal"><span class="pre">file</span></code> option in the outputs object). Any mutations that are applied to a procedure object&#8217;s <code class="docutils literal"><span class="pre">inputs</span></code> are isolated from any other procedure object and the CERO itself - i.e. each procedure can be considered a &#8216;silo&#8217; separate from others.</p>
+<p>A <em>procedure object</em> can be either a <code class="docutils literal"><span class="pre">str</span></code> or a <code class="docutils literal"><span class="pre">dict</span></code>. The <code class="docutils literal"><span class="pre">dict</span></code> form is the more general form - if a procedure object is provided as the (<code class="docutils literal"><span class="pre">str</span></code>) <code class="docutils literal"><span class="pre">ser_obj</span></code>, it is immediately converted to the equivalent form <code class="docutils literal"><span class="pre">{'name':</span> <span class="pre">ser_obj}</span></code> - a <code class="docutils literal"><span class="pre">dict</span></code> containing the one mandatory option:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name given to the procedure.</li>
+</ul>
+</div></blockquote>
+<p>Often, more specification will be necessary. Other options include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">file:</span> <span class="pre">(str)</span></code> - if provided, the output from this procedure object, and only this procedure object, will     be exported to <code class="docutils literal"><span class="pre">file</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">inputs:</span> <span class="pre">list(str|list(str))</span></code> - is a list of identifiers corresponding to identifiers in the CERO.     If an item of the list is a string with one or more commas, or is itself a list, then the item will be     interpreted as a tuple-form identifier. See <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>.</li>
+<li><code class="docutils literal"><span class="pre">outputs:</span> <span class="pre">list(str|list(str))</span></code> - a list of identifiers that are to be exported to the file. If outputs     are not specified, then ConCERO will export all <em>updated</em> inputs after all operations are performed. Read     <a class="reference internal" href="#output-process-flow"><span class="std std-ref">Description of the output process-flow</span></a> to understand what is meant by <em>updated</em> inputs. If it is desirable that none of the data     series be exported to a file in a conventional manner, which is the case if - for example - plotting output,     then specify <code class="docutils literal"><span class="pre">outputs</span></code>, but leave the corresponding value blank to indicate a value of <code class="docutils literal"><span class="pre">None</span></code>.     If an item of the list is a string with one or more commas, or is itself a list, then the item will be     interpreted as a tuple-form identifier. See <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>.</li>
+<li><code class="docutils literal"><span class="pre">operations:</span> <span class="pre">list[operations</span> <span class="pre">objects]</span></code> - to mutate the <code class="docutils literal"><span class="pre">inputs</span></code> into a desirable form for export,     operations must be applied to mutate the data. <code class="docutils literal"><span class="pre">operations</span></code> is a list of <em>operations objects</em>, which     modify the data in a sequential manner. See <a class="reference internal" href="#operations-objects"><span class="std std-ref">Operations Objects</span></a> for more information.</li>
+</ul>
+</div></blockquote>
+<p>Below is a shell showing the two different procedure object types:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">(str)</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">(list[str])</span>
+      <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">(list[operation])</span>
+      <span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">(str)</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">(str)</span>
+</pre></div>
+</div>
+<p>The 1st procedure object is in dictionary form, and the 2nd is in string form.</p>
+</div>
+<div class="section" id="inheritance-paths">
+<h4>Inheritance paths<a class="headerlink" href="#inheritance-paths" title="Permalink to this headline">¶</a></h4>
+<p>Below is an outline of how options are inherited:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">inputs</span></code> - If inputs is undefined, then <code class="docutils literal"><span class="pre">inputs</span></code> is the identifier <code class="docutils literal"><span class="pre">name</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">outputs</span></code> - If outputs is undefined, it is assumed to be equivalent to <code class="docutils literal"><span class="pre">inputs</span></code>. By extension, if <code class="docutils literal"><span class="pre">inputs</span></code>     is undefined, then <code class="docutils literal"><span class="pre">outputs</span></code> is the identifer <code class="docutils literal"><span class="pre">name</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">operations</span></code> - Inherits from the outputs object, if unspecified. It is not necessary to specify a value     for <code class="docutils literal"><span class="pre">operations</span></code>.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="operations-objects">
+<span id="id2"></span><h4>Operations Objects<a class="headerlink" href="#operations-objects" title="Permalink to this headline">¶</a></h4>
+<p>An <em>operation</em> refers to the process of applying a function to some inputs to return an output(s). Unlike separate procedures, operations (within the same procedure object) can <em>not</em> be considered to operate in a &#8216;silo&#8217; manner, and therefore the order of <code class="docutils literal"><span class="pre">operations</span></code> is significant. Each item of the list <code class="docutils literal"><span class="pre">operations</span></code> must be an <em>operation object</em> - that is, a <code class="docutils literal"><span class="pre">dict</span></code> with the mandatory option:</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">func:</span> <span class="pre">(str)</span></code> - <code class="docutils literal"><span class="pre">func</span></code> is the name of a function present in the <code class="docutils literal"><span class="pre">libfuncs</span></code> library, that is applied to     <code class="docutils literal"><span class="pre">arrays</span></code> (see below). If <code class="docutils literal"><span class="pre">arrays</span></code> is not provided, <code class="docutils literal"><span class="pre">func</span></code> is applied to <code class="docutils literal"><span class="pre">inputs</span></code>. The functions available     can be easily expanded by:</dt>
+<dd><ol class="first last arabic simple">
+<li>Correctly identifying the class of the new function - see <span class="xref std std-ref">func_classes</span>.</li>
+<li>Adding the function to the <code class="docutils literal"><span class="pre">libfuncs.py</span></code> file, <em>with the associated function decorator</em> (as explained in         <span class="xref std std-ref">func_classes</span>).</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>And may have the options:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">arrays:</span> <span class="pre">list(str|list(str))</span></code> - <code class="docutils literal"><span class="pre">arrays</span></code> must be of the same form as <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">outputs</span></code>. <code class="docutils literal"><span class="pre">arrays</span></code>     specifies which of the <code class="docutils literal"><span class="pre">inputs</span></code> that <code class="docutils literal"><span class="pre">func</span></code> will manipulate. Note that any manipulation to applied to     <code class="docutils literal"><span class="pre">arrays</span></code> will be in effect for all subsequent <code class="docutils literal"><span class="pre">operations</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">rename:</span> <span class="pre">(str)</span></code> - providing this option renames the first element of <code class="docutils literal"><span class="pre">arrays</span></code> to <code class="docutils literal"><span class="pre">rename</span></code> (inline with     how strings are interpreted as identifiers - see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>).</li>
+<li><code class="docutils literal"><span class="pre">start_year:</span> <span class="pre">(int)</span></code> - this option constrains the dataset to years after and <strong>including</strong> <code class="docutils literal"><span class="pre">start_year</span></code>. This     option may be useful to avoid attempting to apply <code class="docutils literal"><span class="pre">func</span></code> to missing data.</li>
+<li><code class="docutils literal"><span class="pre">end_year:</span> <span class="pre">(int)</span></code> - this option constrains the dataset to years before and <strong>excluding</strong> <code class="docutils literal"><span class="pre">end_year</span></code>. This     option may be useful to avoid attempting to apply <code class="docutils literal"><span class="pre">func</span></code> to missing data.</li>
+</ul>
+</div></blockquote>
+<p>Additional options can be provided, and are passed to <code class="docutils literal"><span class="pre">func</span></code> as keyword arguments.</p>
+</div>
+<div class="section" id="sets">
+<span id="id3"></span><h4>Sets<a class="headerlink" href="#sets" title="Permalink to this headline">¶</a></h4>
+<p>The option:</p>
+<p><code class="docutils literal"><span class="pre">sets:</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">list(str)]</span></code></p>
+<p>Providing the <code class="docutils literal"><span class="pre">sets</span></code> option to the outputs object provides a powerful way to list many identifiers with a small amount of references. An example configuration of sets is:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sets</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">ASET</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+</pre></div>
+</div>
+<p>A user, could then specify all the elements of the set for the purposes of <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">arrays</span></code> by referencing the set as an item in the procedure option <code class="docutils literal"><span class="pre">inputs</span></code> or the operation option <code class="docutils literal"><span class="pre">arrays</span></code>. For example:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sets</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">ASET</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
+<span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_procedure</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
+      <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_func</span>
+          <span class="l l-Scalar l-Scalar-Plain">arrays</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
+</pre></div>
+</div>
+<p>Which is equivalent to (the more verbose):</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_procedure</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
+      <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_func</span>
+          <span class="l l-Scalar l-Scalar-Plain">arrays</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
+</pre></div>
+</div>
+<p>Specifying <code class="docutils literal"><span class="pre">sets</span></code> is even more powerful when using them in the context of tuple-identifiers. For example, consider that these (100*100 = 10,000) identifiers were in the CERO (in python list form):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;100&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Rather than listing all 10,000 identifiers, a user can create a set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">sets</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;century&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>and select all 10,000 identifiers by referencing the set twice with a comma inbetween - e.g. in YAML:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">century,century</span>
+</pre></div>
+</div>
+<p>Note that the selection takes place by using the cartesian product operation, and it is necessary that the cartesian product be convex.</p>
+</div>
+</div>
+</div>
+<div class="section" id="description-of-the-output-process-flow">
+<span id="output-process-flow"></span><h2>Description of the output process-flow<a class="headerlink" href="#description-of-the-output-process-flow" title="Permalink to this headline">¶</a></h2>
+<p>Each procedure object - that is, an item in the mandatory outputs object option <code class="docutils literal"><span class="pre">procedures</span></code> - corresponds to the output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not at all), and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO to an output file, the general process flow is:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">From the given CERO, identify as <code class="docutils literal"><span class="pre">inputs</span></code> the relevant data series by their identifier.</p>
+</li>
+<li><p class="first">Copy those <code class="docutils literal"><span class="pre">inputs</span></code> to avoid disturbing/mutating the original CERO.</p>
+</li>
+<li><dl class="first docutils">
+<dt>From the copied inputs, perform a sequence of operations where, for each operation:</dt>
+<dd><ol class="first last arabic simple">
+<li>A subset of the copied <code class="docutils literal"><span class="pre">inputs</span></code> is selected (that is, the <code class="docutils literal"><span class="pre">arrays</span></code>).</li>
+<li>A function mutates the <code class="docutils literal"><span class="pre">arrays</span></code>. By default, the result of the mutation is stored as the first item in         <code class="docutils literal"><span class="pre">arrays</span></code>.</li>
+<li>The copied inputs get updated with the mutated <code class="docutils literal"><span class="pre">arrays</span></code>, such that subsequent operations that mutate         the same data series operate on the mutated result, not the original <code class="docutils literal"><span class="pre">inputs</span></code>. The updated form of         the <code class="docutils literal"><span class="pre">inputs</span></code>, in the context of a procedure object, is referred to as the <em>updated inputs</em>.</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Export <code class="docutils literal"><span class="pre">outputs</span></code> to either:</dt>
+<dd><ol class="first last arabic simple">
+<li><code class="docutils literal"><span class="pre">file</span></code>, if <code class="docutils literal"><span class="pre">file</span></code> is specified the procedure object, or</li>
+<li><code class="docutils literal"><span class="pre">file</span></code> as defined in the outputs object, <em>if specified</em>, or</li>
+<li><code class="docutils literal"><span class="pre">output.csv</span></code> if <code class="docutils literal"><span class="pre">file</span></code> is unspecified.</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="fromcero-technical-specification">
+<h2>FromCERO Technical Specification<a class="headerlink" href="#fromcero-technical-specification" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="from_cero.FromCERO">
+<em class="property">class </em><code class="descclassname">from_cero.</code><code class="descname">FromCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>*</em>, <em>parent=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dict]' conf</strong> (<em>'Union[str,</em>) &#8211; A dictionary containing the configuration. If a <cite>str</cite> is provided, it is interpreted as the filename, relative to the current working directory, of a configuration file (in YAML format).</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; If provided, the created object will inherit from the parent <cite>dict</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the <cite>dict</cite> class).</p>
+<dl class="method">
+<dt id="from_cero.FromCERO.exec_procedures">
+<code class="descname">exec_procedures</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.exec_procedures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.exec_procedures" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cero</strong> (<em>pandas.DataFrame</em>) &#8211; A CERO object on which to apply the procedures. The argument is not mutated/modified.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.is_valid">
+<em class="property">static </em><code class="descname">is_valid</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs static checks on <code class="docutils literal"><span class="pre">conf</span></code>.</p>
+<dl class="docutils">
+<dt>Checks include:</dt>
+<dd><ul class="first last simple">
+<li>Valid configuration.</li>
+<li>If <code class="docutils literal"><span class="pre">file</span></code> given, that the user has write permissions in that directory.</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; </li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.load_config">
+<em class="property">static </em><code class="descname">load_config</code><span class="sig-paren">(</span><em>conf</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads configuration of FromCERO. If conf is a <cite>str</cite>, this is interpreted as configuration filename. Otherwise conf must be a dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dict]' conf</strong> (<em>'Union[str,</em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.run_checks">
+<em class="property">static </em><code class="descname">run_checks</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.run_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.run_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs runtime checks on <code class="docutils literal"><span class="pre">conf</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; </li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<p>Created on Jan 22 08:44:08 2018</p>
+<p><em>Section author: Lyle Collins &lt;<a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a>&gt;</em></p>
+<p><em>Code author: Lyle Collins &lt;<a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a>&gt;</em></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Converting FROM the Collins Economics Result Object (CERO) format</a><ul>
+<li><a class="reference internal" href="#output-independent-instructions">Output-Independent Instructions</a><ul>
+<li><a class="reference internal" href="#setting-up-a-fromcero-configuration-file">Setting up a FromCERO configuration file</a><ul>
+<li><a class="reference internal" href="#procedure-objects">Procedure Objects</a></li>
+<li><a class="reference internal" href="#inheritance-paths">Inheritance paths</a></li>
+<li><a class="reference internal" href="#operations-objects">Operations Objects</a></li>
+<li><a class="reference internal" href="#sets">Sets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#description-of-the-output-process-flow">Description of the output process-flow</a></li>
+<li><a class="reference internal" href="#fromcero-technical-specification">FromCERO Technical Specification</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="to_cero.html" title="previous chapter">Converting TO the Collins Economics Result Object (CERO) format</a></li>
+      <li>Next: <a href="libfuncs_wrappers.html" title="next chapter">Classes of User-Specified Functions for operating on CEROs</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/from_cero.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/from_cero.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

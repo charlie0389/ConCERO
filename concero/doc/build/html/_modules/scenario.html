@@ -1,0 +1,548 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>scenario &#8212; ConCERO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="ConCERO 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for scenario</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Feb 05 09:44:50 2018</span>
+
+<span class="sd">.. sectionauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">.. codeauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">concero.conf</span> <span class="k">as</span> <span class="nn">conf</span>
+<span class="kn">from</span> <span class="nn">concero.format_convert_tools</span> <span class="k">import</span> <span class="n">read_yaml</span>
+<span class="kn">from</span> <span class="nn">concero.model</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">concero.to_cero</span> <span class="k">import</span> <span class="n">ToCERO</span>
+<span class="kn">from</span> <span class="nn">concero.from_cero</span> <span class="k">import</span> <span class="n">FromCERO</span>
+<span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
+
+<div class="viewcode-block" id="Scenario"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario">[docs]</a><span class="k">class</span> <span class="nc">Scenario</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sc_def</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param sc_def: A scenario definition object.</span>
+<span class="sd">        :param args: Passed to the superclass (dict) as positional arguments at initialisation.</span>
+<span class="sd">        :param scenarios_set: A ScenariosSet object, used to verify that ``sc_def`` is a valid \</span>
+<span class="sd">        definition.</span>
+<span class="sd">        :param kwargs: Passed to the superclass (dict) as keyword arguments at initialisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;models&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;scenarios_set&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;input_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;output_conf&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sc_def</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Scenario definition provided in incorrect format - type </span><span class="si">%s</span><span class="s2"> instead of dict.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">sc_def</span><span class="p">))</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sc_def</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scenarios_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;scenarios_set&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenarios_set</span>
+
+        <span class="n">sc_def</span> <span class="o">=</span> <span class="n">defaults</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">sc_def</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">])]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+
+        <span class="n">model_parent</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Model</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">model_parent</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]]</span>
+
+        <span class="c1"># Load ToCERO conf</span>
+        <span class="n">par_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]}</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ic</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">parent</span><span class="o">=</span><span class="n">par_dict</span><span class="p">)</span>
+
+        <span class="c1"># Load FromCERO conf</span>
+        <span class="n">par_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]}</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">oc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">parent</span><span class="o">=</span><span class="n">par_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>  <span class="c1"># Check Scenario is valid</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenarios_set&quot;</span><span class="p">):</span>
+            <span class="n">scenarios_set</span> <span class="o">=</span> <span class="n">ScenariosSet</span><span class="p">(</span><span class="n">scen_defs</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;scenarios_set&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">scenarios_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link_scenario_set</span><span class="p">(</span><span class="n">scenarios_set</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;run_no&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="c1"># run_no defaults to 1 if not provided</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;run_no&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Scenario.run"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a scenario run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_empty</span><span class="p">()</span>
+
+        <span class="n">ceros</span> <span class="o">=</span> <span class="p">[</span><span class="n">in_conf</span><span class="o">.</span><span class="n">create_cero</span><span class="p">()</span> <span class="k">for</span> <span class="n">in_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully loaded scenario inputs as CERO.&quot;</span><span class="p">)</span>
+
+        <span class="n">FromCERO</span><span class="o">.</span><span class="n">xlsx_out</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cero</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%03d</span><span class="s2">_step_</span><span class="si">%02d</span><span class="s2">.xlsx&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;run_no&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">]):</span>
+            <span class="n">m_cero</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cero</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed run of model (</span><span class="si">%s</span><span class="s2">).&quot;</span> <span class="o">%</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+            <span class="c1"># If ouput_conf is not defined for a model, then None is returned...</span>
+            <span class="k">if</span> <span class="n">m_cero</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">m_cero</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Object returned from model run is *not* of CERO format.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_mod_xlsx&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_mod_xlsx&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)):</span>
+                <span class="c1"># By default, export model outputs automatically to xlsx files</span>
+                <span class="n">model_out_file</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%03d</span><span class="s2">_</span><span class="si">%s</span><span class="s2">.xlsx&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;run_no&quot;</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exporting output of </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">model_out_file</span><span class="p">))</span>
+                <span class="n">m_cero</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">model_out_file</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">cero</span><span class="p">,</span> <span class="n">m_cero</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_int_xlsx&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="c1"># If true (default), export the intermediate steps to xlsx files</span>
+                <span class="n">isfn</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%03d</span><span class="s2">_step_</span><span class="si">%02d</span><span class="s2">.xlsx&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;run_no&quot;</span><span class="p">],</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exporting updated CERO to </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">isfn</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cero</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">isfn</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">out_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]:</span>
+            <span class="n">out_conf</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cero</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed generation of scenario outputs.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Scenario.is_valid"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Performs static checks on ``self`` to ensure it is a valid Scenario object.&quot;&quot;&quot;</span>
+
+        <span class="n">req_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;models&quot;</span><span class="p">,</span> <span class="s2">&quot;input_conf&quot;</span><span class="p">,</span> <span class="s2">&quot;output_conf&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">req_keys</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Not all required key-value pairs have been defined. &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;It is necessary to define all of </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">req_keys</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Scenario property </span><span class="se">\&#39;</span><span class="s2">models</span><span class="se">\&#39;</span><span class="s2"> must be defined as a list.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">Model</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Object &#39;</span><span class="si">%s</span><span class="s2">&#39; is of type &#39;</span><span class="si">%s</span><span class="s2">&#39;, not &#39;Model&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">ic</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">oc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">oc</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Scenario.run_checks"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.run_checks">[docs]</a>    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs runtime checks on ``self`` to ensure it is a valid Scenario object. Failure of runtime checks indicates that the scenario is not ready to run.</span>
+
+<span class="sd">        :param bool raise_exception:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]:</span>
+            <span class="n">ToCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">ic</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Scenario.link_scenario_set"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.link_scenario_set">[docs]</a>    <span class="k">def</span> <span class="nf">link_scenario_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Link a ScenariosSet object (``scenarios_set``) to this Scenario (if it hasn&#39;t already been done).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scenarios_set</span><span class="o">.</span><span class="n">is_valid_def</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Check if scenario definition is valid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linked_scenariosets</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_linked_scenariosets&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">ss</span> <span class="o">==</span> <span class="n">scenarios_set</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linked_scenariosets</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_linked_scenariosets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scenarios_set</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;ScenariosSet already linked to Scenario.&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">Scenario</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Scenario.get_name"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long_form</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the ``Scenario``, which is dependent on the first linked ``ScenariosSet`` object.</span>
+<span class="sd">        :param long_form: If ``True`` (default) return a long-form of the name. If ``False``, return a short form.</span>
+<span class="sd">        :return: The name of the ``Scenario``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_linked_scenariosets&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linked_scenariosets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_scenario_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long_form</span><span class="o">=</span><span class="n">long_form</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Must either link ScenariosSet, or give Scenario a &#39;name&#39; before a name can be generated.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">orig_filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+            <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Scenario.find_file(): testing path: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; not found on any of the paths </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orig_filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">])</span>
+            <span class="n">Scenario</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Scenario.get_linked_scenarios"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.get_linked_scenarios">[docs]</a>    <span class="k">def</span> <span class="nf">get_linked_scenarios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return &quot;List[&#39;ScenariosSet&#39;]&quot;: A list of linked ``ScenariosSet``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_linked_scenariosets&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Scenario.load_scenarios"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.load_scenarios">[docs]</a>    <span class="k">def</span> <span class="nf">load_scenarios</span><span class="p">(</span><span class="n">scen_def</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param scen_def: The file containing one or more scenario definitions.</span>
+<span class="sd">        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \</span>
+<span class="sd">        definition.</span>
+<span class="sd">        :return &quot;Union[&#39;Scenario&#39;, List[&#39;Scenario&#39;]]&quot;: Either a single ``Scenario``, or a ``list`` of ``Scenario``s.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">scen_def</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">scen_def</span><span class="p">))</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">scen_def</span><span class="p">))</span>
+            <span class="n">scen_def</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">scen_def</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;defaults: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
+        <span class="n">Scenario</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># single scenario in file</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Scenario</span><span class="o">.</span><span class="n">load_scenario</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="o">=</span><span class="n">scenarios_set</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">defaults</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># List of scenarios</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Scenario</span><span class="o">.</span><span class="n">load_scenario</span><span class="p">(</span><span class="n">scd</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="o">=</span><span class="n">scenarios_set</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">defaults</span><span class="p">)</span> <span class="k">for</span> <span class="n">scd</span> <span class="ow">in</span> <span class="n">scen_def</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Scenario.load_scenario"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.load_scenario">[docs]</a>    <span class="k">def</span> <span class="nf">load_scenario</span><span class="p">(</span><span class="n">scen_def</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param scen_def: The file containing a single scenario definition, or a scenario definition `dict`.</span>
+<span class="sd">        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \</span>
+<span class="sd">        definition.</span>
+<span class="sd">        :return &#39;Scenario&#39;: A single ``Scenario`` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())}</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">scen_def</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">scen_def</span><span class="p">)</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">scen_def</span><span class="p">))</span>
+            <span class="n">scen_def</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">scen_def</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;scen_def&#39; must be either a str to a file containing a scenario definition or a scenario definition dict.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Scenario</span><span class="p">(</span><span class="n">scen_def</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="o">=</span><span class="n">scenarios_set</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">defaults</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ScenariosSet"><a class="viewcode-back" href="../scenarios.html#scenario.ScenariosSet">[docs]</a><span class="k">class</span> <span class="nc">ScenariosSet</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scen_defs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A ``ScenariosSet`` object defines a set of valid ``Scenario``, and is therefore can be used to \</span>
+<span class="sd">        name a ``Scenario``, or check validity of a ``Scenario``.</span>
+
+<span class="sd">        :param scen_defs: The file containing the definition of valid scenarios.</span>
+<span class="sd">        :param args: Passed to the superclass (``list``) on initialisation.</span>
+<span class="sd">        :param kwargs: Passed to the superclass (``list``) on initialisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">scen_defs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">)</span>
+            <span class="c1"># scen_defs = os.path.relpath(os.path.normpath(scen_defs))</span>
+            <span class="n">scen_defs</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># If dict, assumed to be single-workstream ScenarioSet</span>
+            <span class="n">scen_defs</span> <span class="o">=</span> <span class="p">[</span><span class="n">scen_defs</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">),</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;scen_defs&#39; must be provided as a filename, or a list of workstreams, or a dict representing a single workstream.&quot;</span><span class="p">)</span>
+
+        <span class="n">scen_defs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_WorkStream</span><span class="p">(</span><span class="n">wkstrm_def</span><span class="p">)</span> <span class="k">for</span> <span class="n">wkstrm_def</span> <span class="ow">in</span> <span class="n">scen_defs</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScenariosSet.is_valid"><a class="viewcode-back" href="../scenarios.html#scenario.ScenariosSet.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks object is a valid ScenarioSet. NOT implemented.&quot;&quot;&quot;</span>
+        <span class="c1">#TODO: Write this</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ScenariosSet.is_valid_def"><a class="viewcode-back" href="../scenarios.html#scenario.ScenariosSet.is_valid_def">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid_def</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks that ``scenario`` is a valid definition for this ``ScenarioSet``. A scenario is a valid definition\</span>
+<span class="sd">        if it is an element of the set defined by ``self``.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scenario</span><span class="p">,</span> <span class="n">Scenario</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid scenario definition. Argument &#39;scenario&#39; is not of scenario.Scenario type.&quot;</span><span class="p">)</span>
+
+        <span class="n">wkstrm_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">wkstrm</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">wkstrm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="n">wkstrm_ids</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">scenario</span><span class="p">[</span><span class="s2">&quot;def&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Non-existant workstreams defined in scenario.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">wkstrm_id</span> <span class="ow">in</span> <span class="n">scenario</span><span class="p">[</span><span class="s2">&quot;def&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">wkstrm_id</span> <span class="ow">in</span> <span class="n">wkstrm_ids</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Not all workstreams have been defined.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">wkstrm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">wkstrm</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="n">wkstrm</span><span class="o">.</span><span class="n">is_valid_def</span><span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s2">&quot;def&quot;</span><span class="p">][</span><span class="nb">id</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ScenariosSet.get_scenario_name"><a class="viewcode-back" href="../scenarios.html#scenario.ScenariosSet.get_scenario_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_scenario_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario</span><span class="p">:</span> <span class="n">Scenario</span><span class="p">,</span> <span class="n">long_form</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given ``scenario``, returns the name of the ``scenario`` in a long or short form.</span>
+<span class="sd">        :param scenario: A ``Scenario`` object to retrieve the name of.</span>
+<span class="sd">        :param long_form: If ``True`` (default), return the long form name, otherwise return the short form.</span>
+<span class="sd">        :return: The name of the ``Scenario``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid_def</span><span class="p">(</span><span class="n">scenario</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">scenario</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Scenario must have a name to provide string representation.&quot;</span><span class="p">)</span>
+
+        <span class="n">nm</span> <span class="o">=</span> <span class="n">scenario</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+
+        <span class="k">for</span> <span class="n">wkstrm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">wkstrm</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="n">nm</span> <span class="o">+=</span> <span class="n">wkstrm</span><span class="o">.</span><span class="n">get_str</span><span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s2">&quot;def&quot;</span><span class="p">][</span><span class="nb">id</span><span class="p">],</span> <span class="n">long_form</span><span class="o">=</span><span class="n">long_form</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nm</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span> <span class="o">==</span> <span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<span class="k">class</span> <span class="nc">_WorkStream</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wkstrm_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">wkstrm_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Issue</span><span class="p">(</span><span class="n">issue</span><span class="p">)</span> <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;issues&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">all</span><span class="p">([</span>
+                <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">,</span>
+                <span class="s2">&quot;issues&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid workstream definition provided.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">is_valid_def</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workstream</span><span class="p">):</span>
+        <span class="n">issue_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">issue</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="n">issue_ids</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">workstream</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Issues inappropriate for workstream </span><span class="si">%s</span><span class="s2"> defined.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">issue_id</span> <span class="ow">in</span> <span class="n">workstream</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">issue_id</span> <span class="ow">in</span> <span class="n">issue_ids</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Not all issues for workstream </span><span class="si">%s</span><span class="s2"> have been defined.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">issue</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="n">issue</span><span class="o">.</span><span class="n">is_valid_def</span><span class="p">(</span><span class="n">workstream</span><span class="p">[</span><span class="nb">id</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">get_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workstrm_def</span><span class="p">,</span> <span class="n">long_form</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+        <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">issue</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="n">nm</span> <span class="o">+=</span> <span class="n">issue</span><span class="o">.</span><span class="n">get_str</span><span class="p">(</span><span class="n">workstrm_def</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">long_form</span><span class="o">=</span><span class="n">long_form</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nm</span>
+
+
+<span class="k">class</span> <span class="nc">_Issue</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issue_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">issue_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">all</span><span class="p">([</span>
+                <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">,</span>
+                <span class="s2">&quot;values&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">,</span>
+                <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="p">]))</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid issue definition provided.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_valid_def</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issue</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Inappropriate value for issue </span><span class="si">%s</span><span class="s2"> defined.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">get_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issue_def</span><span class="p">,</span> <span class="n">long_form</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">nm</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">long_form</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">issue_def</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">nm</span> <span class="o">+=</span> <span class="s2">&quot;B&quot;</span> <span class="k">if</span> <span class="n">issue_def</span> <span class="k">else</span> <span class="s2">&quot;O&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nm</span> <span class="o">+=</span> <span class="n">issue_def</span>
+        <span class="k">return</span> <span class="n">nm</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
