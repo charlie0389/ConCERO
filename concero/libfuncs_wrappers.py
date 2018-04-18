@@ -360,13 +360,13 @@ def series_op(func):
             assert(df.shape[0] == 1)
         except:
             raise TypeError("Must be single series in pandas.DataFrame.")
-        nans = (~df.iloc[0,:].isna()).tolist()
-        result = func(df.iloc[0, nans], *args, **kwargs)
+        valid_cols = (~df.iloc[0,:].isna()).tolist()
+        result = func(df.iloc[0, valid_cols], *args, **kwargs)
         try:
             assert(isinstance(result, pd.Series))
         except AssertionError:
             raise TypeError("A \'series_op\' must return pandas.Series object.")
-        df.iloc[0, nans] = result
+        df.iloc[0, valid_cols] = result
         return None
     return wrapper
 

@@ -3,6 +3,8 @@ import os
 import logging
 
 project_dir = os.path.dirname(__file__)
+d_t = os.path.join(project_dir, "tests", "") # Test directory with trailing /
+d_td = os.path.join(d_t, "data", "") # test data directory with trailing /
 _search_paths = []
 
 _logd = None

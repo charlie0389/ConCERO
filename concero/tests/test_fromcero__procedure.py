@@ -15,12 +15,11 @@ import pandas as pd
 from concero.tests.data_tools import DefaultTestCase
 from concero.cero import CERO
 from concero.from_cero import FromCERO
+import concero.conf as cfg
 
 
 class TestFromCERO_Procedure(DefaultTestCase):
     '''Tests CERO methods.'''
-    _dd = os.path.join(os.path.dirname(__file__), "data", "")
-
 
     def test_load(self):
 
@@ -30,7 +29,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
         self.assertTrue(CERO.is_cero(cero))
 
-        fc = FromCERO(TestFromCERO_Procedure._dd + "test_fromcero_procedureload.yaml")
+        fc = FromCERO(cfg.d_td + "test_fromcero_procedureload.yaml")
         fc.exec_procedures(cero)
 
         df1 = pd.read_csv("procedureload.csv", index_col=0)
@@ -86,7 +85,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         cero.sort_index(inplace=True)
         self.assertTrue(CERO.is_cero(cero))
 
-        fc = FromCERO(TestFromCERO_Procedure._dd + "test_procedure_export_csv.yaml")
+        fc = FromCERO(cfg.d_td + "test_procedure_export_csv.yaml")
         fc.exec_procedures(cero)
 
         df1 = pd.read_csv("csv_export.csv", index_col=0)
@@ -106,7 +105,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
         self.assertTrue(CERO.is_cero(cero))
 
-        fc = FromCERO(TestFromCERO_Procedure._dd + "test_procedure_export_xlsx.yaml")
+        fc = FromCERO(cfg.d_td + "test_procedure_export_xlsx.yaml")
         fc.exec_procedures(cero)
 
         df1 = pd.read_excel("xlsx_export.xlsx", index_col=0)
@@ -125,7 +124,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
         self.assertTrue(CERO.is_cero(cero))
 
-        fc = FromCERO(TestFromCERO_Procedure._dd + "test_procedure_autoexport.yaml")
+        fc = FromCERO(cfg.d_td + "test_procedure_autoexport.yaml")
         fc.exec_procedures(cero)
 
         df1 = pd.read_csv("auto_csv_export.csv", index_col=0)
@@ -164,6 +163,30 @@ class TestFromCERO_Procedure(DefaultTestCase):
         self.assertTrue(df.shape[0] == 1)
 
         os.remove("test_output_cero.csv")
+
+    def test_load_sets_from_file(self):
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+        self.assertTrue(CERO.is_cero(cero))
+
+        proc = FromCERO._Procedure({"sets": {"a_set": cfg.d_td + "test_set.yaml"},
+                                    "ref_dir": ".",
+                                    "name": "test_set",
+                                    "inputs": ["a_set"],
+                                    "file": "test_sets.csv"})
+        proc.exec_ops(cero)
+        new_df = pd.read_csv("test_sets.csv", index_col=0)
+
+        test_labels = ["A", "B"]
+        test_vals = [[1], [2]]
+
+        self.assertTrue(new_df.index.tolist() == test_labels)
+        self.assertTrue(new_df.values.tolist() == test_vals)
+
+        os.remove("test_sets.csv")
+
 
 
 if script_run:

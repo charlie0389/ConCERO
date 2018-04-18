@@ -312,8 +312,20 @@ class FromCERO(dict):
                                                                                                   self._sup_procedure_output_types))
 
             # Ensure sets are in string form
-            for k, v in self.get("sets", {}).items():
-                self["sets"][k] = [val for val in v]
+            for k in self.get("sets", {}).keys():
+
+                if isinstance(self["sets"][k], str):
+                    # Interpret str as file path
+                    self["sets"][k] = read_yaml(self["sets"][k])
+
+                try:
+                    assert (issubclass(type(self["sets"][k]), list))
+                except AssertionError:
+                    msg = "Each set must be provided as a list, not type '%s' for object %s." % (type(self["sets"][k]), self["sets"][k])
+                    FromCERO._logger.error(msg)
+                    raise TypeError(msg)
+
+                self["sets"][k] = ["%s" % val for val in self["sets"][k]]
 
             # Determine identifiers for all inputs
             expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
