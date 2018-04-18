@@ -311,22 +311,6 @@ class FromCERO(dict):
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
-            # Ensure sets are in string form
-            for k in self.get("sets", {}).keys():
-
-                if isinstance(self["sets"][k], str):
-                    # Interpret str as file path
-                    self["sets"][k] = read_yaml(self["sets"][k])
-
-                try:
-                    assert (issubclass(type(self["sets"][k]), list))
-                except AssertionError:
-                    msg = "Each set must be provided as a list, not type '%s' for object %s." % (type(self["sets"][k]), self["sets"][k])
-                    FromCERO._logger.error(msg)
-                    raise TypeError(msg)
-
-                self["sets"][k] = ["%s" % val for val in self["sets"][k]]
-
             # Determine identifiers for all inputs
             expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
             self["inputs"] = list(it.chain(*expanded_inputs))
@@ -365,6 +349,10 @@ class FromCERO(dict):
 
             if defaults.get("file"):
                 defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
+
+            # Ensure sets are lists of strings
+            for k in defaults["sets"]:
+                defaults["sets"][k] = FromCERO._load_set(defaults["sets"][k], defaults["ref_dir"])
 
             if isinstance(defaults["inputs"], str):
                 defaults["inputs"] = [defaults["inputs"]]
@@ -635,6 +623,24 @@ class FromCERO(dict):
         return os.path.join(base_dir, filename)
 
     @staticmethod
+    def _load_set(set: "Union[str, List[str]]", ref_dir: str):
+
+        if isinstance(set, str):
+            # Interpret str as file path
+            set = read_yaml(set)
+
+        try:
+            assert (issubclass(type(set), list))
+        except AssertionError:
+            msg = "Each set must be provided as a list, not type '%s' for object %s." % (
+                type(set), set)
+            FromCERO._logger.error(msg)
+            raise TypeError(msg)
+
+        return ["%s" % val for val in set]
+
+
+    @staticmethod
     def load_config(conf, parent=None):
         """
         Loads configuration of FromCERO. If conf is a `str`, this is interpreted as configuration filename. Otherwise conf must be a dictionary.
@@ -669,6 +675,10 @@ class FromCERO(dict):
             _conf["ref_dir"] = os.path.abspath(os.getcwd())
 
         _conf["file"] = FromCERO.get_relpath(_conf["ref_dir"], _conf["file"])
+
+        # Ensure sets are lists of strings
+        for k in _conf.get("sets", {}).keys():
+            _conf["sets"][k] = FromCERO._load_set(_conf["sets"][k], _conf["ref_dir"])
 
         file_ext = os.path.splitext(_conf["file"])[1][1:]
         if file_ext in [".", ""]:
