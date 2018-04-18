@@ -209,8 +209,8 @@ import functools
 
 import pandas as pd
 
-import ConCERO.conf as conf
-from ConCERO._identifier import _Identifier
+import concero.conf as conf
+from concero._identifier import _Identifier
 
 log = conf.setup_logger(__name__)
 

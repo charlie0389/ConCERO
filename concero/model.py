@@ -9,11 +9,11 @@ import os
 import subprocess
 import contextlib
 
-import ConCERO.conf as conf
-import ConCERO.modfuncs as modfuncs
-from ConCERO.from_cero import FromCERO
-from ConCERO.to_cero import ToCERO
-from ConCERO.cero import CERO
+import concero.conf as conf
+import concero.modfuncs as modfuncs
+from concero.from_cero import FromCERO
+from concero.to_cero import ToCERO
+from concero.cero import CERO
 
 @contextlib.contextmanager
 def _modified_environ(*remove, **update):

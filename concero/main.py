@@ -5,14 +5,14 @@ Created on Feb 05 10:42:27 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 script_run = True if __name__ == "__main__" else False
-# __name__ = "ConCERO.main"
+# __name__ = "concero.main"
 
 import os
 import sys
 import argparse as ap
 
-import ConCERO.conf as conf
-from ConCERO.scenario import ScenariosSet, Scenario
+import concero.conf as conf
+from concero.scenario import ScenariosSet, Scenario
 
 def run(scenario, **kwargs):
 
@@ -55,7 +55,7 @@ def run(scenario, **kwargs):
 
 if script_run:
 
-    argpar = ap.ArgumentParser(prog="ConCERO",
+    argpar = ap.ArgumentParser(prog="concero",
              description="Run a scenario with ConCERO.")
     argpar.add_argument('scenario', type=str, #nargs=1,
                         help="The file that contains the scenario definition.")

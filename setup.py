@@ -13,12 +13,12 @@ def package_files(directory, append_to=None):
             paths.append(os.path.join('..', path, filename))
     return paths
 
-test_files = package_files('ConCERO/tests/data')
-doc_files = package_files('ConCERO/doc/build/html', append_to=test_files)
-doc_files = package_files('ConCERO/doc/source', append_to=doc_files)
+test_files = package_files('concero/tests/data')
+doc_files = package_files('concero/doc/build/html', append_to=test_files)
+doc_files = package_files('concero/doc/source', append_to=doc_files)
 doc_files.append('doc/Makefile')
 
-setup(name='ConCERO',
+setup(name='concero',
     version='0.1',
     description='Automates the running of models and data conversion for the ANO2 project.',
     author='Lyle Collins',
@@ -30,6 +30,6 @@ setup(name='ConCERO',
     install_requires=["scipy", "pandas>=0.22", "numpy", "pyyaml", "seaborn>=0.8.1", "xlrd>=1.1.0", "openpyxl", "pytz",
                       "python-dateutil", "six"],
     tests_require=["harpy", "gdxpds"],
-    test_suite="ConCERO.tests.test_concero.TestConCERO.__init__",
-    package_data={'ConCERO': doc_files},
+    test_suite="concero.tests.test_concero.TestConCERO.__init__",
+    package_data={'concero': doc_files},
 )

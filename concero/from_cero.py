@@ -268,8 +268,8 @@ Created on Jan 22 08:44:08 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 
-import ConCERO.conf
-if getattr(ConCERO.conf, "gdxpds_installed", False):
+import concero.conf
+if getattr(concero.conf, "gdxpds_installed", False):
     import gdxpds #: Warning given if not imported before pandas
 import os
 import copy
@@ -281,17 +281,17 @@ import getpass
 import numpy as np
 import pandas as pd
 
-from ConCERO.cero import CERO
-import ConCERO.libfuncs as libfuncs
-from ConCERO.format_convert_tools import read_yaml
-from ConCERO._identifier import _Identifier
-import ConCERO.libfuncs_wrappers as libfuncs_wrappers
+from concero.cero import CERO
+import concero.libfuncs as libfuncs
+from concero.format_convert_tools import read_yaml
+from concero._identifier import _Identifier
+import concero.libfuncs_wrappers as libfuncs_wrappers
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 class FromCERO(dict):
     sup_output_types = {'csv', 'xlsx', 'excel', 'npy', 'png', 'pdf', 'ps', 'eps', 'svg'}
-    _logger = ConCERO.conf.setup_logger(__name__)
+    _logger = concero.conf.setup_logger(__name__)
 
     class _Procedure(dict):
         """_Procedure object class."""
@@ -793,7 +793,7 @@ class FromCERO(dict):
             FromCERO._gdx_out(df, output_file, output_kwargs=output_kwargs)
         else:
             raise TypeError("Output files of this type cannot be created from dataframes. It will be necessary " + \
-                            "to create your own output function in ConCERO.libfuncs and call it as an operation.")
+                            "to create your own output function in concero.libfuncs and call it as an operation.")
 
     @staticmethod
     def _csv_out(df: pd.DataFrame, output_file: str, output_kwargs: dict=None, **kwargs):

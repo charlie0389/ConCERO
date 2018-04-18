@@ -117,13 +117,13 @@ import matplotlib
 #         import matplotlib.pyplot
 import seaborn
 
-import ConCERO.conf as conf
+import concero.conf as conf
 if getattr(conf, "harpy_installed", False):
     import harpy
 
-from ConCERO.libfuncs_wrappers import dataframe_op, series_op, recursive_op
-from ConCERO._identifier import _Identifier
-from ConCERO.cero import CERO
+from concero.libfuncs_wrappers import dataframe_op, series_op, recursive_op
+from concero._identifier import _Identifier
+from concero.cero import CERO
 
 seaborn.set() # Necessary from version 0.8.1 onwards to import colour palette
 

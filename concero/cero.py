@@ -85,7 +85,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from ConCERO._identifier import _Identifier
+from concero._identifier import _Identifier
 
 class CERO(object):
     _msg_inv_type = "Object not of CERO type (pandas.DataFrame)."

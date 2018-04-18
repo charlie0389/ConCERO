@@ -8,12 +8,12 @@ Created on Feb 05 09:44:50 2018
 import os
 import copy
 
-import ConCERO.conf as conf
-from ConCERO.format_convert_tools import read_yaml
-from ConCERO.model import Model
-from ConCERO.to_cero import ToCERO
-from ConCERO.from_cero import FromCERO
-from ConCERO.cero import CERO
+import concero.conf as conf
+from concero.format_convert_tools import read_yaml
+from concero.model import Model
+from concero.to_cero import ToCERO
+from concero.from_cero import FromCERO
+from concero.cero import CERO
 
 class Scenario(dict):
 

@@ -320,10 +320,10 @@ Created on Fri Jan 19 11:49:23 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 
-import ConCERO.conf
-if getattr(ConCERO.conf, "gdxpds_installed", False):
+import concero.conf
+if getattr(concero.conf, "gdxpds_installed", False):
     import gdxpds #: Warning given if not imported before pandas
-if getattr(ConCERO.conf, "harpy_installed", False):
+if getattr(concero.conf, "harpy_installed", False):
     import harpy
 
 import re
@@ -336,15 +336,15 @@ import getpass
 import pandas as pd
 import xlrd
 
-from ConCERO.format_convert_tools import read_yaml
-from ConCERO._identifier import _Identifier
-from ConCERO.cero import CERO
+from concero.format_convert_tools import read_yaml
+from concero._identifier import _Identifier
+from concero.cero import CERO
 
 
 class ToCERO(dict):
 
     # supported_file_types = ["har", "csv", "xlsx", "shk", "gdx"]
-    _logger = ConCERO.conf.setup_logger(__name__)
+    _logger = concero.conf.setup_logger(__name__)
 
     class _FileObj(dict):
 

@@ -8,7 +8,7 @@ import os
 import shutil
 import zipfile
 
-import ConCERO.conf as conf
+import concero.conf as conf
 
 log = conf.setup_logger(__name__)
 
