@@ -9,8 +9,8 @@ import unittest
 
 import pandas as pd
 
-from ConCERO.to_cero import ToCERO
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+from concero.to_cero import ToCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
 class TestScenIn2CERO(DefaultTestCase):

@@ -11,15 +11,15 @@ import sys
 import os
 import unittest
 
-import ConCERO.conf
-from ConCERO.to_cero import ToCERO
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+import concero.conf
+from concero.to_cero import ToCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
 class TestGTAPE2CERO(DefaultTestCase):
     '''Test the VURM to CERO conversion class.'''
 
-    @unittest.skipIf(not ConCERO.conf.gdxpds_installed, "gdxpds not installed")
+    @unittest.skipIf(not concero.conf.gdxpds_installed, "gdxpds not installed")
     def test_gtape2cero(self):
         '''Tests VURM2CERO conversion process.'''
 

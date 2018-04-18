@@ -10,9 +10,9 @@ import shutil
 
 import numpy as np
 
-import ConCERO.conf
-import ConCERO.scenario as sn
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+import concero.conf
+import concero.scenario as sn
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
 class TestScenario(DefaultTestCase):
@@ -23,7 +23,7 @@ class TestScenario(DefaultTestCase):
     def test_scenario_run(self):
         '''Tests a scenario run.'''
 
-        src = ConCERO.conf.find_file("dummy_model.py")
+        src = concero.conf.find_file("dummy_model.py")
         shutil.copy2(src, "dummy_model_run.py")
 
         ssf = TestScenario._dd + "test_scenario_set.yaml"

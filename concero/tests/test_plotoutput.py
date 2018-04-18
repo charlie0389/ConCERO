@@ -6,23 +6,15 @@ Created on Jan 23 08:29:29 2018
 """
 
 script_run = True if __name__ == "__main__" else False
-# print(__name__)
-__name__ = "ConCERO.tests.test_plotoutput"
-# print(__name__)
-# print(__file__)
-# print(__package__)
-# print(__spec__)
-# import sys
-# #print(sys.modules)
-# print(sys.meta_path)
+__name__ = "concero.tests.test_plotoutput"
 
 import os
 import unittest
 
-import ConCERO.conf as conf
-from ConCERO.from_cero import FromCERO
-from ConCERO.cero import CERO
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+import concero.conf as conf
+from concero.from_cero import FromCERO
+from concero.cero import CERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 class TestPlotOutput(DefaultTestCase):
     '''Tests plot output.'''

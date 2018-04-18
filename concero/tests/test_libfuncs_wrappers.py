@@ -10,10 +10,10 @@ import unittest
 import pandas as pd
 import numpy as np
 
-import ConCERO.libfuncs as libfuncs
-from ConCERO.cero import CERO
-import ConCERO.libfuncs_wrappers as libfuncs_wrappers
-from ConCERO.tests.data_tools import DefaultTestCase
+import concero.libfuncs as libfuncs
+from concero.cero import CERO
+import concero.libfuncs_wrappers as libfuncs_wrappers
+from concero.tests.data_tools import DefaultTestCase
 
 
 class TestLibfuncsWrappers(DefaultTestCase):

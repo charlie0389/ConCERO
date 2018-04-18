@@ -13,7 +13,7 @@ import unittest
 
 import pandas as pd
 
-import ConCERO.conf as conf
+import concero.conf as conf
 if getattr(conf, "harpy_installed", False):
     import harpy
 

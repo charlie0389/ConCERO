@@ -9,9 +9,9 @@ import unittest
 
 import numpy as np
 
-import ConCERO.conf as conf
-from ConCERO.from_cero import FromCERO
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+import concero.conf as conf
+from concero.from_cero import FromCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
 class TestCERO2GALLME(DefaultTestCase):

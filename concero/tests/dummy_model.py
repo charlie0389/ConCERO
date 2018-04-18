@@ -9,10 +9,10 @@ import os
 import sys
 import shutil
 
-import ConCERO.conf
+import concero.conf
 
 if __name__ == "__main__":
-    infile = ConCERO.conf.find_file("test_model_input.har")
+    infile = concero.conf.find_file("test_model_input.har")
     shutil.copyfile(infile, "test_model_output.har")
     print("Fake model successfully run!")
     sys.exit(0)

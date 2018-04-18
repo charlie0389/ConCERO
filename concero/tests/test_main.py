@@ -8,10 +8,10 @@ import os
 import unittest
 import shutil
 
-import ConCERO.conf
-import ConCERO.main
-import ConCERO.scenario as sn
-from ConCERO.tests.data_tools import DefaultTestCase
+import concero.conf
+import concero.main
+import concero.scenario as sn
+from concero.tests.data_tools import DefaultTestCase
 
 
 class TestMain(DefaultTestCase):
@@ -21,7 +21,7 @@ class TestMain(DefaultTestCase):
 
     def test_normal_run(self):
 
-        src = ConCERO.conf.find_file("dummy_model.py")
+        src = concero.conf.find_file("dummy_model.py")
         shutil.copy2(src, "dummy_model_run.py")
 
         scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
@@ -29,7 +29,7 @@ class TestMain(DefaultTestCase):
         ssf = TestMain._dd + "test_scenario_set.yaml"
         ss = sn.ScenariosSet(scen_defs=ssf)
 
-        ConCERO.main.run(scen_file, scenarios_set=ss)
+        concero.main.run(scen_file, scenarios_set=ss)
 
         # Clean up...
         os.remove('test_scen_outputs.har')
@@ -44,9 +44,9 @@ class TestMain(DefaultTestCase):
         ssf = TestMain._dd + "test_scenario_set.yaml"
         ss = sn.ScenariosSet(scen_defs=ssf)
 
-        ConCERO.main.run(scen_file, fake_run=True)
+        concero.main.run(scen_file, fake_run=True)
 
-        ConCERO.main.run(scen_file, scenarios_set=ss, fake_run=True)
+        concero.main.run(scen_file, scenarios_set=ss, fake_run=True)
 
         # TODO: Come up with more thorough way of checking the scenario hasn't run
 
@@ -56,9 +56,9 @@ class TestMain(DefaultTestCase):
         ssf = TestMain._dd + "test_scenario_set.yaml"
         ss = sn.ScenariosSet(scen_defs=ssf)
 
-        ConCERO.main.run(scen_file, fake_run=True)
+        concero.main.run(scen_file, fake_run=True)
 
-        ConCERO.main.run(scen_file, scenarios_set=ss, check=True)
+        concero.main.run(scen_file, scenarios_set=ss, check=True)
 
         # TODO: Come up with more thorough way of checking that checks have occured
 

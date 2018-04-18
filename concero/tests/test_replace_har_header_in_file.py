@@ -1,23 +1,15 @@
 script_run = True if __name__ == "__main__" else False
-# __name__ = "ConCERO.tests.test_replace_har_header_in_file"
 
 import unittest
 import os
 import shutil
 
-from ConCERO.from_cero import FromCERO
-from ConCERO.tests.data_tools import DataTools
+from concero.from_cero import FromCERO
+from concero.tests.data_tools import DataTools
 
 class TestHARHeaderReplace(unittest.TestCase):
     """Tests header replacement functionality.
     """
-
-    # def setUp(self):
-    #     self._old_dir = os.getcwd()
-    #     os.chdir(os.path.dirname(__file__))
-    #
-    # def tearDown(self):
-    #     os.chdir(self._old_dir)
 
     def test_replace_har_header_in_file(self):
 

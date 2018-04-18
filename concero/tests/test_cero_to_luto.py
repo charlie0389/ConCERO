@@ -11,8 +11,8 @@ import unittest
 
 import numpy as np
 
-from ConCERO.from_cero import FromCERO
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
+from concero.from_cero import FromCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
 class TestCERO2LUTO(DefaultTestCase):

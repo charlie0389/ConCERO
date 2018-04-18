@@ -8,8 +8,8 @@ Created on Mar 27 13:45:58 2018
 import os
 import unittest
 
-from ConCERO._identifier import _Identifier
-from ConCERO.tests.data_tools import DefaultTestCase
+from concero._identifier import _Identifier
+from concero.tests.data_tools import DefaultTestCase
 
 
 class Test_Identifier(DefaultTestCase):

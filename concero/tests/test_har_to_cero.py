@@ -5,14 +5,14 @@ Created on Jan 30 16:13:13 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 script_run = True if __name__ == "__main__" else False
-# __name__ = "ConCERO.tests.test_har_to_cero"
+# __name__ = "concero.tests.test_har_to_cero"
 
 import os
 import unittest
 import shutil
 
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
-from ConCERO.to_cero import ToCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
+from concero.to_cero import ToCERO
 
 
 class TestHAR2CERO(DefaultTestCase):

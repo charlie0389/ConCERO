@@ -12,9 +12,9 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from ConCERO.tests.data_tools import DefaultTestCase
-from ConCERO.cero import CERO
-from ConCERO.from_cero import FromCERO
+from concero.tests.data_tools import DefaultTestCase
+from concero.cero import CERO
+from concero.from_cero import FromCERO
 
 
 class TestFromCERO_Procedure(DefaultTestCase):

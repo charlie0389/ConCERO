@@ -5,9 +5,9 @@ import unittest
 
 import pandas as pd
 
-from ConCERO.tests.data_tools import DataTools, DefaultTestCase
-from ConCERO.cero import CERO
-from ConCERO.to_cero import ToCERO
+from concero.tests.data_tools import DataTools, DefaultTestCase
+from concero.cero import CERO
+from concero.to_cero import ToCERO
 
 
 class TestCERO(DefaultTestCase):

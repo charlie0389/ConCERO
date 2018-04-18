@@ -10,10 +10,10 @@ import os
 import pandas as pd
 import numpy as np
 
-import ConCERO.libfuncs as libfuncs
-from ConCERO.cero import CERO
-from ConCERO.to_cero import ToCERO
-from ConCERO.tests.data_tools import DefaultTestCase
+import concero.libfuncs as libfuncs
+from concero.cero import CERO
+from concero.to_cero import ToCERO
+from concero.tests.data_tools import DefaultTestCase
 
 
 class TestLibfuncs(DefaultTestCase):

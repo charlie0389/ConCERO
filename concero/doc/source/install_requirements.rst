@@ -91,11 +91,11 @@ or
 
 depending which command corresponds to the python 3 interpreter. To check that the installation was successful, run the test suite:
 
-    ``python3 -m ConCERO.tests.test_concero``
+    ``python3 -m concero.tests.test_concero``
 
 Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options, with the command:
 
-    ``python3 -m ConCERO.main -h``
+    ``python3 -m concero.main -h``
 
 .. [1] To check whether this library (``lib``) is installed (correctly), the simplest way is to open python on the command line. For example - ``python``. Then, in the python interpreter, execute ``import lib``, where ``lib`` is the relevant library. If no errors are raised, then the program is installed correctly.
 
