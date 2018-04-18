@@ -32,4 +32,5 @@ setup(name='concero',
     tests_require=["harpy", "gdxpds"],
     test_suite="concero.tests.test_concero.TestConCERO.__init__",
     package_data={'concero': doc_files},
+    entry_points={'console_scripts': ['concero = concero.__main__:launch']},
 )
