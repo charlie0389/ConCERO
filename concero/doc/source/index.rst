@@ -48,6 +48,7 @@ Contents:
 .. toctree::
     :maxdepth: 3
 
+    quickstart
     design_philosophy
     install_requirements
     tests
