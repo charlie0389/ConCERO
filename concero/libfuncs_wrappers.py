@@ -360,13 +360,16 @@ def series_op(func):
             assert(df.shape[0] == 1)
         except:
             raise TypeError("Must be single series in pandas.DataFrame.")
-        valid_cols = (~df.iloc[0,:].isna()).tolist()
-        result = func(df.iloc[0, valid_cols], *args, **kwargs)
+
+        # Note that pandas slicing is inclusive (in contrast to standard python list slicing)...
+        valid_df = df.iloc[0].loc[df.iloc[0].first_valid_index(): df.iloc[0].last_valid_index()]
+
+        result = func(valid_df, *args, **kwargs)
         try:
             assert(isinstance(result, pd.Series))
         except AssertionError:
             raise TypeError("A \'series_op\' must return pandas.Series object.")
-        df.iloc[0, valid_cols] = result
+        df.iloc[0].loc[df.iloc[0].first_valid_index(): df.iloc[0].last_valid_index()] = result
         return None
     return wrapper
 
