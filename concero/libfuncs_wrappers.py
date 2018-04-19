@@ -382,10 +382,10 @@ def recursive_op(func):
                 init: list = None,
                 post: list = None,
                 inplace: bool = True,
-                auto_init: int = 0,
-                auto_post: int = 0,
-                col_init: list = None,
-                col_post: list = None,
+                auto_init: int = None,
+                auto_post: int = None,
+                init_cols: list = None,
+                post_cols: list = None,
                 **kwargs) -> pd.Series:
         '''
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.
@@ -399,44 +399,63 @@ def recursive_op(func):
         applied function. Will copy ``name`` and ``index`` \
         properties of the provided ``pandas.Series`` object to the returned object.'''
 
-        array_list = array.values.tolist()
-        if init is None:
-            init = []
-        if post is None:
-            post = []
+        if [bool(init), bool(auto_init), bool(init_cols)].count(True) >= 2:
+            raise ValueError("Only one of the keyword arguments 'init', 'auto_init' and 'init_cols' must be provided.")
+        if [bool(post), bool(auto_post), bool(post_cols)].count(True) >= 2:
+            raise ValueError("Only one of the keyword arguments 'post', 'auto_post' and 'post_cols' must be provided.")
 
-        if not isinstance(auto_init, int):
-            raise TypeError("'auto_init' keyword argument must be provided as an integer.")
-        if auto_init > 0 and init == []: # In the event of conflict ``init`` overrules ``auto_init``.
-            init = [array[0]]*auto_init
-        if not isinstance(auto_post, int):
-            raise TypeError("'auto_post' keyword argument must be provided as an integer.")
-        if auto_post > 0 and post == []: # In the event of conflict ``post`` overrules ``auto_post``.
-            post = [array[-1]]*auto_post
+        if not init: init = []
+        if not post: post = []
 
-        before = len(init)
-        after = len(post)
-        array_list = init + array_list + post
+        if not auto_init: auto_init = 0
+        if not auto_post: auto_post = 0
 
-        new_array = [None] * len(array_list)
+        if not init_cols: init_cols = []
+        if not post_cols: post_cols = []
 
-        for i in range(before, len(array_list) - after):
-            rec_args = array_list[i - before:i + after + 1] + list(args)
+        if not isinstance(auto_init, int) or auto_init < 0:
+            raise TypeError("'auto_init' keyword argument must be provided as an integer greater than 0.")
+        if not isinstance(auto_post, int) or auto_post < 0:
+            raise TypeError("'auto_post' keyword argument must be provided as an integer greater than 0.")
+
+        if auto_init: init = [array[0]]*auto_init
+        if auto_post: post = [array[-1]]*auto_post
+
+        dis_start = len(init)
+        dis_end = len(post)
+        sl_start = None
+        sl_end = None
+
+        if init_cols:
+            init = array.loc[pd.to_datetime(init_cols, format="%Y")].tolist()
+            sl_start = len(init)
+        if post_cols:
+            post = array.loc[pd.to_datetime(post_cols, format="%Y")].tolist()
+            sl_end = -len(post)
+        sl = slice(sl_start, sl_end)
+
+        array_list = init + array.values.tolist()[sl] + post
+
+        no_args = len(init) + len(post) + 1
+        no_ops = len(array_list) - no_args + 1
+
+        new_array = init + [None]*no_ops + post
+
+        for i in range(no_ops):
+            rec_args = array_list[i: i + no_args] + list(args)
             tmp = func(*rec_args, **kwargs)
-            # tmp = func(*array_list[i - before:i + after + 1], # This form can only be used for Python 3.5 onwards...
+            # tmp = func(*array_list[i - dis_start:i + dis_end + 1], # This form can only be used for Python 3.5 onwards...
             #            *args,
             #            **kwargs)
             if tmp is None:
                 raise ValueError("'recursive_op' functions must return a floating point value.")
-            if inplace:
-                array_list[i] = tmp
-            else:
-                new_array[i] = tmp
 
-        if inplace:
-            new_array = array_list
+            if inplace: array_list[i + len(init)] = tmp
+            else:        new_array[i + len(init)] = tmp
 
-        new_array = new_array[before:len(new_array) - after]
+        if inplace: new_array = array_list
+
+        new_array = new_array[dis_start: len(new_array) - dis_end]
 
         # Copy names and index to new series
         new_array = pd.Series(data=new_array, index=array.index, name=array.name)

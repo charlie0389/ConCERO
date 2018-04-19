@@ -212,6 +212,30 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         self.assertTrue(np.allclose(cero.iloc[1].values, np.array([10/3, 4.0, 14/3])))
 
+    def test_initpostcols(self):
+
+        @libfuncs_wrappers.recursive_op
+        def sum_3(nm1, n, n1):
+            return (nm1 + n + n1)
+
+        cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                       "B": [6, 4, 5, 6, 7],
+                                       "C": [4, 5, 8, 7, 8],
+                                       "D": [9, 10, 12, 11, 2],
+                                     }, orient="index",
+                                    dtype=pd.np.float32)
+
+        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        cero.sort_index(inplace=True)
+
+        test_vals = [[1, 6,  9,  12, 5],
+                     [6, 15, 15, 18, 7],
+                     [4, 17, 20, 23, 8],
+                     [9, 31, 33, 25, 2]]
+
+        sum_3(cero, init_cols=[2017], post_cols=[2021], inplace=False)
+        self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
+
 
 if __name__ == '__main__':
     unittest.main()
