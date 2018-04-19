@@ -354,8 +354,6 @@ def series_op(func):
         :return: Returns ``df`` with the first data series updated with the result of the encapsulated function.
         """
 
-        # TODO: Relax 1-row constraint - i.e. apply series operation to all rows in dataframe
-
         for idx, ser in df.iterrows():
 
             # Note that pandas slicing is inclusive (in contrast to standard python list slicing)...
