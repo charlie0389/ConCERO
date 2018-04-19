@@ -382,8 +382,10 @@ def recursive_op(func):
                 init: list = None,
                 post: list = None,
                 inplace: bool = True,
-                auto_init: bool = 0,
-                auto_post:  bool = 0,
+                auto_init: int = 0,
+                auto_post: int = 0,
+                col_init: list = None,
+                col_post: list = None,
                 **kwargs) -> pd.Series:
         '''
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.

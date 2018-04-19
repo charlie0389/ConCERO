@@ -403,9 +403,11 @@ def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: 
     # print("rename_dict: ", rename_dict)
     CERO.rename_index_values(df, rename_dict, inplace=True)
 
-@dataframe_op
-def map_index(df, orig: list, new: list= None, idx: int=0):
-    pass
+@series_op
+def interpolate(series, **kwargs):
+    defaults = {"method":"time"}
+    defaults.update(kwargs)
+    return series.interpolate(**defaults)
 
 @recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:

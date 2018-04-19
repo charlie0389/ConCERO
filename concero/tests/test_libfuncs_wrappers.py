@@ -130,8 +130,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
                 "method":"time",
             }
             defaults.update(kwargs)
-            ser = series.interpolate(**defaults)
-            return ser
+            return series.interpolate(**defaults)
 
         cero = pd.DataFrame.from_dict({"A": [1, 2, pd.np.nan, 4, 5],
                                      "B": [pd.np.nan, 2, pd.np.nan, 4, 5],
