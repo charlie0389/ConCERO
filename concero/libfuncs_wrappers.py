@@ -356,20 +356,19 @@ def series_op(func):
 
         # TODO: Relax 1-row constraint - i.e. apply series operation to all rows in dataframe
 
-        try:
-            assert(df.shape[0] == 1)
-        except:
-            raise TypeError("Must be single series in pandas.DataFrame.")
+        for idx, ser in df.iterrows():
 
-        # Note that pandas slicing is inclusive (in contrast to standard python list slicing)...
-        valid_df = df.iloc[0].loc[df.iloc[0].first_valid_index(): df.iloc[0].last_valid_index()]
+            # Note that pandas slicing is inclusive (in contrast to standard python list slicing)...
+            valid_ser = ser[ser.first_valid_index(): ser.last_valid_index()]
 
-        result = func(valid_df, *args, **kwargs)
-        try:
-            assert(isinstance(result, pd.Series))
-        except AssertionError:
-            raise TypeError("A \'series_op\' must return pandas.Series object.")
-        df.iloc[0].loc[df.iloc[0].first_valid_index(): df.iloc[0].last_valid_index()] = result
+            result = func(valid_ser, *args, **kwargs)
+            try:
+                assert (isinstance(result, pd.Series))
+            except AssertionError:
+                raise TypeError("A \'series_op\' must return pandas.Series object.")
+
+            df.loc[idx, ser.first_valid_index(): ser.last_valid_index()] = result
+
         return None
     return wrapper
 

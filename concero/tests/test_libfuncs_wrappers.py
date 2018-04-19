@@ -162,6 +162,40 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(np.isnan(cero.iloc[2, 4]))
         self.assertTrue(np.isnan(cero.iloc[3, 4]))
 
+    def test_series_dropnans3(self):
+
+        @libfuncs_wrappers.series_op
+        def interpolate(series, **kwargs):
+            defaults = {
+                "method":"time",
+            }
+            defaults.update(kwargs)
+            ser = series.interpolate(**defaults)
+            return ser
+
+        cero = pd.DataFrame.from_dict({"A": [1, 2, pd.np.nan, 4, 5],
+                                     "B": [pd.np.nan, 2, pd.np.nan, 4, 5],
+                                     "C": [1, 2, pd.np.nan, 4, pd.np.nan],
+                                     "D": [pd.np.nan, 2, pd.np.nan, 4, pd.np.nan],
+                                     },
+                                      orient="index",
+                                    dtype=pd.np.float32)
+        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        cero.sort_index(inplace=True)
+
+        test_vals = [[1, 2, 3, 4, 5],
+                     [pd.np.nan, 2, 3, 4, 5],
+                     [1, 2, 3, 4, pd.np.nan],
+                     [pd.np.nan, 2, 3, 4, pd.np.nan]]
+
+        interpolate(cero)
+        self.assertTrue(np.allclose(test_vals, cero.values.tolist(), equal_nan=True))
+
+        self.assertTrue(np.isnan(cero.iloc[1, 0]))
+        self.assertTrue(np.isnan(cero.iloc[3, 0]))
+        self.assertTrue(np.isnan(cero.iloc[2, 4]))
+        self.assertTrue(np.isnan(cero.iloc[3, 4]))
+
 
     def test_autoinitpost(self):
         """Ensures that NaNs are dropped from a series before a series operation is applied."""
