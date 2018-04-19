@@ -242,7 +242,8 @@ def dataframe_op(func):
     """
 
     @functools.wraps(func)
-    def wrapper(df: pd.DataFrame, *args,
+    def wrapper(df: pd.DataFrame,
+                *args,
                 locs: "List[Union[tuple, str]]" = None,
                 ilocs: "List[int]" = None,
                 start_year: "Union[pd.datetime, int]" = None,

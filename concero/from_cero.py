@@ -440,6 +440,8 @@ class FromCERO(dict):
 
             # Apply operation to procedure
             func_name = op.pop('func')
+            op_args = op.pop('args', [])
+
             try:
                 func = getattr(libfuncs, func_name)
             except AttributeError:
@@ -455,7 +457,7 @@ class FromCERO(dict):
 
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
-            ret = func(self.inputs, locs=arrays, **op)  # func must alter inputs inplace
+            ret = func(self.inputs, *op_args, locs=arrays, **op)  # func must alter inputs inplace
 
             op['func'] = func.__name__  # For cleanliness of presentation
 
