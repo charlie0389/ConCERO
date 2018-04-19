@@ -350,7 +350,7 @@ class FromCERO(dict):
             if defaults.get("file"):
                 defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
 
-            # Ensure sets are lists of strings
+            # Load sets
             for k in defaults["sets"]:
                 defaults["sets"][k] = FromCERO._load_set(defaults["sets"][k], defaults["ref_dir"])
 
@@ -627,7 +627,7 @@ class FromCERO(dict):
 
         if isinstance(set, str):
             # Interpret str as file path
-            set = read_yaml(set)
+            set = read_yaml(os.path.join(ref_dir, set))
 
         try:
             assert (issubclass(type(set), list))
@@ -676,7 +676,7 @@ class FromCERO(dict):
 
         _conf["file"] = FromCERO.get_relpath(_conf["ref_dir"], _conf["file"])
 
-        # Ensure sets are lists of strings
+        # Load sets
         for k in _conf.get("sets", {}).keys():
             _conf["sets"][k] = FromCERO._load_set(_conf["sets"][k], _conf["ref_dir"])
 
