@@ -427,9 +427,11 @@ def recursive_op(func):
         sl_end = None
 
         if init_cols:
+            if isinstance(init_cols, int): init_cols = [dt.year for dt in array.index.tolist()[:init_cols]]
             init = array.loc[pd.to_datetime(init_cols, format="%Y")].tolist()
             sl_start = len(init)
         if post_cols:
+            if isinstance(post_cols, int): post_cols = [dt.year for dt in array.index.tolist()[-post_cols:]]
             post = array.loc[pd.to_datetime(post_cols, format="%Y")].tolist()
             sl_end = -len(post)
         sl = slice(sl_start, sl_end)
