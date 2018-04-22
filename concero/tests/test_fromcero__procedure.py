@@ -387,6 +387,15 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("test_load_set_inputs.csv")
 
+    def test_custom_libfuncs(self):
+
+        FromCERO._Procedure({"libfuncs": "local_libfuncs",
+                             "name": "test_set",
+                             "inputs": ["a_set"],
+                             "file": "test_sets.csv"})
+
+
+        self.assertTrue(False)
 
 if script_run:
     unittest.main()

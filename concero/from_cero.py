@@ -304,6 +304,7 @@ class FromCERO(dict):
             super().__init__(proc, *args, **kwargs)
             FromCERO._Procedure.is_valid(self)
 
+            # TODO: Move this check to is_valid
             if self.get('file'):
                 file_type = os.path.splitext(self.get('file'))[1][1:]  # get file extension without full stop
 
@@ -323,7 +324,9 @@ class FromCERO(dict):
                         "inputs": [],
                         "ref_dir": None,
                         "sets": {},
-                        "map": {}}
+                        "map": {},
+                        "libfuncs": [],
+                        }
 
             if parent is None:
                 parent = {}
@@ -337,6 +340,10 @@ class FromCERO(dict):
 
             if defaults.get("file"):
                 defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
+
+            if concero.conf.find_file("libfuncs.py") not in defaults.get("libfuncs"):
+                defaults["libfuncs"].append(concero.conf.find_file("libfuncs.py"))
+            # defaults["libfuncs"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["libfuncs"]))
 
             # Load sets
             for k in defaults["sets"]:
@@ -684,7 +691,8 @@ class FromCERO(dict):
                  "sets": {},
                  "map": {},
                  "ref_dir": None, # Type: str
-                 "procedures": []}  # Defaults
+                 "procedures": [],
+                 "libfuncs": concero.conf.find_file("libfuncs.py")}  # Defaults
 
         if parent is None:
             parent = {}
@@ -705,6 +713,9 @@ class FromCERO(dict):
             _conf["ref_dir"] = os.path.abspath(os.getcwd())
 
         _conf["file"] = FromCERO.get_relpath(_conf["ref_dir"], _conf["file"])
+
+        if concero.conf.find_file("libfuncs.py") not in _conf.get("libfuncs"):
+            _conf["libfuncs"].append(concero.conf.find_file("libfuncs.py"))
 
         # Load sets
         for k in _conf.get("sets", {}).keys():
