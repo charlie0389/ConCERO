@@ -1,0 +1,16 @@
+ref_dir: .
+procedures:
+  - name: sum_a
+    file: test_groupby_sum_a
+    operations:
+      - func: groupby
+        key: 0
+        match: a
+        agg: sum
+  - name: avg_b
+    file: test_groupby_avg_b
+    operations:
+      - func: groupby
+        key: 1
+        match: b
+        agg: avg
