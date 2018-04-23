@@ -417,6 +417,10 @@ def interpolate(series, **kwargs):
     return series.interpolate(**defaults)
 
 @recursive_op
+def pc_change(x, y):
+    return x*(1 + y/100)
+
+@recursive_op
 def iter_and_norm(prev: float, inp: float) -> float:
     res = prev + prev * inp / 100
     return res
