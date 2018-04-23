@@ -318,9 +318,7 @@ def dataframe_op(func):
 
         ret = func(df_cp, *args, **kwargs)
         if ret is None:
-            # Assume operation is inplace if None is returned
-            ret = df_cp
-            raise DeprecationWarning("DataFrame operations should return the dataframe. Inplace dataframe operations have been deprecated.")
+            return ret
         else:
             CERO.is_cero(ret) # Performs checks to ensure ret is a valid CERO
 

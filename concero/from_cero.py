@@ -416,9 +416,8 @@ class FromCERO(dict):
 
             for op in self["operations"]:
                 ret = self._exec_op(op)
-
                 if ret is not None:
-                    raise ValueError(("%s returned a value other than 'None' (when 'None' is expected).") % op["func"])
+                    self.inputs = CERO.combine_ceros([self.inputs, ret], overwrite=True)
 
             if "outputs" in self and self["outputs"] is None:
                 # The result of this procedures operations is to be explicitly ignored, may be useful when objective is simply to plot data
@@ -461,7 +460,7 @@ class FromCERO(dict):
 
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
-            ret = func(self.inputs, *op_args, locs=arrays, **op)  # func must alter inputs inplace
+            ret = func(self.inputs, *op_args, locs=arrays, **op)
 
             op['func'] = func.__name__  # For cleanliness of presentation
 
@@ -592,6 +591,7 @@ class FromCERO(dict):
 
             try:
                 ret = procedure.exec_ops(cero)
+                # if ret is not None, should be dict with key: procedure["name"], value: resultant CERO
             except Exception as e:
                 raise e.__class__(e.__str__() + " Error in procedure '%s'." % (procedure["name"]))
 

@@ -76,7 +76,7 @@ class TestLibfuncs(DefaultTestCase):
                                 "sheet": "groupby",
                                 "index_col": [0,1]}]})
         cero = tc.create_cero()
-        libfuncs.groupby(cero, key=0, match="a", agg="sum")
+        cero = libfuncs.groupby(cero, key=0, match="a", agg="sum")
 
         test_list = ["a", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
         test_vals = [6, 2, 3, 4, 5]
@@ -89,7 +89,7 @@ class TestLibfuncs(DefaultTestCase):
                                 "sheet": "groupby",
                                 "index_col": [0, 1]}]})
         cero = tc.create_cero()
-        libfuncs.groupby(cero, key=1, match="b", agg="mean")
+        cero = libfuncs.groupby(cero, key=1, match="b", agg="mean")
 
         test_list = ["b", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
         test_vals = [3.3333333333, 2, 3, 4, 5]

@@ -357,6 +357,7 @@ def fillna(df, *args, value=None, method=None, **kwargs):
         df.fillna(value=value, **kwargs)
     else:
         df.fillna(method="ffill", **kwargs)
+    return df
 
 @dataframe_op
 def apply_func(df, *args, numpy_func: str=None, **kwargs):
@@ -365,6 +366,7 @@ def apply_func(df, *args, numpy_func: str=None, **kwargs):
     defaults.update(kwargs)
 
     df.loc[:,:] = df.apply(getattr(np, numpy_func), **kwargs)
+    return df
 
 @dataframe_op
 def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: str=None, **kwargs):
@@ -405,8 +407,8 @@ def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: 
         # Rename row
         rename_dict.update({row_loc: _Identifier.keep_only_fields(key[0], row_loc)})
 
-    # print("rename_dict: ", rename_dict)
     CERO.rename_index_values(df, rename_dict, inplace=True)
+    return df
 
 @series_op
 def interpolate(series, **kwargs):
