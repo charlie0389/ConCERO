@@ -220,26 +220,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
         os.remove("test_output_cero2.csv")
         os.remove("test_output_cero5.csv")
 
-    # def test_output_cero(self):
-    #     cero = pd.DataFrame.from_dict({("A", "1"): [1], ("B", "2"): [2], ("C", "3"): [3]}, orient='index',
-    #                                   dtype=pd.np.float32)
-    #     cero.sort_index(inplace=True)
-    #     cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-    #     self.assertTrue(CERO.is_cero(cero))
-    #
-    #     proc = FromCERO._Procedure({"name": "test_output_cero",
-    #                                 "file": "test_output_cero.csv",
-    #                                 "ref_dir": ".",
-    #                                 "outputs": [("A", 1)]})
-    #
-    #     """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
-    #     proc.exec_ops(cero)
-    #
-    #     df = pd.read_csv("test_output_cero.csv", index_col=0)
-    #     self.assertTrue(df.shape[0] == 1)
-    #
-    #     os.remove("test_output_cero.csv")
-
     def test_load_sets_from_file(self):
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',
                                       dtype=pd.np.float32)
