@@ -321,7 +321,6 @@ def dataframe_op(func):
             if issubclass(type(rename), list):
                 # Build mapping dictionary
                 rename = dict(list(zip(ret.index.values, rename)))
-                # rename = dict(list(zip(df.index.values[ilocs], rename)))
         else:
             rename = {}
         map_dict.update(rename)
