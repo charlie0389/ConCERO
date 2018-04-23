@@ -250,7 +250,6 @@ def dataframe_op(func):
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
                 rename: "Union[str, dict, List[str]]" = None,
-                # new_names: "Union[str, dict, List[str]]" = None,
                 **kwargs):
 
         """
