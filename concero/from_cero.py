@@ -461,7 +461,6 @@ class FromCERO(dict):
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
             ret = func(self.inputs, *op_args, locs=arrays, **op)
-
             op['func'] = func.__name__  # For cleanliness of presentation
 
             return ret

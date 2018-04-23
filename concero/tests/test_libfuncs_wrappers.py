@@ -76,8 +76,8 @@ class TestLibfuncsWrappers(DefaultTestCase):
         cero = modify_test(cero, True, ilocs=[1], start_year=2018, end_year=2019, rename="D", a_kw_arg=True,
                     return_something=True)
 
-        self.assertTrue(cero.index.values[1] == "D")
-        self.assertTrue(cero.iloc[1,1] == 100)
+        self.assertTrue(cero.index.values[0] == "D")
+        self.assertTrue(cero.iloc[0, 0] == 100)
 
     def test_recursive_op(self):
 
@@ -101,9 +101,8 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         cero = modify_test(cero, True, ilocs=[1], rename="D", a_kw_arg=True, inplace=False, return_something=True, init=[5.0], post=[6.0])
 
-        self.assertTrue(cero.index.values[1] == "D")
-
-        self.assertTrue(np.allclose(cero.iloc[1].values, np.array([4.0, 4.0, 5.0])))
+        self.assertTrue(cero.index.values[0] == "D")
+        self.assertTrue(np.allclose(cero.iloc[0].values, np.array([4.0, 4.0, 5.0])))
 
     def test_series_dropnans(self):
         """Ensures that NaNs are dropped from a series before a series operation is applied."""
@@ -119,8 +118,8 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         cero = fibonnaci(cero, ilocs = [1], init = [0.0]) # Only 'B' row is modified
 
-        self.assertTrue(np.allclose(cero.iloc[1].values[1:], np.array([4.0, 9.0])))
-        self.assertTrue(all(x == y for (x, y) in zip(cero.iloc[1].isna().tolist(), [True, False, False])))
+        self.assertTrue(np.allclose(cero.iloc[0].values[1:], np.array([4.0, 9.0])))
+        self.assertTrue(all(x == y for (x, y) in zip(cero.iloc[0].isna().tolist(), [True, False, False])))
 
     def test_series_dropnans2(self):
 
@@ -144,22 +143,21 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         test_vals = [1, 2, 3, 4, 5]
 
-        cero = interpolate(cero, ilocs=[0])
-        self.assertTrue(np.allclose(test_vals, cero.iloc[0].tolist()))
+        ret_cero = interpolate(cero, ilocs=[0])
+        self.assertTrue(np.allclose(test_vals, ret_cero.iloc[0].tolist()))
 
-        cero = interpolate(cero, ilocs=[1])
-        self.assertTrue(np.allclose(test_vals[1:], cero.iloc[1].tolist()[1:]))
+        ret_cero = interpolate(cero, ilocs=[1])
+        self.assertTrue(np.allclose(test_vals[1:], ret_cero.iloc[0].tolist()[1:]))
+        self.assertTrue(np.isnan(ret_cero.iloc[0, 0]))
 
-        cero = interpolate(cero, ilocs=[2])
-        self.assertTrue(np.allclose(test_vals[:-1], cero.iloc[2].tolist()[:-1]))
+        ret_cero = interpolate(cero, ilocs=[2])
+        self.assertTrue(np.allclose(test_vals[:-1], ret_cero.iloc[0].tolist()[:-1]))
+        self.assertTrue(np.isnan(ret_cero.iloc[0, 4]))
 
-        cero = interpolate(cero, ilocs=[3])
-        self.assertTrue(np.allclose(test_vals[1:-1], cero.iloc[3].tolist()[1:-1]))
-
-        self.assertTrue(np.isnan(cero.iloc[1, 0]))
-        self.assertTrue(np.isnan(cero.iloc[3, 0]))
-        self.assertTrue(np.isnan(cero.iloc[2, 4]))
-        self.assertTrue(np.isnan(cero.iloc[3, 4]))
+        ret_cero = interpolate(cero, ilocs=[3])
+        self.assertTrue(np.allclose(test_vals[1:-1], ret_cero.iloc[0].tolist()[1:-1]))
+        self.assertTrue(np.isnan(ret_cero.iloc[0, 0]))
+        self.assertTrue(np.isnan(ret_cero.iloc[0, 4]))
 
     def test_series_dropnans3(self):
 
@@ -210,7 +208,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         cero = mv_avg_3(cero, ilocs=[1], auto_init=1, auto_post=1, inplace=False) # Only 'B' row is modified
 
-        self.assertTrue(np.allclose(cero.iloc[1].values, np.array([10/3, 4.0, 14/3])))
+        self.assertTrue(np.allclose(cero.iloc[0].values, np.array([10 / 3, 4.0, 14 / 3])))
 
     def test_initpostcols(self):
 
@@ -345,9 +343,10 @@ class TestLibfuncsWrappers(DefaultTestCase):
         # Now conduct tests with rename argument provided....
 
         test_df = pd.DataFrame.from_dict({"Z": [1, 2, 3, 4, 5],
-                                       "B": [6, 4, 5, 6, 7],
-                                       "C": [4, 5, 8, 7, 8],
-                                       "D": [9, 10, 12, 11, 2]},
+                                       # "B": [6, 4, 5, 6, 7],
+                                       # "C": [4, 5, 8, 7, 8],
+                                       # "D": [9, 10, 12, 11, 2],
+                                          },
                                       orient="index",
                                       dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
@@ -360,8 +359,9 @@ class TestLibfuncsWrappers(DefaultTestCase):
         # Another test...
         test_df = pd.DataFrame.from_dict({"Z": [1, 2, 3, 4, 5],
                                           "Y": [6, 4, 5, 6, 7],
-                                          "C": [4, 5, 8, 7, 8],
-                                          "D": [9, 10, 12, 11, 2]},
+                                          # "C": [4, 5, 8, 7, 8],
+                                          # "D": [9, 10, 12, 11, 2],
+                                          },
                                          orient="index",
                                          dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
@@ -385,42 +385,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df))
 
-        # Another test...
-        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
-                                          "B": [6, 4, 5, 6, 7],
-                                          "C": [4, 5, 8, 7, 8],
-                                          "D": [20, 7, 3, 1, 2],
-                                          "F": [7, 10, 12, 7, 8],
-                                          },
-                                         orient="index",
-                                         dtype=pd.np.float32)
-
-        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
-        test_df.sort_index(inplace=True)
-        df_new = add_modify_series(cero, rename={"E": "F"})
-        df_new.sort_index(inplace=True)
-        self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
-        self.assertTrue(test_df.equals(df_new))
-
-        # Another test...
-        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
-                                          "B": [6, 4, 5, 6, 7],
-                                          "C": [4, 5, 8, 7, 8],
-                                          "D": [9, 10, 12, 11, 2],
-                                          "G": [20, 7, 3, 1, 2],
-                                          "F": [7, 10, 12, 7, 8],
-                                          },
-                                         orient="index",
-                                         dtype=pd.np.float32)
-
-        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
-        test_df.sort_index(inplace=True)
-        df_new = add_modify_series(cero, new_names={"D": "G", "E": "F"})
-        df_new.sort_index(inplace=True)
-        self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
-        self.assertTrue(test_df.equals(df_new))
-
-        # Another test...
+        # # Another test...
         test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
                                           "B": [6, 4, 5, 6, 7],
                                           "C": [4, 5, 8, 7, 8],
@@ -432,7 +397,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         test_df.sort_index(inplace=True)
-        df_new = add_modify_series(cero, rename={"D": "G"}, new_names={"E": "F"}) # Test rename and new_names
+        df_new = add_modify_series(cero, rename={"D": "G", "E": "F"})
         df_new.sort_index(inplace=True)
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(test_df.equals(df_new))

@@ -250,7 +250,7 @@ def dataframe_op(func):
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
                 rename: "Union[str, dict, List[str]]" = None,
-                new_names: "Union[str, dict, List[str]]" = None,
+                # new_names: "Union[str, dict, List[str]]" = None,
                 **kwargs):
 
         """
@@ -302,20 +302,6 @@ def dataframe_op(func):
         df_cp = df.iloc[ilocs, start_year:end_year].copy(deep=False) # df_cp is always different object to df
         df_cp_idx = df_cp.copy(deep=False)
 
-
-        map_dict = {}
-
-        if rename is not None:
-            if isinstance(rename, str):
-                rename = [rename]
-
-            if issubclass(type(rename), list):
-                # Build mapping dictionary
-                rename = dict(list(zip(df.index.values[ilocs], rename)))
-        else:
-            rename = {}
-        map_dict.update(rename)
-
         ret = func(df_cp, *args, **kwargs)
         if ret is None:
             return ret
@@ -328,23 +314,26 @@ def dataframe_op(func):
         except AssertionError:
             raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
 
-        if new_names is not None:
-            if issubclass(type(new_names), str):
-                new_names = [new_names]
+        # df = CERO.combine_ceros([df, ret], overwrite=True)
 
-            if issubclass(type(new_names), list):
-                try:
-                    assert (len(new_names) == ret.shape[0])
-                except AssertionError:
-                    raise TypeError("'new_names' must be identical in length to the index of the result of the operation.")
+        map_dict = {}
+        if rename is not None:
+            if isinstance(rename, str):
+                rename = [rename]
 
-                new_names = dict(list(zip(df.index.values, new_names)))
+            if issubclass(type(rename), list):
+                # Build mapping dictionary
+                rename = dict(list(zip(ret.index.values, rename)))
+                # rename = dict(list(zip(df.index.values[ilocs], rename)))
+        else:
+            rename = {}
+        map_dict.update(rename)
 
-            CERO.rename_index_values(ret, new_names, inplace=True)
+        CERO.rename_index_values(ret, map_dict)
+        return ret
 
-        df = CERO.combine_ceros([df, ret], overwrite=True)
-        CERO.rename_index_values(df, map_dict)
-        return df
+        # CERO.rename_index_values(df, map_dict)
+        # return df
 
     return wrapper
 
