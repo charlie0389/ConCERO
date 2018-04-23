@@ -347,7 +347,7 @@ def dataframe_op(func):
         df = CERO.combine_ceros([df, ret], overwrite=True)
         CERO.rename_index_values(df, map_dict)
         return df
-    
+
     return wrapper
 
 
@@ -403,7 +403,8 @@ def series_op(func):
 
             df.loc[idx, ser.first_valid_index(): ser.last_valid_index()] = result
 
-        return None
+        return df
+        # return None
     return wrapper
 
 
