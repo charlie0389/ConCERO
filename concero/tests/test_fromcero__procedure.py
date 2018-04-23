@@ -15,6 +15,8 @@ import pandas as pd
 from concero.tests.data_tools import DefaultTestCase
 from concero.cero import CERO
 from concero.from_cero import FromCERO
+from concero.to_cero import ToCERO
+from concero.format_convert_tools import read_yaml
 import concero.conf as cfg
 
 
@@ -27,7 +29,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-        self.assertTrue(CERO.is_cero(cero))
 
         fc = FromCERO(cfg.d_td + "test_fromcero_procedureload.yaml")
         fc.exec_procedures(cero)
@@ -103,10 +104,9 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-        self.assertTrue(CERO.is_cero(cero))
 
-        fc = FromCERO(cfg.d_td + "test_procedure_export_xlsx.yaml")
-        fc.exec_procedures(cero)
+        proc = FromCERO._Procedure(read_yaml(cfg.d_td + "test_procedure_export_xlsx.yaml"))
+        proc.exec_ops(cero)
 
         df1 = pd.read_excel("xlsx_export.xlsx", index_col=0)
         test_list = [1, 2, 3]
@@ -145,24 +145,100 @@ class TestFromCERO_Procedure(DefaultTestCase):
         os.remove("auto_xlsx_export.xlsx")
 
     def test_output_cero(self):
-        cero = pd.DataFrame.from_dict({("A", "1"): [1], ("B", "2"): [2], ("C", "3"): [3]}, orient='index',
+        """
+        Tests the behaviour of the "outputs" argument is correct.
+        """
+
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-        self.assertTrue(CERO.is_cero(cero))
 
         proc = FromCERO._Procedure({"name": "test_output_cero",
                                     "file": "test_output_cero.csv",
+                                    "inputs": ["A", "B", "C"],
                                     "ref_dir": ".",
-                                    "outputs": [("A", 1)]})
+                                    "outputs": ["A"]})
 
         """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
         proc.exec_ops(cero)
 
-        df = pd.read_csv("test_output_cero.csv", index_col=0)
-        self.assertTrue(df.shape[0] == 1)
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."),"test_output_cero.csv")}]})
+        df = tc.create_cero()
+
+        self.assertTrue(cero.loc[["A"]].equals(df))
+
+        # Another test...
+        proc = FromCERO._Procedure({"name": "test_output_cero",
+                                    "file": "test_output_cero2.csv",
+                                    "inputs": ["A", "B", "C"],
+                                    "ref_dir": ".",
+                                    "outputs": True})
+
+        """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
+        proc.exec_ops(cero)
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_output_cero2.csv")}]})
+        df = tc.create_cero()
+        self.assertTrue(cero.equals(df))
+
+        # Another test...
+        proc = FromCERO._Procedure({"name": "test_output_cero",
+                                    "file": "test_output_cero3.csv",
+                                    "inputs": ["A", "B", "C"],
+                                    "ref_dir": ".",
+                                    "outputs": None})
+
+        """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
+        proc.exec_ops(cero)
+        self.assertFalse(os.path.isfile("test_output_cero3.csv"))
+
+        # Another test...
+        proc = FromCERO._Procedure({"name": "test_output_cero",
+                                    "file": "test_output_cero4.csv",
+                                    "inputs": ["A", "B", "C"],
+                                    "ref_dir": ".",
+                                    "outputs": False})
+
+        """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
+        proc.exec_ops(cero)
+        self.assertFalse(os.path.isfile("test_output_cero4.csv"))
+
+
+        # Another test...
+        proc = FromCERO._Procedure({"name": "test_output_cero",
+                                    "file": "test_output_cero5.csv",
+                                    "inputs": ["A", "B", "C"],
+                                    "ref_dir": "."})
+
+        """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
+        proc.exec_ops(cero)
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_output_cero2.csv")}]})
+        df = tc.create_cero()
+        self.assertTrue(cero.equals(df))
 
         os.remove("test_output_cero.csv")
+        os.remove("test_output_cero2.csv")
+        os.remove("test_output_cero5.csv")
+
+    # def test_output_cero(self):
+    #     cero = pd.DataFrame.from_dict({("A", "1"): [1], ("B", "2"): [2], ("C", "3"): [3]}, orient='index',
+    #                                   dtype=pd.np.float32)
+    #     cero.sort_index(inplace=True)
+    #     cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+    #     self.assertTrue(CERO.is_cero(cero))
+    #
+    #     proc = FromCERO._Procedure({"name": "test_output_cero",
+    #                                 "file": "test_output_cero.csv",
+    #                                 "ref_dir": ".",
+    #                                 "outputs": [("A", 1)]})
+    #
+    #     """Because single item in outputs, error may be raised (but shouldn't) on attempting to export a Pandas.Series object instead of a Pandas.DataFrame object."""
+    #     proc.exec_ops(cero)
+    #
+    #     df = pd.read_csv("test_output_cero.csv", index_col=0)
+    #     self.assertTrue(df.shape[0] == 1)
+    #
+    #     os.remove("test_output_cero.csv")
 
     def test_load_sets_from_file(self):
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',

@@ -19,32 +19,32 @@ from concero.tests.data_tools import DefaultTestCase
 class TestLibfuncsWrappers(DefaultTestCase):
     '''Tests libfuncs methods.'''
 
-    def test_dataframe_op(self):
-
-        @libfuncs_wrappers.dataframe_op
-        def modify_test(cero, an_arg, a_kw_arg=None):
-            self.assertTrue(an_arg)
-            self.assertTrue(a_kw_arg)
-
-            # Restricted cero for comparison
-            ceror = pd.DataFrame.from_dict({"A": [2], "C": [5]}, orient="index")
-            ceror.columns = pd.DatetimeIndex(pd.to_datetime([2018], format="%Y"))
-            ceror.sort_index(inplace=True)
-            ceror = ceror.astype(pd.np.float32)
-
-            self.assertTrue(cero.equals(ceror))
-
-            cero.iloc[0,0] = 3.0
-
-        cero = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [3, 4, 5], "C": [4, 5, 6]}, orient="index")
-        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
-        cero.sort_index(inplace=True)
-        cero = cero.astype(pd.np.float32)
-
-        modify_test(cero, True, ilocs=[0,2], start_year=2018, end_year=2019, rename="D", a_kw_arg=True)
-
-        self.assertTrue(cero.index.values[0] == "D")
-        self.assertTrue(cero.iloc[0, 1] == 3.0)
+    # def test_dataframe_op(self):
+    #
+    #     @libfuncs_wrappers.dataframe_op
+    #     def modify_test(cero, an_arg, a_kw_arg=None):
+    #         self.assertTrue(an_arg)
+    #         self.assertTrue(a_kw_arg)
+    #
+    #         # Restricted cero for comparison
+    #         ceror = pd.DataFrame.from_dict({"A": [2], "C": [5]}, orient="index")
+    #         ceror.columns = pd.DatetimeIndex(pd.to_datetime([2018], format="%Y"))
+    #         ceror.sort_index(inplace=True)
+    #         ceror = ceror.astype(pd.np.float32)
+    #
+    #         self.assertTrue(cero.equals(ceror))
+    #
+    #         cero.iloc[0,0] = 3.0
+    #
+    #     cero = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [3, 4, 5], "C": [4, 5, 6]}, orient="index")
+    #     cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+    #     cero.sort_index(inplace=True)
+    #     cero = cero.astype(pd.np.float32)
+    #
+    #     modify_test(cero, True, ilocs=[0,2], start_year=2018, end_year=2019, rename="D", a_kw_arg=True)
+    #
+    #     self.assertTrue(cero.index.values[0] == "D")
+    #     self.assertTrue(cero.iloc[0, 1] == 3.0)
 
     def test_series_op(self):
 
@@ -271,6 +271,26 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         sum_3(cero, init_cols=1, post_cols=1)  # Uses inplace form
         self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
+
+    # def test_create_series(self):
+    #
+    #     @libfuncs_wrappers.series_op
+    #     def no_op(df):
+    #         return
+    #
+    #     cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+    #                                    "B": [6, 4, 5, 6, 7],
+    #                                    "C": [4, 5, 8, 7, 8],
+    #                                    "D": [9, 10, 12, 11, 2]},
+    #                                   orient="index",
+    #                                   dtype=pd.np.float32)
+    #
+    #     cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+    #     cero.sort_index(inplace=True)
+    #
+    #
+    #
+    #     self.assertTrue(False)
 
 
 if __name__ == '__main__':

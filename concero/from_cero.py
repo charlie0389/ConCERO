@@ -311,10 +311,6 @@ class FromCERO(dict):
                     raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
                                                                                                   self._sup_procedure_output_types))
 
-            # Determine identifiers for all inputs
-            expanded_inputs = [_Identifier.get_identifiers(inp, self.get("sets", None)) for inp in self['inputs']]
-            self["inputs"] = list(it.chain(*expanded_inputs))
-
             if "lstrip" in self:
                 # TODO: Move this such that it can accomodate case that all inputs are imported
                 self["inputs"] = [_Identifier.lstrip_identifier(self["lstrip"], inp) for inp in self["inputs"]]
@@ -338,6 +334,10 @@ class FromCERO(dict):
             if "outputs" in defaults:
                 if issubclass(type(defaults["outputs"]), list):
                     defaults["outputs"] = [_Identifier.tupleize_name(name) for name in defaults["outputs"]]
+                elif defaults["outputs"] == True:
+                    defaults.pop("outputs")
+                elif defaults["outputs"] == False:
+                    defaults["outputs"] = None
                 elif defaults["outputs"] is None:
                     pass
                 else:
@@ -356,6 +356,10 @@ class FromCERO(dict):
 
             if isinstance(defaults["inputs"], str):
                 defaults["inputs"] = [defaults["inputs"]]
+
+            # Determine identifiers for all inputs
+            expanded_inputs = [_Identifier.get_identifiers(inp, defaults.get("sets", None)) for inp in defaults['inputs']]
+            defaults["inputs"] = list(it.chain(*expanded_inputs))
 
             return defaults
 
@@ -420,7 +424,7 @@ class FromCERO(dict):
                 # The result of this procedures operations is to be explicitly ignored, may be useful when objective is simply to plot data
                 return
 
-            if self.get("outputs", []) == []:
+            if (self.get("outputs", []) == []) or (self.get("outputs", True) == True):
                     # Get all rows if none specified
                     self["outputs"] = self.inputs.index.tolist()
 
