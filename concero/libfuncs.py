@@ -222,6 +222,11 @@ def plotdf(df,
     fig.savefig(os.path.relpath(figurepath), format=plotformat, bbox_inches='tight')
 
 @dataframe_op
+def merge_new(df, *args, **kwargs):
+    df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series
+    return df
+
+@dataframe_op
 def merge(df, *args, **kwargs):
     df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series
     return

@@ -211,6 +211,7 @@ import pandas as pd
 
 import concero.conf as conf
 from concero._identifier import _Identifier
+from concero.cero import CERO
 
 log = conf.setup_logger(__name__)
 
@@ -248,7 +249,8 @@ def dataframe_op(func):
                 ilocs: "List[int]" = None,
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
-                rename: str = None,
+                rename: "Union[str, dict, List[str]]" = None,
+                new_names: "Union[str, dict, List[str]]" = None,
                 **kwargs):
 
         """
@@ -300,19 +302,52 @@ def dataframe_op(func):
         df_cp = df.iloc[ilocs, start_year:end_year].copy(deep=False) # df_cp is always different object to df
         df_cp_idx = df_cp.copy(deep=False)
 
-        ret = func(df_cp, *args, **kwargs)
-        df.update(df_cp)
 
-        if not df_cp_idx.equals(df_cp.index):
-            # Index has been altered in operation
-            _rename(df, old_names=df.index.values[ilocs],
-                        new_names=df_cp.index.values)
+        map_dict = {}
 
         if rename is not None:
-            _rename(df,
-                    old_names=df.index.values[ilocs[0]],
-                    new_names=rename)
-        return ret
+            if isinstance(rename, str):
+                rename = [rename]
+
+            if issubclass(type(rename), list):
+                # Build mapping dictionary
+                rename = dict(list(zip(df.index.values[ilocs], rename)))
+        else:
+            rename = {}
+        map_dict.update(rename)
+
+        ret = func(df_cp, *args, **kwargs)
+        if ret is None:
+            # Assume operation is inplace if None is returned
+            ret = df_cp
+            raise DeprecationWarning("DataFrame operations should return the dataframe. Inplace dataframe operations have been deprecated.")
+        else:
+            CERO.is_cero(ret) # Performs checks to ensure ret is a valid CERO
+
+        try:
+            # TODO: If series, convert to dataframe
+            assert issubclass(type(ret), pd.DataFrame)
+        except AssertionError:
+            raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
+
+        if new_names is not None:
+            if issubclass(type(new_names), str):
+                new_names = [new_names]
+
+            if issubclass(type(new_names), list):
+                try:
+                    assert (len(new_names) == ret.shape[0])
+                except AssertionError:
+                    raise TypeError("'new_names' must be identical in length to the index of the result of the operation.")
+
+                new_names = dict(list(zip(df.index.values, new_names)))
+
+            CERO.rename_index_values(ret, new_names, inplace=True)
+
+        df = CERO.combine_ceros([df, ret], overwrite=True)
+        CERO.rename_index_values(df, map_dict)
+        return df
+    
     return wrapper
 
 

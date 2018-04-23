@@ -225,7 +225,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-        self.assertTrue(CERO.is_cero(cero))
 
         proc = FromCERO._Procedure({"sets": {"a_set": cfg.d_td + "test_set.yaml"},
                                     "ref_dir": ".",
@@ -243,6 +242,18 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("test_sets.csv")
 
+    def test_exec_ops(self):
+
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+
+        proc = FromCERO._Procedure({"name": "test_output_cero",
+                                    "file": "test_output_cero5.csv",
+                                    "inputs": ["A", "B", "C"],
+                                    "operations": [{"func": "merge_new"}],
+                                    "ref_dir": "."})
 
 
 if script_run:
