@@ -300,7 +300,6 @@ def dataframe_op(func):
             ilocs = pd.IndexSlice[0:]
 
         df_cp = df.iloc[ilocs, start_year:end_year].copy(deep=False) # df_cp is always different object to df
-        df_cp_idx = df_cp.copy(deep=False)
 
         ret = func(df_cp, *args, **kwargs)
         if ret is None:
@@ -313,8 +312,6 @@ def dataframe_op(func):
             assert issubclass(type(ret), pd.DataFrame)
         except AssertionError:
             raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
-
-        # df = CERO.combine_ceros([df, ret], overwrite=True)
 
         map_dict = {}
         if rename is not None:
@@ -331,9 +328,6 @@ def dataframe_op(func):
 
         CERO.rename_index_values(ret, map_dict)
         return ret
-
-        # CERO.rename_index_values(df, map_dict)
-        # return df
 
     return wrapper
 
