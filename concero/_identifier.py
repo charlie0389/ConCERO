@@ -13,6 +13,46 @@ import re
 class _Identifier(object):
 
     @staticmethod
+    def get_one_to_one_mapping(map_dict: dict, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+        old_names, new_names = [list(i) for i in zip(*map_dict.items())]
+
+        assert (all([isinstance(on, (str, tuple)) for on in old_names]))
+        _new_names = []
+        for nn in new_names:
+            if issubclass(type(nn), list):
+                _new_names += nn
+            else:
+                _new_names.append(nn)
+        new_names = _new_names
+
+        return _Identifier.get_mapping_dict(old_names, new_names, sets=sets)
+
+    @staticmethod
+    def get_mapping_dict(names_old: "Union[str, List[str]]",
+                         names_new: "Union[str, List[str]]",
+                         sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+
+        if isinstance(names_old, str):
+            names_old = [names_old]
+        if isinstance(names_new, str):
+            names_new = [names_new]
+
+        names_old = _Identifier.get_all_idents(names_old, sets=sets)
+        names_new = _Identifier.get_all_idents(names_new, sets=sets)
+
+        if len(names_old) != len(names_new):
+            msg = "'old_names' and 'new_names' must refer to equal numbers of identifiers (otherwise one-to-one mapping cannot be achieved)."
+            raise ValueError(msg)
+
+        return dict(list(zip(names_old, names_new)))
+
+    @staticmethod
+    def get_all_idents(strings: "List[str]", sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+        strings = [_Identifier.get_identifiers(s, sets=sets) for s in strings]
+        strings = list(it.chain(*strings))
+        return strings
+
+    @staticmethod
     def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
         tupled_name = _Identifier.tupleize_name(string)
         if isinstance(tupled_name, tuple):

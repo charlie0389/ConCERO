@@ -455,8 +455,7 @@ class FromCERO(dict):
 
             arrays = None
             if "arrays" in op:
-                arrays = [_Identifier.get_identifiers(arr_name, sets=self["sets"]) for arr_name in op.pop("arrays")]
-                arrays = list(it.chain(*arrays))
+                arrays = _Identifier.get_all_idents(op.pop("arrays"), sets=self["sets"])
 
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
