@@ -48,12 +48,21 @@ class _Identifier(object):
 
     @staticmethod
     def get_all_idents(strings: "List[str]", sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+
+        if not issubclass(type(strings), list):
+            msg = "First argument must be a list."
+            raise ValueError(msg)
+
         strings = [_Identifier.get_identifiers(s, sets=sets) for s in strings]
         strings = list(it.chain(*strings))
         return strings
 
     @staticmethod
     def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+
+        if sets is None:
+            sets = {}
+
         tupled_name = _Identifier.tupleize_name(string)
         if isinstance(tupled_name, tuple):
             new_fields = []
