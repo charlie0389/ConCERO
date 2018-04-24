@@ -274,9 +274,9 @@ if getattr(concero.conf, "gdxpds_installed", False):
 import os
 import copy
 from collections import OrderedDict
-import itertools as it
 import warnings
 import getpass
+import importlib.util
 
 import numpy as np
 import pandas as pd
@@ -341,9 +341,27 @@ class FromCERO(dict):
             if defaults.get("file"):
                 defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
 
-            if concero.conf.find_file("libfuncs.py") not in defaults.get("libfuncs"):
-                defaults["libfuncs"].append(concero.conf.find_file("libfuncs.py"))
-            # defaults["libfuncs"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["libfuncs"]))
+            if "libfuncs" in proc_dict:
+                if isinstance(proc_dict.get("libfuncs", []), str):
+                    proc_dict["libfuncs"] = [proc_dict["libfuncs"]]
+
+                # Update paths to be relative to "ref_dir"
+                proc_dict["libfuncs"] = [os.path.abspath(os.path.join(defaults["ref_dir"], lf)) for lf in proc_dict["libfuncs"]]
+                defaults["libfuncs"] = proc_dict["libfuncs"]
+
+            # Find libfuncs file...
+            system_libfuncs = concero.conf.find_file("libfuncs.py")
+            if system_libfuncs not in defaults.get("libfuncs", []):
+                defaults["libfuncs"].append(system_libfuncs)
+
+            # Load the modules...
+            mods = []
+            for idx, lf in enumerate(defaults["libfuncs"]):
+                spec = importlib.util.spec_from_file_location("libfuncs%d" % idx, lf)
+                mod = importlib.util.module_from_spec(spec)
+                mods.append(mod)
+                spec.loader.exec_module(mod)
+            defaults["libfuncs"] = mods
 
             # Load sets
             for k in defaults["sets"]:
@@ -471,13 +489,23 @@ class FromCERO(dict):
                     arrays = [arrays]
                 arrays = _Identifier.get_all_idents(arrays, sets=self["sets"])
 
-            try:
-                func = getattr(libfuncs, func_name)
-            except AttributeError:
-                raise AttributeError(("Invalid function name (%s) provided for procedure" + \
-                                      " \'%s\'. Function must exist in libfuncs.") % (func_name, self["name"]))
-            except KeyError:
-                raise KeyError("'func' must be provided for procedure '%s'." % self["name"])
+            for mod in self["libfuncs"]:
+                if hasattr(mod, func_name):
+                    func = getattr(mod, func_name)
+                    break
+            else:
+                msg = ('Invalid function name provided - \'%s\'. Function does not exist in any of the modules %s. It will be necessary to create a python module with the necessary functions and provide this file with the \'libfuncs\' option.' %
+                            (func_name, self["libfuncs"]))
+                FromCERO._logger.error(msg)
+                raise AttributeError(msg)
+
+            # try:
+            #     func = getattr(libfuncs, func_name)
+            # except AttributeError:
+            #     raise AttributeError(("Invalid function name (%s) provided for procedure" + \
+            #                           " \'%s\'. Function must exist in libfuncs.") % (func_name, self["name"]))
+            # except KeyError:
+            #     raise KeyError("'func' must be provided for procedure '%s'." % self["name"])
 
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
@@ -543,6 +571,22 @@ class FromCERO(dict):
 
             if not issubclass(type(proc["operations"]), list):
                 msg = "'operations' for procedure '%s' must be of list format." % proc["name"]
+                FromCERO._logger.error(msg)
+                if raise_exception:
+                    raise TypeError(msg)
+                print(msg)
+                return False
+
+            if proc.get("operations", []) and not "libfuncs" in proc:
+                msg = "If 'operations' are given, then a file containing functions needs to provided (with the 'libfuncs' argument) for process '%s'." % proc["name"]
+                FromCERO._logger.error(msg)
+                if raise_exception:
+                    raise TypeError(msg)
+                print(msg)
+                return False
+
+            if not issubclass(type(proc.get("libfuncs", [])), (str, list)):
+                msg = "'libfuncs' for procedure '%s' must be of str or list format." % proc["libfuncs"]
                 FromCERO._logger.error(msg)
                 if raise_exception:
                     raise TypeError(msg)
@@ -692,7 +736,7 @@ class FromCERO(dict):
                  "map": {},
                  "ref_dir": None, # Type: str
                  "procedures": [],
-                 "libfuncs": concero.conf.find_file("libfuncs.py")}  # Defaults
+                 "libfuncs": []}  # Defaults
 
         if parent is None:
             parent = {}
@@ -714,8 +758,9 @@ class FromCERO(dict):
 
         _conf["file"] = FromCERO.get_relpath(_conf["ref_dir"], _conf["file"])
 
-        if concero.conf.find_file("libfuncs.py") not in _conf.get("libfuncs"):
-            _conf["libfuncs"].append(concero.conf.find_file("libfuncs.py"))
+        system_libfuncs = concero.conf.find_file("libfuncs.py")
+        if system_libfuncs not in _conf.get("libfuncs", []):
+            _conf["libfuncs"].append(system_libfuncs)
 
         # Load sets
         for k in _conf.get("sets", {}).keys():
@@ -761,8 +806,7 @@ class FromCERO(dict):
         """
 
         if not issubclass(type(conf), dict):
-            print(conf)
-            msg = "Configuration has not been provided as a dictionary."
+            msg = "Configuration is of type %s (that is, not a dictionary)." % type(conf)
             FromCERO._logger.error(msg)
             if raise_exception:
                 raise TypeError(msg)
@@ -905,8 +949,6 @@ class FromCERO(dict):
         try:
             assert (issubclass(type(df), pd.DataFrame))
         except AssertionError as e:
-            print(df)
-            print(type(df))
             raise e
         libfuncs_wrappers._rename(df, df.index.values[0], "Value")
         df = df.transpose()

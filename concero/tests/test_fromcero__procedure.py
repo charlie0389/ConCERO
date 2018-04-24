@@ -8,6 +8,7 @@ script_run = True if __name__ == "__main__" else False
 
 import os
 import unittest
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -17,12 +18,14 @@ from concero.cero import CERO
 from concero.from_cero import FromCERO
 from concero.to_cero import ToCERO
 from concero.format_convert_tools import read_yaml
-import concero.libfuncs_wrappers as libfuncs_wrappers
+import concero.libfuncs as libfuncs
 import concero.conf as cfg
 
 
 class TestFromCERO_Procedure(DefaultTestCase):
     '''Tests CERO methods.'''
+
+    _dd = os.path.join(os.path.dirname(__file__), "data", "")
 
     def test_load(self):
 
@@ -57,7 +60,19 @@ class TestFromCERO_Procedure(DefaultTestCase):
             FromCERO._Procedure.is_valid(proc)
         self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
 
-        proc = {"operations": ["bad_op_type"], "name": "test_proc"}
+        proc = {"operations": ["bad_op_type"], "name": "no_libfuncs_defined"}
+
+        with self.assertRaises(TypeError):
+            FromCERO._Procedure.is_valid(proc)
+        self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
+
+        proc = {"operations": ["bad_op_type"], "name": "bad_libfuncs_type", "libfuncs": True}
+
+        with self.assertRaises(TypeError):
+            FromCERO._Procedure.is_valid(proc)
+        self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
+
+        proc = {"operations": ["bad_op_type"], "name": "test_proc", "libfuncs": [libfuncs]}
 
         with self.assertRaises(TypeError):
             FromCERO._Procedure.is_valid(proc)
@@ -69,7 +84,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
             FromCERO._Procedure.is_valid(proc)
         self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
 
-        proc = {"operations": [{"func": "replace_har_header_in_file"}], "name": "test_proc"}
+        proc = {"operations": [{"func": "replace_har_header_in_file"}], "name": "test_proc", "libfuncs": [libfuncs]}
 
         self.assertTrue(FromCERO._Procedure.is_valid(proc))
 
@@ -113,11 +128,11 @@ class TestFromCERO_Procedure(DefaultTestCase):
         os.remove("xlsx_export.xlsx")
 
     def test_auto_export(self):
-        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]}, orient='index',
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]},
+                                      orient='index',
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
         cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-        self.assertTrue(CERO.is_cero(cero))
 
         fc = FromCERO(cfg.d_td + "test_procedure_autoexport.yaml")
         fc.exec_procedures(cero)
@@ -387,15 +402,38 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("test_load_set_inputs.csv")
 
-    def test_custom_libfuncs(self):
+    def test_local_libfuncs(self):
 
-        FromCERO._Procedure({"libfuncs": "local_libfuncs",
+        shutil.copy2(TestFromCERO_Procedure._dd + "test_local_libfuncs.py", os.getcwd())
+
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]},
+                                      orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+
+        test_df = pd.DataFrame.from_dict({"A": [2], "B": [4], "C": [6]},
+                                      orient='index',
+                                      dtype=pd.np.float32)
+        test_df.sort_index(inplace=True)
+        test_df.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+
+        proc = FromCERO._Procedure({"libfuncs": "test_local_libfuncs.py",
+                             "ref_dir": ".",
                              "name": "test_set",
-                             "inputs": ["a_set"],
-                             "file": "test_sets.csv"})
+                             "inputs": ["A", "B", "C"],
+                             "operations": [{"func": "test_local_recursive_op"}],
+                             "file": "test_local_libfuncs.csv"})
 
+        proc.exec_ops(cero)
 
-        self.assertTrue(False)
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_local_libfuncs.csv")}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
+        os.remove("test_local_libfuncs.py")
+        os.remove("test_local_libfuncs.csv")
 
 if script_run:
     unittest.main()

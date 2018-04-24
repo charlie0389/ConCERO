@@ -54,8 +54,10 @@ class DataTools(object):
 class DefaultTestCase(unittest.TestCase):
 
     def setUp(self):
-        conf.set_log_level("DEBUG")
-        conf.add_search_path(os.path.join(os.path.dirname(__file__), ""))
+        # conf.set_log_level("DEBUG")
+        # conf.add_search_path(os.path.join(os.path.dirname(__file__), ""))
+        pass
 
     def tearDown(self):
-        conf.rm_search_path()
+        # conf.rm_search_path()
+        pass
