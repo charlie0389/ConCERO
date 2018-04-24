@@ -7,13 +7,15 @@ Created on Jan 30 17:34:37 2018
 .. sectionauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
+from collections import OrderedDict
+
 import itertools as it
 import re
 
 class _Identifier(object):
 
     @staticmethod
-    def get_one_to_one_mapping(map_dict: dict, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+    def get_one_to_one_mapping(map_dict: OrderedDict, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
         old_names, new_names = [list(i) for i in zip(*map_dict.items())]
 
         assert (all([isinstance(on, (str, tuple)) for on in old_names]))
@@ -44,7 +46,7 @@ class _Identifier(object):
             msg = "'old_names' and 'new_names' must refer to equal numbers of identifiers (otherwise one-to-one mapping cannot be achieved)."
             raise ValueError(msg)
 
-        return dict(list(zip(names_old, names_new)))
+        return OrderedDict(list(zip(names_old, names_new)))
 
     @staticmethod
     def get_all_idents(strings: "List[str]", sets: "Dict[str, List[str]]" = None) -> "List[tuple]":

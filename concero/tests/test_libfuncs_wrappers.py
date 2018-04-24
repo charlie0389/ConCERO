@@ -343,6 +343,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
         # Now conduct tests with rename argument provided....
 
         test_df = pd.DataFrame.from_dict({"Z": [1, 2, 3, 4, 5],
+                                          # "A": [1, 2, 3, 4, 5],
                                        # "B": [6, 4, 5, 6, 7],
                                        # "C": [4, 5, 8, 7, 8],
                                        # "D": [9, 10, 12, 11, 2],
@@ -372,10 +373,11 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(df_new.equals(test_df))
 
         # Another test...
-        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
-                                          "X": [6, 4, 5, 6, 7],
+        test_df = pd.DataFrame.from_dict({"X": [6, 4, 5, 6, 7],
                                           "Z": [4, 5, 8, 7, 8],
-                                          "D": [9, 10, 12, 11, 2]},
+                                          # "A": [1, 2, 3, 4, 5],
+                                          # "D": [9, 10, 12, 11, 2],
+                                          },
                                          orient="index",
                                          dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
@@ -386,9 +388,9 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(df_new.equals(test_df))
 
         # # Another test...
-        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
-                                          "B": [6, 4, 5, 6, 7],
-                                          "C": [4, 5, 8, 7, 8],
+        test_df = pd.DataFrame.from_dict({#"A": [1, 2, 3, 4, 5],
+                                          # "B": [6, 4, 5, 6, 7],
+                                          # "C": [4, 5, 8, 7, 8],
                                           "G": [20, 7, 3, 1, 2],
                                           "F": [7, 10, 12, 7, 8],
                                           },

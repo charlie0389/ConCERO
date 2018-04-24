@@ -319,14 +319,16 @@ def dataframe_op(func):
 
             if issubclass(type(rename), list):
                 # Build mapping dictionary
-                rename = _Identifier.get_mapping_dict(ret.index.values, rename, sets=sets)
-                # rename = dict(list(zip(ret.index.values, rename)))
+                rename = _Identifier.get_mapping_dict(ret.index.tolist(), rename, sets=sets)
             elif issubclass(type(rename), dict):
                 rename = _Identifier.get_one_to_one_mapping(rename, sets=sets)
 
-            assert issubclass(type(rename), dict) # At this point, rename should be one-to-one mapping dict
+            # At this point, rename should be one-to-one mapping dict
+
             renamed = CERO.rename_index_values(ret.loc[list(rename.keys())], rename, inplace=False)
-            ret = CERO.combine_ceros([ret, renamed])
+            ret = renamed.loc[list(rename.values())]  # Restrict renamed to only the rows that have been specified
+
+            # ret = CERO.combine_ceros([ret, renamed])
 
         return ret
 
