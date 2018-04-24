@@ -249,8 +249,8 @@ def dataframe_op(func):
                 ilocs: "List[int]" = None,
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
-                rename: "Union[str, dict, List[str]]" = None,
-                sets: dict = None,
+                # rename: "Union[str, dict, List[str]]" = None,
+                # sets: dict = None,
                 **kwargs):
 
         """
@@ -312,23 +312,6 @@ def dataframe_op(func):
             assert issubclass(type(ret), pd.DataFrame)
         except AssertionError:
             raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
-
-        if rename is not None:
-            if isinstance(rename, str):
-                rename = [rename]
-
-            if issubclass(type(rename), list):
-                # Build mapping dictionary
-                rename = _Identifier.get_mapping_dict(ret.index.tolist(), rename, sets=sets)
-            elif issubclass(type(rename), dict):
-                rename = _Identifier.get_one_to_one_mapping(rename, sets=sets)
-
-            # At this point, rename should be one-to-one mapping dict
-
-            renamed = CERO.rename_index_values(ret.loc[list(rename.keys())], rename, inplace=False)
-            ret = renamed.loc[list(rename.values())]  # Restrict renamed to only the rows that have been specified
-
-            # ret = CERO.combine_ceros([ret, renamed])
 
         return ret
 

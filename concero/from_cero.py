@@ -446,6 +446,7 @@ class FromCERO(dict):
             # Apply operation to procedure
             func_name = op.pop('func')
             op_args = op.pop('args', [])
+            rename = op.pop("rename", None)
 
             try:
                 func = getattr(libfuncs, func_name)
@@ -463,6 +464,21 @@ class FromCERO(dict):
 
             ret = func(self.inputs, *op_args, locs=arrays, **op)
             op['func'] = func.__name__  # For cleanliness of presentation
+
+            if (ret is not None) and (rename is not None):
+                if isinstance(rename, str):
+                    rename = [rename]
+
+                if issubclass(type(rename), list):
+                    # Build mapping dictionary
+                    rename = _Identifier.get_mapping_dict(ret.index.tolist(), rename, sets=self.get("sets"))
+                elif issubclass(type(rename), dict):
+                    rename = _Identifier.get_one_to_one_mapping(rename, sets=self.get("sets"))
+
+                # At this point, rename should be one-to-one mapping dict
+
+                renamed = CERO.rename_index_values(ret.loc[list(rename.keys())], rename, inplace=False)
+                ret = renamed.loc[list(rename.values())]  # Restrict renamed to only the rows that have been specified
 
             return ret
 

@@ -17,6 +17,7 @@ from concero.cero import CERO
 from concero.from_cero import FromCERO
 from concero.to_cero import ToCERO
 from concero.format_convert_tools import read_yaml
+import concero.libfuncs_wrappers as libfuncs_wrappers
 import concero.conf as cfg
 
 
@@ -285,15 +286,10 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                              "b_set": ["D", "E", "F"]},
                                     "inputs": ["a_set", "b_set"],
                                     "operations": [{"func": "nop",
-                                                    "rename": {"b_set": "a_set"},
-                                                    "sets": {"a_set": ["A", "B", "C"],
-                                                    "b_set": ["D", "E", "F"]},
-                                                    },
+                                                    "rename": {"b_set": "a_set"}},
                                                    {"func": "pc_change",
                                                     "arrays": ["a_set"],
-                                                    "init_cols": [2018],
-                                                    },
-                                                   ],
+                                                    "init_cols": [2018]}],
                                     "ref_dir": "."})
         proc.exec_ops(cero)
 
@@ -301,6 +297,71 @@ class TestFromCERO_Procedure(DefaultTestCase):
         df = tc.create_cero()
 
         self.assertTrue(df.equals(test_df))
+
+    def test_rename(self):
+
+        cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                       "B": [6, 4, 5, 6, 7],
+                                       "C": [4, 5, 8, 7, 8],
+                                       "D": [9, 10, 12, 11, 2]},
+                                      orient="index",
+                                      dtype=pd.np.float32)
+
+        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        cero.sort_index(inplace=True)
+
+        proc = FromCERO._Procedure({"name": "test_proc",
+                                    "inputs": ["A", "B", "C", "D"]})
+        proc.inputs = cero.copy()
+        df = proc._exec_op({"func": "nop"})
+
+        self.assertTrue(df.equals(cero))
+
+        test_df = pd.DataFrame.from_dict({"Z": [6, 4, 5, 6, 7]},
+                                            orient="index",
+                                            dtype=pd.np.float32)
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        proc = FromCERO._Procedure({"name": "test_proc",
+                                    "inputs": ["B"]})
+        proc._set_inputs(cero)
+        df_new = proc._exec_op({"func": "nop", "rename": "Z"})
+
+        self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
+        self.assertTrue(df_new.equals(test_df))
+
+        # Another test...
+        test_df = pd.DataFrame.from_dict({"Z": [6, 4, 5, 6, 7],
+                                          "Y": [4, 5, 8, 7, 8]},
+                                         orient="index",
+                                         dtype=pd.np.float32)
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        proc = FromCERO._Procedure({"name": "test_proc",
+                                    "inputs": ["B", "C"]})
+        proc._set_inputs(cero)
+        df_new = proc._exec_op({"func": "nop", "rename": ["Z", "Y"]})
+
+        self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
+        self.assertTrue(df_new.equals(test_df.loc[df_new.index.tolist()]))
+
+        # Another test...
+        test_df = pd.DataFrame.from_dict({"X": [6, 4, 5, 6, 7],
+                                          "Z": [4, 5, 8, 7, 8]},
+                                         orient="index",
+                                         dtype=pd.np.float32)
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        proc = FromCERO._Procedure({"name": "test_proc",
+                                    "inputs": ["B", "C"]})
+        proc._set_inputs(cero)
+        df_new = proc._exec_op({"func": "nop", "rename": {"C":"Z", "B":"X"}})
+
+        self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
+        self.assertTrue(df_new.equals(test_df.loc[df_new.index.tolist()]))
 
 
 if script_run:

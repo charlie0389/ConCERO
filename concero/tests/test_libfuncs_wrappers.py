@@ -19,33 +19,6 @@ from concero.tests.data_tools import DefaultTestCase
 class TestLibfuncsWrappers(DefaultTestCase):
     '''Tests libfuncs methods.'''
 
-    # def test_dataframe_op(self):
-    #
-    #     @libfuncs_wrappers.dataframe_op
-    #     def modify_test(cero, an_arg, a_kw_arg=None):
-    #         self.assertTrue(an_arg)
-    #         self.assertTrue(a_kw_arg)
-    #
-    #         # Restricted cero for comparison
-    #         ceror = pd.DataFrame.from_dict({"A": [2], "C": [5]}, orient="index")
-    #         ceror.columns = pd.DatetimeIndex(pd.to_datetime([2018], format="%Y"))
-    #         ceror.sort_index(inplace=True)
-    #         ceror = ceror.astype(pd.np.float32)
-    #
-    #         self.assertTrue(cero.equals(ceror))
-    #
-    #         cero.iloc[0,0] = 3.0
-    #
-    #     cero = pd.DataFrame.from_dict({"A": [1, 2, 3], "B": [3, 4, 5], "C": [4, 5, 6]}, orient="index")
-    #     cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
-    #     cero.sort_index(inplace=True)
-    #     cero = cero.astype(pd.np.float32)
-    #
-    #     modify_test(cero, True, ilocs=[0,2], start_year=2018, end_year=2019, rename="D", a_kw_arg=True)
-    #
-    #     self.assertTrue(cero.index.values[0] == "D")
-    #     self.assertTrue(cero.iloc[0, 1] == 3.0)
-
     def test_series_op(self):
 
         @libfuncs_wrappers.series_op
@@ -71,12 +44,11 @@ class TestLibfuncsWrappers(DefaultTestCase):
         cero = cero.astype(pd.np.float32)
 
         with self.assertRaises(TypeError):
-            modify_test(cero, True, ilocs=[1], start_year=2018, end_year=2019, rename="D", a_kw_arg=True)
+            modify_test(cero, True, ilocs=[1], start_year=2018, end_year=2019, a_kw_arg=True)
 
-        cero = modify_test(cero, True, ilocs=[1], start_year=2018, end_year=2019, rename="D", a_kw_arg=True,
-                    return_something=True)
+        cero = modify_test(cero, True, ilocs=[1], start_year=2018, end_year=2019, a_kw_arg=True,return_something=True)
 
-        self.assertTrue(cero.index.values[0] == "D")
+        self.assertTrue(cero.index.values[0] == "B")
         self.assertTrue(cero.iloc[0, 0] == 100)
 
     def test_recursive_op(self):
@@ -97,11 +69,15 @@ class TestLibfuncsWrappers(DefaultTestCase):
         cero = cero.astype(pd.np.float32)
 
         with self.assertRaises(ValueError):
-            modify_test(cero, True, ilocs=[1], rename="D", a_kw_arg=True, inplace=False, init=[5.0], post=[6.0])
+            modify_test(cero, True, ilocs=[1],
+                        # rename="D",
+                        a_kw_arg=True, inplace=False, init=[5.0], post=[6.0])
 
-        cero = modify_test(cero, True, ilocs=[1], rename="D", a_kw_arg=True, inplace=False, return_something=True, init=[5.0], post=[6.0])
+        cero = modify_test(cero, True, ilocs=[1],
+                           # rename="D",
+                           a_kw_arg=True, inplace=False, return_something=True, init=[5.0], post=[6.0])
 
-        self.assertTrue(cero.index.values[0] == "D")
+        self.assertTrue(cero.index.values[0] == "B")
         self.assertTrue(np.allclose(cero.iloc[0].values, np.array([4.0, 4.0, 5.0])))
 
     def test_series_dropnans(self):
@@ -341,65 +317,56 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
 
         # Now conduct tests with rename argument provided....
-
-        test_df = pd.DataFrame.from_dict({"Z": [1, 2, 3, 4, 5],
-                                          # "A": [1, 2, 3, 4, 5],
-                                       # "B": [6, 4, 5, 6, 7],
-                                       # "C": [4, 5, 8, 7, 8],
-                                       # "D": [9, 10, 12, 11, 2],
-                                          },
+        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5]},
                                       orient="index",
                                       dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         test_df.sort_index(inplace=True)
-        df_new = no_op(cero, ilocs=[0], rename="Z")
+        df_new = no_op(cero, ilocs=[0])
         df_new.sort_index(inplace=True)
         self.assertTrue(df.equals(cero)) # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df))
 
         # Another test...
-        test_df = pd.DataFrame.from_dict({"Z": [1, 2, 3, 4, 5],
-                                          "Y": [6, 4, 5, 6, 7],
-                                          # "C": [4, 5, 8, 7, 8],
-                                          # "D": [9, 10, 12, 11, 2],
-                                          },
+        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                          "B": [6, 4, 5, 6, 7]},
                                          orient="index",
                                          dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         test_df.sort_index(inplace=True)
-        df_new = no_op(cero, ilocs=[0, 1], rename=["Z", "Y"])
+        df_new = no_op(cero, ilocs=[0, 1])
         df_new.sort_index(inplace=True)
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df))
 
         # Another test...
-        test_df = pd.DataFrame.from_dict({"X": [6, 4, 5, 6, 7],
-                                          "Z": [4, 5, 8, 7, 8],
-                                          # "A": [1, 2, 3, 4, 5],
-                                          # "D": [9, 10, 12, 11, 2],
+        test_df = pd.DataFrame.from_dict({"B": [6, 4, 5, 6, 7],
+                                          "C": [4, 5, 8, 7, 8],
+                                          "A": [1, 2, 3, 4, 5],
+                                          "D": [9, 10, 12, 11, 2],
                                           },
                                          orient="index",
                                          dtype=pd.np.float32)
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         test_df.sort_index(inplace=True)
-        df_new = no_op(cero, rename={"C": "Z", "B": "X"})
+        df_new = no_op(cero)
         df_new.sort_index(inplace=True)
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df))
 
-        # # Another test...
-        test_df = pd.DataFrame.from_dict({#"A": [1, 2, 3, 4, 5],
-                                          # "B": [6, 4, 5, 6, 7],
-                                          # "C": [4, 5, 8, 7, 8],
-                                          "G": [20, 7, 3, 1, 2],
-                                          "F": [7, 10, 12, 7, 8],
+        # Another test...
+        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                          "B": [6, 4, 5, 6, 7],
+                                          "C": [4, 5, 8, 7, 8],
+                                          "D": [20, 7, 3, 1, 2],
+                                          "E": [7, 10, 12, 7, 8],
                                           },
                                          orient="index",
                                          dtype=pd.np.float32)
 
         test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         test_df.sort_index(inplace=True)
-        df_new = add_modify_series(cero, rename={"D": "G", "E": "F"})
+        df_new = add_modify_series(cero)
         df_new.sort_index(inplace=True)
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(test_df.equals(df_new))

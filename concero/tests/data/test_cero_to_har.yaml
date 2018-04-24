@@ -30,4 +30,3 @@ procedures:
         arrays:
           - COM,ALLSRC,IND,REGDST,MARGCOM
         header_name: MAR1
-        rename: MAR1
