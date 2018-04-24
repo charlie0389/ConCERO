@@ -285,9 +285,7 @@ class CERO(object):
             cero = cero.copy(deep=False)
             ret = cero
 
-        # print("cero.index: ", cero.index)
         cero.index = CERO._transform_index(cero.index, f, tupleize_cols=False)
-        # print("cero.index: ", cero.index)
 
         return ret
 

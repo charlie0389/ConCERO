@@ -331,18 +331,6 @@ class FromCERO(dict):
             defaults.update(parent)
             defaults.update(proc_dict)
 
-            if "outputs" in defaults:
-                if issubclass(type(defaults["outputs"]), list):
-                    defaults["outputs"] = [_Identifier.tupleize_name(name) for name in defaults["outputs"]]
-                elif defaults["outputs"] == True:
-                    defaults.pop("outputs")
-                elif defaults["outputs"] == False:
-                    defaults["outputs"] = None
-                elif defaults["outputs"] is None:
-                    pass
-                else:
-                    raise ValueError("'outputs' must be provided as a list or None.")
-
             if defaults.get("ref_dir") is None:
                 defaults["ref_dir"] = os.getcwd()
             defaults["ref_dir"] = os.path.abspath(defaults["ref_dir"])
@@ -358,8 +346,22 @@ class FromCERO(dict):
                 defaults["inputs"] = [defaults["inputs"]]
 
             # Determine identifiers for all inputs
-            expanded_inputs = [_Identifier.get_identifiers(inp, defaults.get("sets", None)) for inp in defaults['inputs']]
-            defaults["inputs"] = list(it.chain(*expanded_inputs))
+            defaults["inputs"] = _Identifier.get_all_idents(defaults["inputs"], sets=defaults["sets"])
+
+            if "outputs" in defaults:
+                if isinstance(defaults["outputs"], str):
+                    defaults["outputs"] = [defaults["outputs"]]
+
+                if issubclass(type(defaults["outputs"]), list):
+                    defaults["outputs"] = _Identifier.get_all_idents(defaults["outputs"], sets=defaults["sets"])
+                elif defaults["outputs"] == True:
+                    defaults.pop("outputs")
+                elif defaults["outputs"] == False:
+                    defaults["outputs"] = None
+                elif defaults["outputs"] is None:
+                    pass
+                else:
+                    raise ValueError("'outputs' must be provided as a list, True or None.")
 
             return defaults
 

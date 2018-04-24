@@ -250,6 +250,7 @@ def dataframe_op(func):
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
                 rename: "Union[str, dict, List[str]]" = None,
+                sets: dict = None,
                 **kwargs):
 
         """
@@ -312,19 +313,21 @@ def dataframe_op(func):
         except AssertionError:
             raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
 
-        map_dict = {}
         if rename is not None:
             if isinstance(rename, str):
                 rename = [rename]
 
             if issubclass(type(rename), list):
                 # Build mapping dictionary
-                rename = dict(list(zip(ret.index.values, rename)))
-        else:
-            rename = {}
-        map_dict.update(rename)
+                rename = _Identifier.get_mapping_dict(ret.index.values, rename, sets=sets)
+                # rename = dict(list(zip(ret.index.values, rename)))
+            elif issubclass(type(rename), dict):
+                rename = _Identifier.get_one_to_one_mapping(rename, sets=sets)
 
-        CERO.rename_index_values(ret, map_dict)
+            assert issubclass(type(rename), dict) # At this point, rename should be one-to-one mapping dict
+            renamed = CERO.rename_index_values(ret.loc[list(rename.keys())], rename, inplace=False)
+            ret = CERO.combine_ceros([ret, renamed])
+
         return ret
 
     return wrapper
@@ -461,10 +464,15 @@ def recursive_op(func):
 
         for i in range(no_ops):
             rec_args = array_list[i: i + no_args] + list(args)
-            tmp = func(*rec_args, **kwargs)
-            # tmp = func(*array_list[i - dis_start:i + dis_end + 1], # This form can only be used for Python 3.5 onwards...
-            #            *args,
-            #            **kwargs)
+            try:
+                tmp = func(*rec_args, **kwargs)
+                # tmp = func(*array_list[i - dis_start:i + dis_end + 1], # This form can only be used for Python 3.5 onwards...
+                #            *args,
+                #            **kwargs)
+            except TypeError as e:
+                msg = e.__str__() + ". A likely cause is that initial conditions (or columns) have not been specified."
+                log.error(msg)
+                raise TypeError(msg)
             if tmp is None:
                 raise ValueError("'recursive_op' functions must return a floating point value.")
 

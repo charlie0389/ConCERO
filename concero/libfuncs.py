@@ -369,6 +369,10 @@ def apply_func(df, *args, numpy_func: str=None, **kwargs):
     return df
 
 @dataframe_op
+def nop(df):
+    return df
+
+@dataframe_op
 def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: str=None, **kwargs):
 
     # TODO: Expand support to include multiple tuple fields as keys

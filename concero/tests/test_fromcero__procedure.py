@@ -255,6 +255,52 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                     "operations": [{"func": "merge_new"}],
                                     "ref_dir": "."})
 
+    def test_stitch_time(self):
+
+        init = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3],
+                                       }, orient='index',
+                                      dtype=pd.np.float32)
+        init.sort_index(inplace=True)
+        init.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+
+        cero = pd.DataFrame.from_dict({"D": [100, 200], "E": [50, 0], "F": [-50, 200]},
+                                      orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2019, 2020], format="%Y"))
+
+        cero = CERO.combine_ceros([init, cero])
+
+        test_df = pd.DataFrame.from_dict({"A": [1, 2, 6], "B": [2, 3, 3], "C": [3, 1.5, 4.5],
+                                          "D": [pd.np.nan, 100, 200], "E": [pd.np.nan, 50, 0], "F": [pd.np.nan, -50, 200]
+                                          },
+                                      orient='index',
+                                      dtype=pd.np.float32)
+        test_df.sort_index(inplace=True)
+        test_df.columns = pd.DatetimeIndex(data=pd.to_datetime([2018, 2019, 2020], format="%Y"))
+
+        proc = FromCERO._Procedure({"name": "test_stitch_time",
+                                    "file": "test_stitch_time.csv",
+                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]},
+                                    "inputs": ["a_set", "b_set"],
+                                    "operations": [{"func": "nop",
+                                                    "rename": {"b_set": "a_set"},
+                                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]}},
+                                                   {"func": "pc_change",
+                                                    "arrays": ["a_set"],
+                                                    "init_cols": [2018],
+                                                    },
+                                                   ],
+                                    "ref_dir": "."})
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_stitch_time.csv")}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
 
 if script_run:
     unittest.main()
