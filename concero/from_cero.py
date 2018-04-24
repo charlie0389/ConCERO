@@ -651,6 +651,8 @@ class FromCERO(dict):
             # Interpret str as file path
             set = read_yaml(os.path.join(ref_dir, set))
 
+        set = _Identifier.get_all_idents(set)
+
         try:
             assert (issubclass(type(set), list))
         except AssertionError:
@@ -659,7 +661,8 @@ class FromCERO(dict):
             FromCERO._logger.error(msg)
             raise TypeError(msg)
 
-        return ["%s" % val for val in set]
+        return set
+        # return ["%s" % val for val in set]
 
 
     @staticmethod
