@@ -111,6 +111,21 @@ class TestFromCERO(DefaultTestCase):
         os.remove("test_fromcero_complexmapping1.xlsx")
         os.remove("test_fromcero_complexmapping2.xlsx")
 
+    def test_load_set(self):
+
+        set = ["A", "B", "C"]
+        ret_set = FromCERO._load_set(set)
+        test_set = ["A", "B", "C"]
+
+        self.assertEqual(ret_set, test_set)
+
+        set = ["A,D", "B,E", "C,F"]
+        ret_set = FromCERO._load_set(set)
+        test_set = [("A", "D"), ("B", "E"), ("C", "F")]
+
+        self.assertEqual(ret_set, test_set)
+
+
 
 
 if script_run:

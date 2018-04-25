@@ -340,7 +340,11 @@ class FromCERO(dict):
 
             # Load sets
             for k in defaults["sets"]:
-                defaults["sets"][k] = FromCERO._load_set(defaults["sets"][k], defaults["ref_dir"])
+                if isinstance(defaults["sets"][k], str):
+                    defaults["sets"][k] = os.path.join(defaults["ref_dir"], defaults["sets"][k])
+                    defaults["sets"][k] = read_yaml(defaults["sets"][k])
+
+                defaults["sets"][k] = FromCERO._load_set(defaults["sets"][k])
 
             if isinstance(defaults["inputs"], str):
                 defaults["inputs"] = [defaults["inputs"]]
@@ -374,19 +378,24 @@ class FromCERO(dict):
                 # Input is entire CERO unless otherwise specified
                 self["inputs"] = cero.index.tolist()
 
+            # Check values in dataframe - check is necessary because KeyError is not thrown if some values are in index (pandas version 0.22).
+            invalid_inputs = [i for i in self["inputs"] if i not in cero.index]
+
             try:
                 self.inputs = copy.deepcopy(cero.iloc[[cero.index.get_loc(loc) for loc in self["inputs"]]]) # Reduce data frame to necessary data and copy
-            except KeyError as e:
-                msg = ("Inputs do not exist. The most likely reason is that the configuration file is " +
+            except KeyError:
+                invalid_inputs = [i for i in self["inputs"] if i not in cero.index]
+                msg = ("Inputs %s do not exist. The most likely reason is that the configuration file is " +
                        "incorrectly specified, or lacks specification. If debugging level has been set to " +
                        "'DEBUG', then the input list is in the log file - note that this list may be " +
                        "extraordinarily long. Common causes of this problem include: \n" +
                        " 1. Set definition in configuration file includes elements that do not exist in the CERO.\n" +
                        " 2. Mis-spellings of identifiers in the configuration file (which includes names of sets for 'inputs' or 'arrays').\n" +
                        " 3. Incorrect ordering of sets in the identifier."
-                       )
+                       ) % invalid_inputs
                 FromCERO._logger.error(msg)
                 raise KeyError(msg)
+
             assert (isinstance(self.inputs, pd.DataFrame))
 
             map_dict = {}
@@ -645,11 +654,7 @@ class FromCERO(dict):
         return os.path.join(base_dir, filename)
 
     @staticmethod
-    def _load_set(set: "Union[str, List[str]]", ref_dir: str):
-
-        if isinstance(set, str):
-            # Interpret str as file path
-            set = read_yaml(os.path.join(ref_dir, set))
+    def _load_set(set: "List[str]"):
 
         set = _Identifier.get_all_idents(set)
 
@@ -703,7 +708,13 @@ class FromCERO(dict):
 
         # Load sets
         for k in _conf.get("sets", {}).keys():
-            _conf["sets"][k] = FromCERO._load_set(_conf["sets"][k], _conf["ref_dir"])
+
+            # If provided as a string, assume to be a file relative to ref_dir
+            if isinstance(_conf["sets"][k], str):
+                _conf["sets"][k] = os.path.join(_conf["ref_dir"], _conf["sets"][k])
+                _conf["sets"][k] = read_yaml(_conf["sets"][k])
+
+            _conf["sets"][k] = FromCERO._load_set(_conf["sets"][k])
 
         file_ext = os.path.splitext(_conf["file"])[1][1:]
         if file_ext in [".", ""]:
@@ -804,26 +815,6 @@ class FromCERO(dict):
             fp.close()
             os.remove(test_file)
         return True
-
-    @staticmethod
-    def _copy_inputs(cero: pd.DataFrame, inp_list: 'List[tuple]') -> OrderedDict:
-        """Copies each data series in ``cero`` indexed by the items in ``inp_list`` to an ``OrderedDict``. This \
-        ensures that ``operations`` do not alter ``cero``.
-        """
-        try:
-            # Reduce data frame to necessary data and copy
-            return copy.deepcopy(cero.loc[inp_list])
-        except KeyError as e:
-            msg = ("Inputs do not exist. The most likely reason is that the configuration file is " +
-                   "incorrectly specified, or lacks specification. If debugging level has been set to " +
-                   "'DEBUG', then the input list is in the log file - note that this list may be " +
-                   "extraordinarily long. Common causes of this problem include: \n" +
-                    " 1. Set definition in configuration file includes elements that do not exist in the CERO.\n" +
-                    " 2. Mis-spellings of identifiers in the configuration file (which includes names of sets for 'inputs' or 'arrays').\n" +
-                    " 3. Incorrect ordering of sets in the identifier."
-            )
-            FromCERO._logger.error(msg)
-            raise KeyError(msg)
 
     @staticmethod
     def _dataframe_out(df, output_file, output_type, output_kwargs: dict=None):
