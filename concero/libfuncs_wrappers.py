@@ -249,8 +249,6 @@ def dataframe_op(func):
                 ilocs: "List[int]" = None,
                 start_year: "Union[pd.datetime, int]" = None,
                 end_year: "Union[pd.datetime, int]" = None,
-                # rename: "Union[str, dict, List[str]]" = None,
-                # sets: dict = None,
                 **kwargs):
 
         """
@@ -304,15 +302,9 @@ def dataframe_op(func):
         ret = func(df_cp, *args, **kwargs)
         if ret is None:
             return ret
-        else:
-            CERO.is_cero(ret) # Performs checks to ensure ret is a valid CERO
+        # TODO: If series, convert to dataframe
 
-        try:
-            # TODO: If series, convert to dataframe
-            assert issubclass(type(ret), pd.DataFrame)
-        except AssertionError:
-            raise TypeError("'dataframe_op'(s) must return a pandas.DataFrame.")
-
+        CERO.is_cero(ret) # Performs checks to ensure ret is a valid CERO
         return ret
 
     return wrapper
@@ -404,9 +396,13 @@ def recursive_op(func):
         properties of the provided ``pandas.Series`` object to the returned object.'''
 
         if [bool(init), bool(auto_init), bool(init_cols)].count(True) >= 2:
-            raise ValueError("Only one of the keyword arguments 'init', 'auto_init' and 'init_cols' must be provided.")
+            msg = "Only one of the keyword arguments 'init', 'auto_init' and 'init_cols' must be provided."
+            log.error(msg)
+            raise ValueError(msg)
         if [bool(post), bool(auto_post), bool(post_cols)].count(True) >= 2:
-            raise ValueError("Only one of the keyword arguments 'post', 'auto_post' and 'post_cols' must be provided.")
+            msg = "Only one of the keyword arguments 'post', 'auto_post' and 'post_cols' must be provided."
+            log.error(msg)
+            raise ValueError(msg)
 
         if not init: init = []
         if not post: post = []
@@ -418,9 +414,13 @@ def recursive_op(func):
         if not post_cols: post_cols = []
 
         if not isinstance(auto_init, int) or auto_init < 0:
-            raise TypeError("'auto_init' keyword argument must be provided as an integer greater than 0.")
+            msg = "'auto_init' keyword argument must be provided as an integer greater than 0."
+            log.error(msg)
+            raise TypeError(msg)
         if not isinstance(auto_post, int) or auto_post < 0:
-            raise TypeError("'auto_post' keyword argument must be provided as an integer greater than 0.")
+            msg = "'auto_post' keyword argument must be provided as an integer greater than 0."
+            log.error(msg)
+            raise TypeError(msg)
 
         if auto_init: init = [array[0]]*auto_init
         if auto_post: post = [array[-1]]*auto_post
@@ -432,11 +432,21 @@ def recursive_op(func):
 
         if init_cols:
             if isinstance(init_cols, int): init_cols = [dt.year for dt in array.index.tolist()[:init_cols]]
-            init = array.loc[pd.to_datetime(init_cols, format="%Y")].tolist()
+            try:
+                init = array.loc[pd.to_datetime(init_cols, format="%Y")].tolist()
+            except KeyError:
+                msg = "Selected years for 'init_cols' (%s) are outside of range of available data." % init_cols
+                log.error(msg)
+                raise KeyError(msg)
             sl_start = len(init)
         if post_cols:
             if isinstance(post_cols, int): post_cols = [dt.year for dt in array.index.tolist()[-post_cols:]]
-            post = array.loc[pd.to_datetime(post_cols, format="%Y")].tolist()
+            try:
+                post = array.loc[pd.to_datetime(post_cols, format="%Y")].tolist()
+            except KeyError:
+                msg = "Selected years for 'post_cols' (%s) are outside of range of available data." % post_cols
+                log.error(msg)
+                raise KeyError(msg)
             sl_end = -len(post)
         sl = slice(sl_start, sl_end)
 

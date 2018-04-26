@@ -125,7 +125,17 @@ class TestFromCERO(DefaultTestCase):
 
         self.assertEqual(ret_set, test_set)
 
+        set = ["A", ("B", "C")]
+        ret_set = FromCERO._load_set(set)
+        test_set = ["A", ("B", "C")]
 
+        self.assertEqual(ret_set, test_set)
+
+        set = ["A", ("B", "C"), "A", ("B", "C")]
+        ret_set = FromCERO._load_set(set)
+        test_set = ["A", ("B", "C"), "A", ("B", "C")]
+
+        self.assertEqual(ret_set, test_set)
 
 
 if script_run:

@@ -82,7 +82,8 @@ class Test_Identifier(DefaultTestCase):
                                   ("C", "A"), ("C", "B"), ("C", "C")])
 
     def test_mapping_dict(self):
-        sets = {"a_set": ["A", "B", "C"]}
+        sets = {"a_set": ["A", "B", "C"],
+                "bad_set": ["A", "B", "C", "A"]}
 
         map_dict = _Identifier.get_mapping_dict(sets["a_set"], sets["a_set"])
         self.assertEqual(map_dict, {"A": "A", "B": "B", "C": "C"})
@@ -95,6 +96,9 @@ class Test_Identifier(DefaultTestCase):
 
         map_dict = _Identifier.get_mapping_dict("a_set", "a_set", sets=sets)
         self.assertEqual(map_dict, {"A": "A", "B": "B", "C": "C"})
+
+        map_dict = _Identifier.get_mapping_dict(sets["bad_set"], sets["bad_set"])
+        self.assertNotEqual(4, len(map_dict.keys()))
 
     def test_get_one_to_one_mapping(self):
 

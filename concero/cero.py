@@ -148,6 +148,7 @@ class CERO(object):
         try:
             assert obj.index.is_unique
         except AssertionError:
+            print(obj)
             if raise_exception:
                 raise CERO.InvalidCERO(CERO._msg_idx_nunique + (" Duplicated values are: %s." % obj.index.get_duplicates()))
             return False

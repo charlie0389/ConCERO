@@ -63,12 +63,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
             FromCERO._Procedure.is_valid(proc)
         self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
 
-        proc = {"operations": [{"func_is_unspecified": None}], "name": "test_proc"}
-
-        with self.assertRaises(KeyError):
-            FromCERO._Procedure.is_valid(proc)
-        self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
-
         proc = {"operations": [{"func": "bad_name"}], "name": "test_proc"} # Good op name, but no 'func' keyword
 
         with self.assertRaises(AttributeError):
@@ -285,7 +279,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
                                     "sets": {"a_set": ["A", "B", "C"],
                                              "b_set": ["D", "E", "F"]},
                                     "inputs": ["a_set", "b_set"],
-                                    "operations": [{"func": "nop",
+                                    "operations": [{"func": "noop",
                                                     "rename": {"b_set": "a_set"}},
                                                    {"func": "pc_change",
                                                     "arrays": ["a_set"],
@@ -297,6 +291,8 @@ class TestFromCERO_Procedure(DefaultTestCase):
         df = tc.create_cero()
 
         self.assertTrue(df.equals(test_df))
+
+        os.remove("test_stitch_time.csv")
 
     def test_rename(self):
 
@@ -313,7 +309,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc = FromCERO._Procedure({"name": "test_proc",
                                     "inputs": ["A", "B", "C", "D"]})
         proc.inputs = cero.copy()
-        df = proc._exec_op({"func": "nop"})
+        df = proc._exec_op({"func": "noop"})
 
         self.assertTrue(df.equals(cero))
 
@@ -326,7 +322,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc = FromCERO._Procedure({"name": "test_proc",
                                     "inputs": ["B"]})
         proc._set_inputs(cero)
-        df_new = proc._exec_op({"func": "nop", "rename": "Z"})
+        df_new = proc._exec_op({"func": "noop", "rename": "Z"})
 
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df))
@@ -342,7 +338,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc = FromCERO._Procedure({"name": "test_proc",
                                     "inputs": ["B", "C"]})
         proc._set_inputs(cero)
-        df_new = proc._exec_op({"func": "nop", "rename": ["Z", "Y"]})
+        df_new = proc._exec_op({"func": "noop", "rename": ["Z", "Y"]})
 
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df.loc[df_new.index.tolist()]))
@@ -358,10 +354,38 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc = FromCERO._Procedure({"name": "test_proc",
                                     "inputs": ["B", "C"]})
         proc._set_inputs(cero)
-        df_new = proc._exec_op({"func": "nop", "rename": {"C":"Z", "B":"X"}})
+        df_new = proc._exec_op({"func": "noop", "rename": {"C":"Z", "B":"X"}})
 
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(df_new.equals(test_df.loc[df_new.index.tolist()]))
+
+    def test_load_set_inputs(self):
+
+        cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                       "B": [6, 4, 5, 6, 7],
+                                       "C": [4, 5, 8, 7, 8],
+                                       "D": [9, 10, 12, 11, 2]},
+                                      orient="index",
+                                      dtype=pd.np.float32)
+
+        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        cero.sort_index(inplace=True)
+
+        proc = FromCERO._Procedure({"name": "test_proc",
+                             "sets": {"a_set": ["A", "B", "C", "D"]},
+                             "inputs": ["a_set"],
+                             "operations": [{"func": "noop",
+                                             "arrays": ["a_set"]}],
+                             "file": "test_load_set_inputs.csv",
+                             })
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_load_set_inputs.csv")}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(cero))
+
+        os.remove("test_load_set_inputs.csv")
 
 
 if script_run:

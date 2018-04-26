@@ -453,9 +453,16 @@ class FromCERO(dict):
         def _exec_op(self, op: dict):
 
             # Apply operation to procedure
-            func_name = op.pop('func')
+            func_name = op.pop('func', "noop") # Perform noop (no-operation) if no func provided.
             op_args = op.pop('args', [])
             rename = op.pop("rename", None)
+
+            arrays = None
+            if "arrays" in op:
+                arrays = op.pop("arrays")
+                if issubclass(type(arrays), str):
+                    arrays = [arrays]
+                arrays = _Identifier.get_all_idents(arrays, sets=self["sets"])
 
             try:
                 func = getattr(libfuncs, func_name)
@@ -465,16 +472,16 @@ class FromCERO(dict):
             except KeyError:
                 raise KeyError("'func' must be provided for procedure '%s'." % self["name"])
 
-            arrays = None
-            if "arrays" in op:
-                arrays = _Identifier.get_all_idents(op.pop("arrays"), sets=self["sets"])
-
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
             ret = func(self.inputs, *op_args, locs=arrays, **op)
             op['func'] = func.__name__  # For cleanliness of presentation
 
-            if (ret is not None) and (rename is not None):
+            if rename is not None:
+
+                if ret is None:
+                    ret = getattr(libfuncs, "noop")(self.inputs, *op_args, locs=arrays, **op)
+
                 if isinstance(rename, str):
                     rename = [rename]
 
@@ -503,23 +510,17 @@ class FromCERO(dict):
                     print(msg)
                     return False
 
-                try:
-                    getattr(libfuncs, operation['func'])
-                except AttributeError:
-                    msg = 'Invalid function name provided - \'%s\'. Function must exist in libfuncs.' % operation[
-                        'func']
-                    FromCERO._logger.error(msg)
-                    if raise_exception:
-                        raise AttributeError(msg)
-                    print(msg)
-                    return False
-                except KeyError:
-                    msg = 'Operation (function) name must be specified.'
-                    FromCERO._logger.error(msg)
-                    if raise_exception:
-                        raise KeyError(msg)
-                    print(msg)
-                    return False
+                if "func" in operation:
+                    try:
+                        getattr(libfuncs, operation['func'])
+                    except AttributeError:
+                        msg = 'Invalid function name provided - \'%s\'. Function must exist in libfuncs.' % operation[
+                            'func']
+                        FromCERO._logger.error(msg)
+                        if raise_exception:
+                            raise AttributeError(msg)
+                        print(msg)
+                        return False
             return True
 
         @staticmethod
@@ -667,7 +668,6 @@ class FromCERO(dict):
             raise TypeError(msg)
 
         return set
-        # return ["%s" % val for val in set]
 
 
     @staticmethod

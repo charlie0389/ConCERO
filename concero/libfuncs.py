@@ -369,7 +369,7 @@ def apply_func(df, *args, numpy_func: str=None, **kwargs):
     return df
 
 @dataframe_op
-def nop(df):
+def noop(df):
     return df
 
 @dataframe_op
