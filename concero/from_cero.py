@@ -277,6 +277,7 @@ from collections import OrderedDict
 import warnings
 import getpass
 import importlib.util
+from types import ModuleType
 
 import numpy as np
 import pandas as pd
@@ -341,26 +342,36 @@ class FromCERO(dict):
             if defaults.get("file"):
                 defaults["file"] = os.path.join(defaults["ref_dir"], os.path.relpath(defaults["file"]))
 
-            if "libfuncs" in proc_dict:
-                if isinstance(proc_dict.get("libfuncs", []), str):
-                    proc_dict["libfuncs"] = [proc_dict["libfuncs"]]
+            if issubclass(type(defaults.get("libfuncs")), str):
+                defaults["libfuncs"] = [defaults["libfuncs"]]
 
-                # Update paths to be relative to "ref_dir"
-                proc_dict["libfuncs"] = [os.path.abspath(os.path.join(defaults["ref_dir"], lf)) for lf in proc_dict["libfuncs"]]
-                defaults["libfuncs"] = proc_dict["libfuncs"]
+            lf_files = []
+            for lf in defaults["libfuncs"]:
+                if issubclass(type(lf), str) and lf in proc_dict.get("libfuncs", []):
+                    lf = os.path.join(defaults["ref_dir"], lf)
+                elif issubclass(type(lf), str):
+                    pass
+                elif issubclass(type(lf), ModuleType):
+                    lf = lf.__file__
+                else:
+                    raise TypeError("'libfuncs' must be provided as a list of strings and/or modules (not %s)." % type(lf))
 
-            # Find libfuncs file...
+                lf_files.append(lf)
+
+            # Ensure system libfuncs is on search path...
             system_libfuncs = concero.conf.find_file("libfuncs.py")
-            if system_libfuncs not in defaults.get("libfuncs", []):
+            if system_libfuncs not in lf_files:
+                lf_files.append(system_libfuncs)
                 defaults["libfuncs"].append(system_libfuncs)
 
-            # Load the modules...
+            # Load modules if necessary
             mods = []
-            for idx, lf in enumerate(defaults["libfuncs"]):
-                spec = importlib.util.spec_from_file_location("libfuncs%d" % idx, lf)
-                mod = importlib.util.module_from_spec(spec)
+            for idx, (lf, mod) in enumerate(zip(lf_files, defaults["libfuncs"])):
+                if issubclass(type(mod), str):
+                    spec = importlib.util.spec_from_file_location(os.path.basename(lf), lf)
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
                 mods.append(mod)
-                spec.loader.exec_module(mod)
             defaults["libfuncs"] = mods
 
             # Load sets

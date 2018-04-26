@@ -64,23 +64,3 @@ class TestMain(DefaultTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
-# from to_cero import ToCERO
-# from data_tools import DataTools
-#
-#
-# class Test_Main(unittest.TestCase):
-#     '''Test the VURM to CERO conversion class.'''
-#
-#     def test_sceninputs_to_cero(self):
-#         '''Tests VURM2CERO conversion process.'''
-#
-#         s2c = ToCERO(conf_file=r'test_sceninputs_to_cero.yaml')
-#         df = DataTools.get_test_data(r'test_sceninputs_to_cero.pickle')
-#
-#         self.assertTrue(s2c.cero.equals(df))
-#
-# if __name__ == '__main__':
-#     unittest.main()
