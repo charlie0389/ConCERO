@@ -84,7 +84,8 @@
 <span class="sd">    * ``map: (dict: str -&gt; str)`` - key-value pairs that maps the &quot;old&quot; identifier to a &quot;new&quot; identifier.</span>
 <span class="sd">    * ``ref_dir: (str)`` where ``ref_dir`` is a file path relative to the current working directory. By default, all \</span>
 <span class="sd">    file names are interpreted as being relative to the configuration file. Providing this option overrides the default.</span>
-<span class="sd">    * ``auto_lstrip: (str)`` where ``str``, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a `str`), or the first field of the identifier (if the identifier is a `tuple`), then a `ValueError` is raised. This option is designed to correspond to CEROs generated using ToCERO with the ``auto_prepend`` option provided.</span>
+<span class="sd">    * ``lstrip: (str)`` where ``str``, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a `str`), or the first field of the identifier (if the identifier is a `tuple`), then a `ValueError` is raised. This option is designed to correspond to CEROs generated using ToCERO with the ``auto_prepend`` option provided.</span>
+<span class="sd">    * ``libfuncs: (str|list[str])`` - paths relative to ``ref_dir`` of python files containing functions to use as operation functions. Note that the ``.py`` extension must be included. The structure of a libfuncs file is discussed below in :ref:`libfuncs_files`.</span>
 
 <span class="sd">Note that, in general, properties at a lower level (i.e. more indentation) &#39;inherit&#39; from a higher level.</span>
 
@@ -135,6 +136,7 @@
 <span class="sd">    * ``operations: list[operations objects]`` - to mutate the ``inputs`` into a desirable form for export, \</span>
 <span class="sd">    operations must be applied to mutate the data. ``operations`` is a list of *operations objects*, which \</span>
 <span class="sd">    modify the data in a sequential manner. See :ref:`operations_objects` for more information.</span>
+<span class="sd">    * ``libfuncs: (str|list[str])`` - Identical in meaning to the equivalent ``FromCERO`` object option. Is inherited from a ``FromCERO`` object if not given.</span>
 
 <span class="sd">Below is a shell showing the two different procedure object types:</span>
 
@@ -166,24 +168,20 @@
 <span class="sd">##################</span>
 
 <span class="sd">An *operation* refers to the process of applying a function to some inputs to return an output(s). Unlike separate \</span>
-<span class="sd">procedures, operations (within the same procedure object) can *not* be considered to operate in a &#39;silo&#39; manner, and \</span>
+<span class="sd">procedures, operations (within the same procedure object) can *not* be considered to operate in a &#39;silo-ed&#39; manner, and \</span>
 <span class="sd">therefore the order of ``operations`` is significant. Each item of the list ``operations`` must be an \</span>
-<span class="sd">*operation object* - that is, a ``dict`` with the mandatory option:</span>
+<span class="sd">*operation object* - that is, a ``dict``, which may contain the options:</span>
 
-<span class="sd">    * ``func: (str)`` - ``func`` is the name of a function present in the ``libfuncs`` library, that is applied to \</span>
+<span class="sd">    * ``func: (str)`` - ``func`` is the name of a function present in a ``libfuncs`` library that is applied to \</span>
 <span class="sd">    ``arrays`` (see below). If ``arrays`` is not provided, ``func`` is applied to ``inputs``. The functions available \</span>
 <span class="sd">    can be easily expanded by:</span>
 <span class="sd">        #. Correctly identifying the class of the new function - see :ref:`func_classes`.</span>
-<span class="sd">        #. Adding the function to the ``libfuncs.py`` file, *with the associated function decorator* (as explained in \</span>
-<span class="sd">        :ref:`func_classes`).</span>
-
-<span class="sd">And may have the options:</span>
-
+<span class="sd">        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in \</span>
+<span class="sd">        :ref:`func_classes`), and referencing that file with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.</span>
 <span class="sd">    * ``arrays: list(str|list(str))`` - ``arrays`` must be of the same form as ``inputs`` and ``outputs``. ``arrays`` \</span>
 <span class="sd">    specifies which of the ``inputs`` that ``func`` will manipulate. Note that any manipulation to applied to \</span>
 <span class="sd">    ``arrays`` will be in effect for all subsequent ``operations``.</span>
-<span class="sd">    * ``rename: (str)`` - providing this option renames the first element of ``arrays`` to ``rename`` (inline with \</span>
-<span class="sd">    how strings are interpreted as identifiers - see :ref:`cero_ids`).</span>
+<span class="sd">    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` (or the inherited ``inputs``) to the values of the list, parsed as identifiers (see :ref:`cero_ids`). The list must be of the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` identifiers matching keys in the dict are renamed to the corresponding value. Regardless of the form of rename (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`.</span>
 <span class="sd">    * ``start_year: (int)`` - this option constrains the dataset to years after and **including** ``start_year``. This \</span>
 <span class="sd">    option may be useful to avoid attempting to apply ``func`` to missing data.</span>
 <span class="sd">    * ``end_year: (int)`` - this option constrains the dataset to years before and **excluding** ``end_year``. This \</span>
@@ -277,6 +275,23 @@
 <span class="sd">Note that the selection takes place by using the cartesian product operation, and it is necessary that the \</span>
 <span class="sd">cartesian product be convex.</span>
 
+<span class="sd">.. _libfuncs_files:</span>
+
+<span class="sd">Libfuncs Files</span>
+<span class="sd">##############</span>
+
+<span class="sd">A libfuncs file is a standard python source file. However, to use the definitions as operations in ConCERO, it is necessary to wrap the functions with specialised wrappers. Therefore, an example python source code file that provides ConCERO-compatible operations is:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    from concero.libfuncs_wrappers import recursive_op</span>
+
+<span class="sd">    @recursive_op</span>
+<span class="sd">    def double_values(x):</span>
+<span class="sd">        return 2*x</span>
+
+<span class="sd">Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible.</span>
+
 <span class="sd">.. _output_process_flow:</span>
 
 <span class="sd">Description of the output process-flow</span>
@@ -320,9 +335,10 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">importlib.util</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">ModuleType</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -350,20 +366,13 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+            <span class="c1"># TODO: Move this check to is_valid</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">):</span>
                 <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">))[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># get file extension without full stop</span>
 
                 <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Output type &#39;</span><span class="si">%s</span><span class="s2">&#39; not supported. Supported types are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_type</span><span class="p">,</span>
                                                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">))</span>
-
-            <span class="c1"># Ensure sets are in string form</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sets&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
-
-            <span class="c1"># Determine identifiers for all inputs</span>
-            <span class="n">expanded_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">get_identifiers</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sets&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]]</span>
-            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">expanded_inputs</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="s2">&quot;lstrip&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="c1"># TODO: Move this such that it can accomodate case that all inputs are imported</span>
@@ -377,21 +386,15 @@
                         <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[],</span>
                         <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                        <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+                        <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                        <span class="s2">&quot;libfuncs&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="p">}</span>
 
             <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
 
             <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
             <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">proc_dict</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="s2">&quot;outputs&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]]</span>
-                <span class="k">elif</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;outputs&#39; must be provided as a list or None.&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -400,8 +403,66 @@
             <span class="k">if</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">):</span>
                 <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]))</span>
 
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">)),</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]]</span>
+
+            <span class="n">lf_files</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">lf</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">lf</span> <span class="ow">in</span> <span class="n">proc_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                    <span class="n">lf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">lf</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="n">ModuleType</span><span class="p">):</span>
+                    <span class="n">lf</span> <span class="o">=</span> <span class="n">lf</span><span class="o">.</span><span class="n">__file__</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;libfuncs&#39; must be provided as a list of strings and/or modules (not </span><span class="si">%s</span><span class="s2">).&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">))</span>
+
+                <span class="n">lf_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lf</span><span class="p">)</span>
+
+            <span class="c1"># Ensure system libfuncs is on search path...</span>
+            <span class="n">system_libfuncs</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="s2">&quot;libfuncs.py&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">system_libfuncs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lf_files</span><span class="p">:</span>
+                <span class="n">lf_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system_libfuncs</span><span class="p">)</span>
+                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system_libfuncs</span><span class="p">)</span>
+
+            <span class="c1"># Load modules if necessary</span>
+            <span class="n">mods</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">lf</span><span class="p">,</span> <span class="n">mod</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lf_files</span><span class="p">,</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">mod</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="n">lf</span><span class="p">)</span>
+                    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+                    <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+                <span class="n">mods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mods</span>
+
+            <span class="c1"># Load sets</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+
+                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_load_set</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]</span>
+
+            <span class="c1"># Determine identifiers for all inputs</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">],</span> <span class="n">sets</span><span class="o">=</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s2">&quot;outputs&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]]</span>
+
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">],</span> <span class="n">sets</span><span class="o">=</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">defaults</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;outputs&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;outputs&#39; must be provided as a list, True or None.&quot;</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">defaults</span>
 
@@ -414,19 +475,24 @@
                 <span class="c1"># Input is entire CERO unless otherwise specified</span>
                 <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
+            <span class="c1"># Check values in dataframe - check is necessary because KeyError is not thrown if some values are in index (pandas version 0.22).</span>
+            <span class="n">invalid_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]])</span> <span class="c1"># Reduce data frame to necessary data and copy</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Inputs do not exist. The most likely reason is that the configuration file is &quot;</span> <span class="o">+</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">invalid_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Inputs </span><span class="si">%s</span><span class="s2"> do not exist. The most likely reason is that the configuration file is &quot;</span> <span class="o">+</span>
                        <span class="s2">&quot;incorrectly specified, or lacks specification. If debugging level has been set to &quot;</span> <span class="o">+</span>
                        <span class="s2">&quot;&#39;DEBUG&#39;, then the input list is in the log file - note that this list may be &quot;</span> <span class="o">+</span>
                        <span class="s2">&quot;extraordinarily long. Common causes of this problem include: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                        <span class="s2">&quot; 1. Set definition in configuration file includes elements that do not exist in the CERO.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                        <span class="s2">&quot; 2. Mis-spellings of identifiers in the configuration file (which includes names of sets for &#39;inputs&#39; or &#39;arrays&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                        <span class="s2">&quot; 3. Incorrect ordering of sets in the identifier.&quot;</span>
-                       <span class="p">)</span>
+                       <span class="p">)</span> <span class="o">%</span> <span class="n">invalid_inputs</span>
                 <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
             <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">))</span>
 
             <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -458,15 +524,14 @@
 
             <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;operations&quot;</span><span class="p">]:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_op</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
-
                 <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> returned a value other than &#39;None&#39; (when &#39;None&#39; is expected).&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">op</span><span class="p">[</span><span class="s2">&quot;func&quot;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">ret</span><span class="p">],</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;outputs&quot;</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># The result of this procedures operations is to be explicitly ignored, may be useful when objective is simply to plot data</span>
                 <span class="k">return</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;outputs&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;outputs&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">==</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;outputs&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">):</span>
                     <span class="c1"># Get all rows if none specified</span>
                     <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
@@ -485,25 +550,50 @@
         <span class="k">def</span> <span class="nf">_exec_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 
             <span class="c1"># Apply operation to procedure</span>
-            <span class="n">func_name</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">libfuncs</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">((</span><span class="s2">&quot;Invalid function name (</span><span class="si">%s</span><span class="s2">) provided for procedure&quot;</span> <span class="o">+</span> \
-                                      <span class="s2">&quot; </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">. Function must exist in libfuncs.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;&#39;func&#39; must be provided for procedure &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+            <span class="n">func_name</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">,</span> <span class="s2">&quot;noop&quot;</span><span class="p">)</span> <span class="c1"># Perform noop (no-operation) if no func provided.</span>
+            <span class="n">op_args</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">rename</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;rename&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
             <span class="n">arrays</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="s2">&quot;arrays&quot;</span> <span class="ow">in</span> <span class="n">op</span><span class="p">:</span>
-                <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">get_identifiers</span><span class="p">(</span><span class="n">arr_name</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">arr_name</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arrays&quot;</span><span class="p">)]</span>
-                <span class="n">arrays</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">))</span>
+                <span class="n">arrays</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;arrays&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arrays</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">arrays</span><span class="p">]</span>
+                <span class="n">arrays</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">func_name</span><span class="p">):</span>
+                    <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Invalid function name provided - </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">. Function does not exist in any of the modules </span><span class="si">%s</span><span class="s1">. It may be necessary to create a python module with the necessary functions and provide this file with the </span><span class="se">\&#39;</span><span class="s1">libfuncs</span><span class="se">\&#39;</span><span class="s1"> option.&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]))</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(*arrays, **op)&quot;</span> <span class="o">%</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
 
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">op</span><span class="p">)</span>  <span class="c1"># func must alter inputs inplace</span>
-
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">op_args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">op</span><span class="p">)</span>
             <span class="n">op</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span>  <span class="c1"># For cleanliness of presentation</span>
+
+            <span class="k">if</span> <span class="n">rename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">libfuncs</span><span class="p">,</span> <span class="s2">&quot;noop&quot;</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">op_args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">op</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rename</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">rename</span> <span class="o">=</span> <span class="p">[</span><span class="n">rename</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">rename</span><span class="p">),</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="c1"># Build mapping dictionary</span>
+                    <span class="n">rename</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_mapping_dict</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">rename</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sets&quot;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">rename</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">rename</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_one_to_one_mapping</span><span class="p">(</span><span class="n">rename</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sets&quot;</span><span class="p">))</span>
+
+                <span class="c1"># At this point, rename should be one-to-one mapping dict</span>
+
+                <span class="n">renamed</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">rename_index_values</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">rename</span><span class="o">.</span><span class="n">keys</span><span class="p">())],</span> <span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">renamed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">rename</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>  <span class="c1"># Restrict renamed to only the rows that have been specified</span>
 
             <span class="k">return</span> <span class="n">ret</span>
 
@@ -519,23 +609,20 @@
                     <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">False</span>
 
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="nb">getattr</span><span class="p">(</span><span class="n">libfuncs</span><span class="p">,</span> <span class="n">operation</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">])</span>
-                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid function name provided - </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">. Function must exist in libfuncs.&#39;</span> <span class="o">%</span> <span class="n">operation</span><span class="p">[</span>
-                        <span class="s1">&#39;func&#39;</span><span class="p">]</span>
-                    <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Operation (function) name must be specified.&#39;</span>
-                    <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="s2">&quot;func&quot;</span> <span class="ow">in</span> <span class="n">operation</span><span class="p">:</span>
+
+                    <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;func&quot;</span><span class="p">]):</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Invalid function name provided - </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">. Function does not exist in any of the modules </span><span class="si">%s</span><span class="s1">. It may be necessary to create a python module with the necessary functions and provide this file with the </span><span class="se">\&#39;</span><span class="s1">libfuncs</span><span class="se">\&#39;</span><span class="s1"> option.&#39;</span> <span class="o">%</span>
+                                    <span class="p">(</span><span class="n">operation</span><span class="p">[</span><span class="s2">&quot;func&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]))</span>
+                        <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="nd">@staticmethod</span>
@@ -551,6 +638,22 @@
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">proc</span><span class="p">[</span><span class="s2">&quot;operations&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;operations&#39; for procedure &#39;</span><span class="si">%s</span><span class="s2">&#39; must be of list format.&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;operations&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;libfuncs&quot;</span> <span class="ow">in</span> <span class="n">proc</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;If &#39;operations&#39; are defined, then so must be &#39;libfuncs&#39; (for process &#39;</span><span class="si">%s</span><span class="s2">&#39;).&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">,</span> <span class="p">[])),</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;libfuncs&#39; for procedure &#39;</span><span class="si">%s</span><span class="s2">&#39; must be of str or list format.&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]</span>
                 <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -632,6 +735,7 @@
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">procedure</span><span class="o">.</span><span class="n">exec_ops</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+                <span class="c1"># if ret is not None, should be dict with key: procedure[&quot;name&quot;], value: resultant CERO</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; Error in procedure &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">procedure</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
 
@@ -669,6 +773,22 @@
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_load_set</span><span class="p">(</span><span class="nb">set</span><span class="p">:</span> <span class="s2">&quot;List[str]&quot;</span><span class="p">):</span>
+
+        <span class="nb">set</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">set</span><span class="p">),</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Each set must be provided as a list, not type &#39;</span><span class="si">%s</span><span class="s2">&#39; for object </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="nb">type</span><span class="p">(</span><span class="nb">set</span><span class="p">),</span> <span class="nb">set</span><span class="p">)</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">set</span>
+
+
+    <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as configuration filename. Otherwise conf must be a dictionary.</span>
@@ -682,7 +802,8 @@
                  <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">{},</span>
                  <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="p">{},</span>
                  <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># Type: str</span>
-                 <span class="s2">&quot;procedures&quot;</span><span class="p">:</span> <span class="p">[]}</span>  <span class="c1"># Defaults</span>
+                 <span class="s2">&quot;procedures&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                 <span class="s2">&quot;libfuncs&quot;</span><span class="p">:</span> <span class="p">[]}</span>  <span class="c1"># Defaults</span>
 
         <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
@@ -703,6 +824,20 @@
             <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
 
         <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">get_relpath</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+
+        <span class="n">system_libfuncs</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="s2">&quot;libfuncs.py&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">system_libfuncs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;libfuncs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system_libfuncs</span><span class="p">)</span>
+
+        <span class="c1"># Load sets</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sets&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+            <span class="c1"># If provided as a string, assume to be a file relative to ref_dir</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_load_set</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
 
         <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">if</span> <span class="n">file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]:</span>
@@ -738,8 +873,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Configuration has not been provided as a dictionary.&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Configuration is of type </span><span class="si">%s</span><span class="s2"> (that is, not a dictionary).&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -803,26 +937,6 @@
             <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">test_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_copy_inputs</span><span class="p">(</span><span class="n">cero</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">inp_list</span><span class="p">:</span> <span class="s1">&#39;List[tuple]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedDict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Copies each data series in ``cero`` indexed by the items in ``inp_list`` to an ``OrderedDict``. This \</span>
-<span class="sd">        ensures that ``operations`` do not alter ``cero``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Reduce data frame to necessary data and copy</span>
-            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">inp_list</span><span class="p">])</span>
-        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Inputs do not exist. The most likely reason is that the configuration file is &quot;</span> <span class="o">+</span>
-                   <span class="s2">&quot;incorrectly specified, or lacks specification. If debugging level has been set to &quot;</span> <span class="o">+</span>
-                   <span class="s2">&quot;&#39;DEBUG&#39;, then the input list is in the log file - note that this list may be &quot;</span> <span class="o">+</span>
-                   <span class="s2">&quot;extraordinarily long. Common causes of this problem include: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-                    <span class="s2">&quot; 1. Set definition in configuration file includes elements that do not exist in the CERO.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-                    <span class="s2">&quot; 2. Mis-spellings of identifiers in the configuration file (which includes names of sets for &#39;inputs&#39; or &#39;arrays&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-                    <span class="s2">&quot; 3. Incorrect ordering of sets in the identifier.&quot;</span>
-            <span class="p">)</span>
-            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_dataframe_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -902,8 +1016,6 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">assert</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="n">libfuncs_wrappers</span><span class="o">.</span><span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>

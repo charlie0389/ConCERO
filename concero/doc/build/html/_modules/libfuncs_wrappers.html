@@ -257,6 +257,7 @@
 
 <span class="kn">import</span> <span class="nn">concero.conf</span> <span class="k">as</span> <span class="nn">conf</span>
 <span class="kn">from</span> <span class="nn">concero._identifier</span> <span class="k">import</span> <span class="n">_Identifier</span>
+<span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
@@ -288,12 +289,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                 <span class="n">locs</span><span class="p">:</span> <span class="s2">&quot;List[Union[tuple, str]]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">ilocs</span><span class="p">:</span> <span class="s2">&quot;List[int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">start_year</span><span class="p">:</span> <span class="s2">&quot;Union[pd.datetime, int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">end_year</span><span class="p">:</span> <span class="s2">&quot;Union[pd.datetime, int]&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">rename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
@@ -343,21 +344,15 @@
             <span class="n">ilocs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">IndexSlice</span><span class="p">[</span><span class="mi">0</span><span class="p">:]</span>
 
         <span class="n">df_cp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ilocs</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span><span class="n">end_year</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># df_cp is always different object to df</span>
-        <span class="n">df_cp_idx</span> <span class="o">=</span> <span class="n">df_cp</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">df_cp</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">df_cp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="c1"># TODO: If series, convert to dataframe</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">df_cp_idx</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">df_cp</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
-            <span class="c1"># Index has been altered in operation</span>
-            <span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">old_names</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ilocs</span><span class="p">],</span>
-                        <span class="n">new_names</span><span class="o">=</span><span class="n">df_cp</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
-                    <span class="n">old_names</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ilocs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                    <span class="n">new_names</span><span class="o">=</span><span class="n">rename</span><span class="p">)</span>
+        <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="c1"># Performs checks to ensure ret is a valid CERO</span>
         <span class="k">return</span> <span class="n">ret</span>
+
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
@@ -400,20 +395,21 @@
 <span class="sd">        :return: Returns ``df`` with the first data series updated with the result of the encapsulated function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># TODO: Relax 1-row constraint - i.e. apply series operation to all rows in dataframe</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ser</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Must be single series in pandas.DataFrame.&quot;</span><span class="p">)</span>
-        <span class="n">nans</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nans</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;A </span><span class="se">\&#39;</span><span class="s2">series_op</span><span class="se">\&#39;</span><span class="s2"> must return pandas.Series object.&quot;</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nans</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-        <span class="k">return</span> <span class="kc">None</span>
+            <span class="c1"># Note that pandas slicing is inclusive (in contrast to standard python list slicing)...</span>
+            <span class="n">valid_ser</span> <span class="o">=</span> <span class="n">ser</span><span class="p">[</span><span class="n">ser</span><span class="o">.</span><span class="n">first_valid_index</span><span class="p">():</span> <span class="n">ser</span><span class="o">.</span><span class="n">last_valid_index</span><span class="p">()]</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">valid_ser</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;A </span><span class="se">\&#39;</span><span class="s2">series_op</span><span class="se">\&#39;</span><span class="s2"> must return pandas.Series object.&quot;</span><span class="p">)</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">ser</span><span class="o">.</span><span class="n">first_valid_index</span><span class="p">():</span> <span class="n">ser</span><span class="o">.</span><span class="n">last_valid_index</span><span class="p">()]</span> <span class="o">=</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+        <span class="c1"># return None</span>
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
@@ -428,8 +424,10 @@
                 <span class="n">init</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">post</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="n">auto_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="n">auto_post</span><span class="p">:</span>  <span class="nb">bool</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">auto_init</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">auto_post</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">init_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">post_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.</span>
@@ -443,44 +441,88 @@
 <span class="sd">        applied function. Will copy ``name`` and ``index`` \</span>
 <span class="sd">        properties of the provided ``pandas.Series`` object to the returned object.&#39;&#39;&#39;</span>
 
-        <span class="n">array_list</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">init</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">post</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">init</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">auto_init</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">init_cols</span><span class="p">)]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only one of the keyword arguments &#39;init&#39;, &#39;auto_init&#39; and &#39;init_cols&#39; must be provided.&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">post</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">auto_post</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">post_cols</span><span class="p">)]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only one of the keyword arguments &#39;post&#39;, &#39;auto_post&#39; and &#39;post_cols&#39; must be provided.&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_init</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;auto_init&#39; keyword argument must be provided as an integer.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">auto_init</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">init</span> <span class="o">==</span> <span class="p">[]:</span> <span class="c1"># In the event of conflict ``init`` overrules ``auto_init``.</span>
-            <span class="n">init</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_init</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_post</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;auto_post&#39; keyword argument must be provided as an integer.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">auto_post</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">post</span> <span class="o">==</span> <span class="p">[]:</span> <span class="c1"># In the event of conflict ``post`` overrules ``auto_post``.</span>
-            <span class="n">post</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_post</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span> <span class="n">init</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">post</span><span class="p">:</span> <span class="n">post</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">after</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
-        <span class="n">array_list</span> <span class="o">=</span> <span class="n">init</span> <span class="o">+</span> <span class="n">array_list</span> <span class="o">+</span> <span class="n">post</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auto_init</span><span class="p">:</span> <span class="n">auto_init</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auto_post</span><span class="p">:</span> <span class="n">auto_post</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">new_array</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">init_cols</span><span class="p">:</span> <span class="n">init_cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">post_cols</span><span class="p">:</span> <span class="n">post_cols</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">before</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_list</span><span class="p">)</span> <span class="o">-</span> <span class="n">after</span><span class="p">):</span>
-            <span class="n">rec_args</span> <span class="o">=</span> <span class="n">array_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">before</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">after</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">rec_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="c1"># tmp = func(*array_list[i - before:i + after + 1], # This form can only be used for Python 3.5 onwards...</span>
-            <span class="c1">#            *args,</span>
-            <span class="c1">#            **kwargs)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_init</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">auto_init</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;auto_init&#39; keyword argument must be provided as an integer greater than 0.&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">auto_post</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">auto_post</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;auto_post&#39; keyword argument must be provided as an integer greater than 0.&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">auto_init</span><span class="p">:</span> <span class="n">init</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_init</span>
+        <span class="k">if</span> <span class="n">auto_post</span><span class="p">:</span> <span class="n">post</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">*</span><span class="n">auto_post</span>
+
+        <span class="n">dis_start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">dis_end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+        <span class="n">sl_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">sl_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">init_cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init_cols</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="n">init_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[:</span><span class="n">init_cols</span><span class="p">]]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">init</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">init_cols</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Selected years for &#39;init_cols&#39; (</span><span class="si">%s</span><span class="s2">) are outside of range of available data.&quot;</span> <span class="o">%</span> <span class="n">init_cols</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">sl_start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">post_cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_cols</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="n">post_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="o">-</span><span class="n">post_cols</span><span class="p">:]]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">post</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">post_cols</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Selected years for &#39;post_cols&#39; (</span><span class="si">%s</span><span class="s2">) are outside of range of available data.&quot;</span> <span class="o">%</span> <span class="n">post_cols</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">sl_end</span> <span class="o">=</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">sl_start</span><span class="p">,</span> <span class="n">sl_end</span><span class="p">)</span>
+
+        <span class="n">array_list</span> <span class="o">=</span> <span class="n">init</span> <span class="o">+</span> <span class="n">array</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="n">sl</span><span class="p">]</span> <span class="o">+</span> <span class="n">post</span>
+
+        <span class="n">no_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">no_ops</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_list</span><span class="p">)</span> <span class="o">-</span> <span class="n">no_args</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">new_array</span> <span class="o">=</span> <span class="n">init</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">no_ops</span> <span class="o">+</span> <span class="n">post</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_ops</span><span class="p">):</span>
+            <span class="n">rec_args</span> <span class="o">=</span> <span class="n">array_list</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">no_args</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">rec_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="c1"># tmp = func(*array_list[i - dis_start:i + dis_end + 1], # This form can only be used for Python 3.5 onwards...</span>
+                <span class="c1">#            *args,</span>
+                <span class="c1">#            **kwargs)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. A likely cause is that initial conditions (or columns) have not been specified.&quot;</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;recursive_op&#39; functions must return a floating point value.&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
-                <span class="n">array_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">new_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
 
-        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="n">new_array</span> <span class="o">=</span> <span class="n">array_list</span>
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span> <span class="n">array_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tmp</span>
+            <span class="k">else</span><span class="p">:</span>        <span class="n">new_array</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tmp</span>
 
-        <span class="n">new_array</span> <span class="o">=</span> <span class="n">new_array</span><span class="p">[</span><span class="n">before</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">new_array</span><span class="p">)</span> <span class="o">-</span> <span class="n">after</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span> <span class="n">new_array</span> <span class="o">=</span> <span class="n">array_list</span>
+
+        <span class="n">new_array</span> <span class="o">=</span> <span class="n">new_array</span><span class="p">[</span><span class="n">dis_start</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_array</span><span class="p">)</span> <span class="o">-</span> <span class="n">dis_end</span><span class="p">]</span>
 
         <span class="c1"># Copy names and index to new series</span>
         <span class="n">new_array</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">new_array</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">array</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>

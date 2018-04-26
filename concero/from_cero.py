@@ -38,7 +38,8 @@ Other options include:
     * ``map: (dict: str -> str)`` - key-value pairs that maps the "old" identifier to a "new" identifier.
     * ``ref_dir: (str)`` where ``ref_dir`` is a file path relative to the current working directory. By default, all \
     file names are interpreted as being relative to the configuration file. Providing this option overrides the default.
-    * ``auto_lstrip: (str)`` where ``str``, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a `str`), or the first field of the identifier (if the identifier is a `tuple`), then a `ValueError` is raised. This option is designed to correspond to CEROs generated using ToCERO with the ``auto_prepend`` option provided.
+    * ``lstrip: (str)`` where ``str``, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a `str`), or the first field of the identifier (if the identifier is a `tuple`), then a `ValueError` is raised. This option is designed to correspond to CEROs generated using ToCERO with the ``auto_prepend`` option provided.
+    * ``libfuncs: (str|list[str])`` - paths relative to ``ref_dir`` of python files containing functions to use as operation functions. Note that the ``.py`` extension must be included. The structure of a libfuncs file is discussed below in :ref:`libfuncs_files`.
 
 Note that, in general, properties at a lower level (i.e. more indentation) 'inherit' from a higher level.
 
@@ -89,6 +90,7 @@ Often, more specification will be necessary. Other options include:
     * ``operations: list[operations objects]`` - to mutate the ``inputs`` into a desirable form for export, \
     operations must be applied to mutate the data. ``operations`` is a list of *operations objects*, which \
     modify the data in a sequential manner. See :ref:`operations_objects` for more information.
+    * ``libfuncs: (str|list[str])`` - Identical in meaning to the equivalent ``FromCERO`` object option. Is inherited from a ``FromCERO`` object if not given.
 
 Below is a shell showing the two different procedure object types:
 
@@ -120,24 +122,20 @@ Operations Objects
 ##################
 
 An *operation* refers to the process of applying a function to some inputs to return an output(s). Unlike separate \
-procedures, operations (within the same procedure object) can *not* be considered to operate in a 'silo' manner, and \
+procedures, operations (within the same procedure object) can *not* be considered to operate in a 'silo-ed' manner, and \
 therefore the order of ``operations`` is significant. Each item of the list ``operations`` must be an \
-*operation object* - that is, a ``dict`` with the mandatory option:
+*operation object* - that is, a ``dict``, which may contain the options:
 
-    * ``func: (str)`` - ``func`` is the name of a function present in the ``libfuncs`` library, that is applied to \
+    * ``func: (str)`` - ``func`` is the name of a function present in a ``libfuncs`` library that is applied to \
     ``arrays`` (see below). If ``arrays`` is not provided, ``func`` is applied to ``inputs``. The functions available \
     can be easily expanded by:
         #. Correctly identifying the class of the new function - see :ref:`func_classes`.
-        #. Adding the function to the ``libfuncs.py`` file, *with the associated function decorator* (as explained in \
-        :ref:`func_classes`).
-
-And may have the options:
-
+        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in \
+        :ref:`func_classes`), and referencing that file with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.
     * ``arrays: list(str|list(str))`` - ``arrays`` must be of the same form as ``inputs`` and ``outputs``. ``arrays`` \
     specifies which of the ``inputs`` that ``func`` will manipulate. Note that any manipulation to applied to \
     ``arrays`` will be in effect for all subsequent ``operations``.
-    * ``rename: (str)`` - providing this option renames the first element of ``arrays`` to ``rename`` (inline with \
-    how strings are interpreted as identifiers - see :ref:`cero_ids`).
+    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` (or the inherited ``inputs``) to the values of the list, parsed as identifiers (see :ref:`cero_ids`). The list must be of the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` identifiers matching keys in the dict are renamed to the corresponding value. Regardless of the form of rename (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`.
     * ``start_year: (int)`` - this option constrains the dataset to years after and **including** ``start_year``. This \
     option may be useful to avoid attempting to apply ``func`` to missing data.
     * ``end_year: (int)`` - this option constrains the dataset to years before and **excluding** ``end_year``. This \
@@ -230,6 +228,23 @@ and select all 10,000 identifiers by referencing the set twice with a comma inbe
 
 Note that the selection takes place by using the cartesian product operation, and it is necessary that the \
 cartesian product be convex.
+
+.. _libfuncs_files:
+
+Libfuncs Files
+##############
+
+A libfuncs file is a standard python source file. However, to use the definitions as operations in ConCERO, it is necessary to wrap the functions with specialised wrappers. Therefore, an example python source code file that provides ConCERO-compatible operations is:
+
+.. code-block:: python
+
+    from concero.libfuncs_wrappers import recursive_op
+
+    @recursive_op
+    def double_values(x):
+        return 2*x
+
+Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible.
 
 .. _output_process_flow:
 
