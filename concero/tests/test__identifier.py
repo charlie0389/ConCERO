@@ -70,6 +70,12 @@ class Test_Identifier(DefaultTestCase):
         res = _Identifier.tupleize_name(("abc", ""))
         self.assertEqual(res, "abc")
 
+        res = _Identifier.tupleize_name("abc;def", sep=";")
+        self.assertEqual(res, ("abc", "def"))
+
+        res = _Identifier.tupleize_name("abc;", sep=";")
+        self.assertEqual(res, "abc")
+
     def test_get_all_idents(self):
 
         sets = {"a_set": ["A", "B", "C"]}

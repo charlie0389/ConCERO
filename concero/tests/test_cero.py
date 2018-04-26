@@ -2,6 +2,7 @@ script_run = True if __name__ == "__main__" else False
 
 import os
 import unittest
+import numpy as np
 
 import pandas as pd
 
@@ -121,6 +122,16 @@ class TestCERO(DefaultTestCase):
 
         self.assertTrue(all([x == y for (x, y) in zip(res.index.tolist(), test_names)]))
         self.assertTrue(all([x == y for (x, y) in zip(df.index.tolist(), test_names_df)]))
+
+    def test_csv_complex(self):
+
+        test_df = pd.DataFrame(data=np.array([[3.78981,2.73377], [2.22027,3.99257]]), index=[("a", "b"), "c"],
+                               dtype=pd.np.float32)
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018], format="%Y"))
+
+        cero = CERO.read_csv(TestCERO._dd + "test_csv_complex.csv")
+
+        self.assertTrue(test_df.equals(cero))
 
 
 

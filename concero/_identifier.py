@@ -49,23 +49,23 @@ class _Identifier(object):
         return OrderedDict(list(zip(names_old, names_new)))
 
     @staticmethod
-    def get_all_idents(strings: "List[str]", sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+    def get_all_idents(strings: "List[str]", sets: "Dict[str, List[str]]" = None, sep: str =",") -> "List[tuple]":
 
         if not issubclass(type(strings), list):
             msg = "First argument must be a list."
             raise ValueError(msg)
 
-        strings = [_Identifier.get_identifiers(s, sets=sets) for s in strings]
+        strings = [_Identifier.get_identifiers(s, sets=sets, sep=sep) for s in strings]
         strings = list(it.chain(*strings))
         return strings
 
     @staticmethod
-    def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None) -> "List[tuple]":
+    def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None, sep: str=",") -> "List[tuple]":
 
         if sets is None:
             sets = {}
 
-        tupled_name = _Identifier.tupleize_name(string)
+        tupled_name = _Identifier.tupleize_name(string, sep=sep)
         if isinstance(tupled_name, tuple):
             new_fields = []
             for field in tupled_name:
@@ -87,7 +87,7 @@ class _Identifier(object):
             raise TypeError("Index field converted to unrecognised type.")
 
     @staticmethod
-    def tupleize_name(name: "Union[str, tuple, list]") -> "Union[tuple, str]":
+    def tupleize_name(name: "Union[str, tuple, list]", sep=",") -> "Union[tuple, str]":
         """Returns a `tuple` of `str` based on the iterable ``name``, unless ``name`` has a single element, in which \
         case that element is returned. Every `str` in the tuple has preceding and trailing whitespace removed."""
 
@@ -95,7 +95,7 @@ class _Identifier(object):
             return name
 
         if isinstance(name, str):
-            name = name.split(",")
+            name = name.split(sep)
 
         name = list(name)
         name = [str(x) for x in name] # Ensure all fields are strings

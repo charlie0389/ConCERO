@@ -148,7 +148,6 @@ class CERO(object):
         try:
             assert obj.index.is_unique
         except AssertionError:
-            print(obj)
             if raise_exception:
                 raise CERO.InvalidCERO(CERO._msg_idx_nunique + (" Duplicated values are: %s." % obj.index.get_duplicates()))
             return False
@@ -204,6 +203,23 @@ class CERO(object):
         cero = pd.read_excel(xlsx_file, index_col=index_col)
         cero = cero.astype(pd.np.float32)
         cero.index = CERO.create_cero_index(cero.index.tolist())
+        assert CERO.is_cero(cero)  # Check that it is a valid CERO object
+
+        return cero
+
+    @staticmethod
+    def read_csv(csv_file):
+        """
+        Reads CEROs that have been exported to csv file. It is assumed that ';' are used to seperate the fields (if more than one) of the identifier.
+
+        :param str csv_file: Path to the file containing the CERO.
+        :return pandas.DataFrame: The imported CERO.
+        """
+
+        cero = pd.read_csv(csv_file, header=0, index_col=0)  # Read header
+        cero = cero.astype(pd.np.float32)
+        cero.index = CERO.create_cero_index(_Identifier.get_all_idents(cero.index.tolist(), sep=";"))
+        cero.columns = pd.to_datetime(cero.columns.tolist(), format="%Y")
         assert CERO.is_cero(cero)  # Check that it is a valid CERO object
 
         return cero
