@@ -100,6 +100,7 @@ class _Identifier(object):
         name = list(name)
         name = [str(x) for x in name] # Ensure all fields are strings
         name = [x.strip() for x in name] # Remove all preceding and trailing whitespace from strings
+        name = [x for x in name if x != ""]  # Drop if empty string
 
         if len(name) == 1:
             return name[0]
