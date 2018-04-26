@@ -505,18 +505,10 @@ class FromCERO(dict):
                     func = getattr(mod, func_name)
                     break
             else:
-                msg = ('Invalid function name provided - \'%s\'. Function does not exist in any of the modules %s. It will be necessary to create a python module with the necessary functions and provide this file with the \'libfuncs\' option.' %
+                msg = ('Invalid function name provided - \'%s\'. Function does not exist in any of the modules %s. It may be necessary to create a python module with the necessary functions and provide this file with the \'libfuncs\' option.' %
                             (func_name, self["libfuncs"]))
                 FromCERO._logger.error(msg)
                 raise AttributeError(msg)
-
-            # try:
-            #     func = getattr(libfuncs, func_name)
-            # except AttributeError:
-            #     raise AttributeError(("Invalid function name (%s) provided for procedure" + \
-            #                           " \'%s\'. Function must exist in libfuncs.") % (func_name, self["name"]))
-            # except KeyError:
-            #     raise KeyError("'func' must be provided for procedure '%s'." % self["name"])
 
             FromCERO._logger.debug("Function call: %s(*arrays, **op)" % func.__name__)
 
@@ -557,16 +549,19 @@ class FromCERO(dict):
                     return False
 
                 if "func" in operation:
-                    try:
-                        getattr(libfuncs, operation['func'])
-                    except AttributeError:
-                        msg = 'Invalid function name provided - \'%s\'. Function must exist in libfuncs.' % operation[
-                            'func']
+
+                    for mod in self["libfuncs"]:
+                        if hasattr(mod, operation["func"]):
+                            break
+                    else:
+                        msg = ('Invalid function name provided - \'%s\'. Function does not exist in any of the modules %s. It may be necessary to create a python module with the necessary functions and provide this file with the \'libfuncs\' option.' %
+                                    (operation["func"], self["libfuncs"]))
                         FromCERO._logger.error(msg)
                         if raise_exception:
                             raise AttributeError(msg)
                         print(msg)
                         return False
+
             return True
 
         @staticmethod
@@ -589,7 +584,7 @@ class FromCERO(dict):
                 return False
 
             if proc.get("operations", []) and not "libfuncs" in proc:
-                msg = "If 'operations' are given, then a file containing functions needs to provided (with the 'libfuncs' argument) for process '%s'." % proc["name"]
+                msg = "If 'operations' are defined, then so must be 'libfuncs' (for process '%s')." % proc["name"]
                 FromCERO._logger.error(msg)
                 if raise_exception:
                     raise TypeError(msg)

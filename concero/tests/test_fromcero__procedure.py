@@ -78,12 +78,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
             FromCERO._Procedure.is_valid(proc)
         self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
 
-        proc = {"operations": [{"func": "bad_name"}], "name": "test_proc"} # Good op name, but no 'func' keyword
-
-        with self.assertRaises(AttributeError):
-            FromCERO._Procedure.is_valid(proc)
-        self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
-
         proc = {"operations": [{"func": "replace_har_header_in_file"}], "name": "test_proc", "libfuncs": [libfuncs]}
 
         self.assertTrue(FromCERO._Procedure.is_valid(proc))
