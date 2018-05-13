@@ -39,7 +39,7 @@ Other options include:
     * ``ref_dir: (str)`` where ``ref_dir`` is a file path relative to the current working directory. By default, all \
     file names are interpreted as being relative to the configuration file. Providing this option overrides the default.
     * ``lstrip: (str)`` where ``str``, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a `str`), or the first field of the identifier (if the identifier is a `tuple`), then a `ValueError` is raised. This option is designed to correspond to CEROs generated using ToCERO with the ``auto_prepend`` option provided.
-    * ``libfuncs: (str|list[str])`` - paths relative to ``ref_dir`` of python files containing functions to use as operation functions. Note that the ``.py`` extension must be included. The structure of a libfuncs file is discussed below in :ref:`libfuncs_files`.
+    * ``libfuncs: (str|list[str])`` - paths relative to ``ref_dir`` of python files containing functions to use as operation functions. Note that the ``.py`` filename extension must be included. The structure of a libfuncs file is discussed below in :ref:`libfuncs_files`.
 
 Note that, in general, properties at a lower level (i.e. more indentation) 'inherit' from a higher level.
 
@@ -244,7 +244,7 @@ A libfuncs file is a standard python source file. However, to use the definition
     def double_values(x):
         return 2*x
 
-Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible.
+Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible. For more information on how to use the wrappers, please consult :ref:`lfwrappers` .
 
 .. _output_process_flow:
 

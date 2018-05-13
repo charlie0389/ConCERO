@@ -45,6 +45,8 @@
             
   <h1>Source code for libfuncs_wrappers</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. _lfwrappers:</span>
+
 <span class="sd">Classes of User-Specified Functions for operating on CEROs</span>
 <span class="sd">==========================================================</span>
 
@@ -68,7 +70,7 @@
 <span class="sd">    @dataframe_op</span>
 <span class="sd">    def func(*args, **kwargs):</span>
 <span class="sd">        ...</span>
-<span class="sd">        return None</span>
+<span class="sd">        return cero</span>
 
 
 <span class="sd">The wrapper functions themselves are stored in  the ``libfuncs_wrappers`` module, but the wrappers themselves should \</span>
@@ -89,28 +91,14 @@
 <span class="sd">    @dataframe_op</span>
 <span class="sd">    def func_name(df, *args, **kwargs):</span>
 <span class="sd">        ...</span>
-<span class="sd">        return None</span>
+<span class="sd">        return cero</span>
 
 <span class="sd">Note the following key features:</span>
 
-<span class="sd">    * The function is proceeded by the @dataframe_op &#39;decorator&#39; (imported from ``libfuncs_wrappers``).</span>
-<span class="sd">    * The first argument provided to ``func_name`` - ``df`` - will be a CERO (an instance of a pandas.DataFrame), \</span>
+<span class="sd">    * The function is proceeded by the ``dataframe_op`` decorator (imported from ``libfuncs_wrappers``).</span>
+<span class="sd">    * The first argument provided to ``func_name``, that is ``df``, will be a CERO (an instance of a pandas.DataFrame), \</span>
 <span class="sd">    reduced by the ``arrays``/``inputs`` options.</span>
-<span class="sd">    * No parameters are to be returned (technically, the last line could be omitted).</span>
-
-<span class="sd">**What is not clear from the function definition above** is the **requirement** that all operations on \</span>
-<span class="sd">``df`` must occur inplace. In other words, all mutations/operations not applied to ``df`` will be ignored. \</span>
-<span class="sd">Note that if this constraint is violated, no exceptions/errors will be raised as it is impossible to detect this \</span>
-<span class="sd">&#39;failure to understand intention&#39;. As a rule of thumb, this can nearly always be achieved by restricting \</span>
-<span class="sd">operations to the types:</span>
-
-<span class="sd">    * ``df.loc[...] = ...``,</span>
-<span class="sd">    * ``df.iloc[...] = ...``, or</span>
-<span class="sd">    * ``df.func(*args, inplace=True, **kwargs)``.</span>
-
-<span class="sd">It is highly recommended to consult ``pandas`` documentation \</span>
-<span class="sd">(e.g. `&lt;https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy&gt;`_) and \</span>
-<span class="sd">``StackOverflow`` to develop a better understanding of what ``inplace`` operations are.</span>
+<span class="sd">    * The returned object (``cero``) must be a valid CERO. A valid CERO is a ``pandas.DataFrame`` object with a ``DatetimeIndex``for columns and tuples/string-type values for the index values.</span>
 
 <span class="sd">The ``libfuncs`` function ``merge`` provides a simple example of how to apply this wrapper:</span>
 
@@ -119,7 +107,7 @@
 <span class="sd">    @dataframe_op</span>
 <span class="sd">    def merge(df, *args, **kwargs):</span>
 <span class="sd">        df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series</span>
-<span class="sd">        return</span>
+<span class="sd">        return df</span>
 
 <span class="sd">Class 2 Functions - Series Operations</span>
 <span class="sd">-------------------------------------</span>
@@ -139,11 +127,8 @@
 
 <span class="sd">With similar features:</span>
 
-<span class="sd">    * The function is proceeded by the @series_op wrapper (imported from ``libfuncs_wrappers``).</span>
-<span class="sd">    * The first argument (``series``) must be of pandas.Series type.</span>
-
-<span class="sd">However, *dissimilar to class 1 functions*, class 2 functions must:</span>
-
+<span class="sd">    * The function is proceeded by the ``@series_op`` decorator (imported from ``libfuncs_wrappers``).</span>
+<span class="sd">    * The first argument (``series``) must be of ``pandas.Series`` type.</span>
 <span class="sd">    * Return an object of ``pandas.Series`` type (``pandas_series``). ``pandas_series`` must be of the \</span>
 <span class="sd">    same ``shape`` as ``series``.</span>
 
@@ -213,30 +198,28 @@
 <span class="sd">Wrapper-less Functions</span>
 <span class="sd">----------------------</span>
 
-<span class="sd">A function that is defined in ``libfuncs`` can be accessed by ``FromCERO``, though there are some constraints \</span>
-<span class="sd">necessary to enable ``FromCERO`` to act in a programmatic way. A function (in ``libfuncs.py``) *that is called upon \</span>
-<span class="sd">by* ``FromCERO`` must have the following function signature:</span>
+<span class="sd">It is **strongly recommended** that a user use the defined wrappers to encapsulate functions. This section should only be used as guidance to understand how the wrappers operate with the ``FromCERO`` module, and for understanding how to write additional wrappers (which is a non-trivial exercise).</span>
+
+<span class="sd">A function that is not decorated with a pre-defined wrapper (as discussed previously) must have the following function signature to be compatible with the ``FromCERO`` module:</span>
 
 <span class="sd">.. code-block:: python</span>
 
-<span class="sd">    def plotdf(df, *args, locs=None, **kwargs):</span>
+<span class="sd">    def func_name(df, *args, locs=None, **kwargs):</span>
 <span class="sd">        ...</span>
-<span class="sd">        return None</span>
+<span class="sd">        return cero</span>
 
-<span class="sd">Where ``df`` is the entire CERO provided to the calling class (so is therefore of ``pandas.DataFrame`` type), and \</span>
-<span class="sd">``locs``, if provided, is a list of all identifiers specifying which series of the CERO have been specified.</span>
+<span class="sd">Where:</span>
 
-<span class="sd">**Note that any changes made to** ``df`` **will be applied in the calling class (i.e. the** ``FromCERO`` **class).**</span>
-
-<span class="sd">Use of wrapper-less functions for use with ``FromCERO`` is **not recommended**, though if it is none-the-less \</span>
-<span class="sd">desirable, ``libfuncs.plotdf()`` serves as an example.</span>
+<span class="sd">    * ``df`` receives the entire CERO (as handled by the calling class), and</span>
+<span class="sd">    * ``locs`` receives a list of all identifiers specifying which series of the CERO have been specified, and</span>
+<span class="sd">    * ``cero`` is the returned dataframe and must be of CERO type. The FromCERO module will overwrite any values of its own CERO with those provided by ``cero``, based on an index match (after renaming takes place).</span>
 
 <span class="sd">Other Notes</span>
 <span class="sd">-----------</span>
 
-<span class="sd">    * Avoid trying to create a renaming function - use ``libfuncs._rename`` - it has been designed to work \</span>
+<span class="sd">    * Avoid trying to create a renaming function - use the ``cero.rename_index_values()`` method - it has been designed to work \</span>
 <span class="sd">    around a bug in Pandas (Issue #19497).</span>
-<span class="sd">    * ``libfuncs`` also serves as a source of examples for how to use the function wrappers.</span>
+<span class="sd">    * The system module ``libfuncs`` serves as a source of examples for how to use the function wrappers.</span>
 
 <span class="sd">Technical Specifications of Decorators</span>
 <span class="sd">--------------------------------------</span>
@@ -283,9 +266,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This decorator is designed to provide ``func`` (the encapsulated function) with a restricted form \</span>
 <span class="sd">    of ``df`` (a CERO). A \</span>
-<span class="sd">    *restricted* ``df`` is the original ``df`` limited to a subset of rows and/or columns. All of the key-word \</span>
-<span class="sd">    arguments, with the exception of ``rename``, define the restriction. Note that a restriction on ``df.columns`` \</span>
-<span class="sd">    will be *compact*, but this is not necessarily the case for restriction on ``df.index``.</span>
+<span class="sd">    *restricted* ``df`` is the original ``df`` limited to a subset of rows and/or columns. Note that a restriction on ``df.columns`` \</span>
+<span class="sd">    will be *compact* (the mathematical property), but this is not necessarily the case for restriction on ``df.index``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -311,9 +293,6 @@
 <span class="sd">        ``start_year`` restricts the CERO to years after *and including* ``start_year``.</span>
 <span class="sd">        :param end_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \</span>
 <span class="sd">        ``end_year`` restricts the CERO to years before, *but excluding* ``end_year``.</span>
-<span class="sd">        :param rename: The first data series of ``df`` (&#39;first&#39; is defined by ``locs`` or ``ilocs``) can be \</span>
-<span class="sd">        renamed by providing this argument. ``rename`` alters the original ``df``, after the encapsulated \</span>
-<span class="sd">        function has been executed.</span>
 <span class="sd">        :param kwargs: Keyword arguments to be passed to the encapsulated function.</span>
 <span class="sd">        :return: The return value of the encapsulated function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

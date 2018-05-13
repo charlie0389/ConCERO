@@ -45,14 +45,14 @@
           <div class="body" role="main">
             
   <span class="target" id="module-libfuncs_wrappers"><span id="func-classes"></span></span><div class="section" id="classes-of-user-specified-functions-for-operating-on-ceros">
-<h1>Classes of User-Specified Functions for operating on CEROs<a class="headerlink" href="#classes-of-user-specified-functions-for-operating-on-ceros" title="Permalink to this headline">¶</a></h1>
+<span id="lfwrappers"></span><h1>Classes of User-Specified Functions for operating on CEROs<a class="headerlink" href="#classes-of-user-specified-functions-for-operating-on-ceros" title="Permalink to this headline">¶</a></h1>
 <p>The set of functions that <em>could</em> be applied to the CERO, and data series within the CERO, is infinitely large, so it is obviously impossible to provide all these functions. It is therefore necessary that the user provide functions as they are needed, by writing the appropriate python 3 code and including this function in <code class="docutils literal"><span class="pre">libfuncs.py</span></code>. To minimise the difficulty and complexity of achieving this, ConCERO includes 3 classes of <em>wrapper functions</em>, that significantly reduce the difficulty for the user in extending the power of <code class="docutils literal"><span class="pre">FromCERO</span></code>.</p>
 <p>A <em>wrapper function</em> is a function that encapsulates another function, and therefore has access to both the inputs and outputs of the encapsulated function. Because the wrapper function has access to the inputs, it can provide pre-processing on the input to reshape it into a specific form, and because it has access to the output of the function, it can post-process the output of the function - mutating it into a desirable form.</p>
 <p>A wrapper function can be directed to encapsulate a function by preceding the function with a <em>decorator</em>. A <em>decorator</em> is a simple one line statement that starts with the &#8216;&#64;&#8217; symbol and then the name of the wrapper function. For example, to encapsulate <code class="docutils literal"><span class="pre">func</span></code> with the <code class="docutils literal"><span class="pre">dataframe_op</span></code> wrapper, the code is:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
 <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="o">...</span>
-    <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">cero</span>
 </pre></div>
 </div>
 <p>The wrapper functions themselves are stored in  the <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code> module, but the wrappers themselves should <em>never</em> be altered by the user.</p>
@@ -63,31 +63,22 @@
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
 <span class="k">def</span> <span class="nf">func_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="o">...</span>
-    <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">cero</span>
 </pre></div>
 </div>
 <p>Note the following key features:</p>
 <blockquote>
 <div><ul class="simple">
-<li>The function is proceeded by the &#64;dataframe_op &#8216;decorator&#8217; (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
-<li>The first argument provided to <code class="docutils literal"><span class="pre">func_name</span></code> - <code class="docutils literal"><span class="pre">df</span></code> - will be a CERO (an instance of a pandas.DataFrame),     reduced by the <code class="docutils literal"><span class="pre">arrays</span></code>/<code class="docutils literal"><span class="pre">inputs</span></code> options.</li>
-<li>No parameters are to be returned (technically, the last line could be omitted).</li>
+<li>The function is proceeded by the <code class="docutils literal"><span class="pre">dataframe_op</span></code> decorator (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
+<li>The first argument provided to <code class="docutils literal"><span class="pre">func_name</span></code>, that is <code class="docutils literal"><span class="pre">df</span></code>, will be a CERO (an instance of a pandas.DataFrame),     reduced by the <code class="docutils literal"><span class="pre">arrays</span></code>/<code class="docutils literal"><span class="pre">inputs</span></code> options.</li>
+<li>The returned object (<code class="docutils literal"><span class="pre">cero</span></code>) must be a valid CERO. A valid CERO is a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> object with a <a href="#id1"><span class="problematic" id="id2">``</span></a>DatetimeIndex``for columns and tuples/string-type values for the index values.</li>
 </ul>
 </div></blockquote>
-<p><strong>What is not clear from the function definition above</strong> is the <strong>requirement</strong> that all operations on <code class="docutils literal"><span class="pre">df</span></code> must occur inplace. In other words, all mutations/operations not applied to <code class="docutils literal"><span class="pre">df</span></code> will be ignored. Note that if this constraint is violated, no exceptions/errors will be raised as it is impossible to detect this &#8216;failure to understand intention&#8217;. As a rule of thumb, this can nearly always be achieved by restricting operations to the types:</p>
-<blockquote>
-<div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">df.loc[...]</span> <span class="pre">=</span> <span class="pre">...</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">df.iloc[...]</span> <span class="pre">=</span> <span class="pre">...</span></code>, or</li>
-<li><code class="docutils literal"><span class="pre">df.func(*args,</span> <span class="pre">inplace=True,</span> <span class="pre">**kwargs)</span></code>.</li>
-</ul>
-</div></blockquote>
-<p>It is highly recommended to consult <code class="docutils literal"><span class="pre">pandas</span></code> documentation (e.g. <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy">https://pandas.pydata.org/pandas-docs/stable/indexing.html#returning-a-view-versus-a-copy</a>) and <code class="docutils literal"><span class="pre">StackOverflow</span></code> to develop a better understanding of what <code class="docutils literal"><span class="pre">inplace</span></code> operations are.</p>
 <p>The <code class="docutils literal"><span class="pre">libfuncs</span></code> function <code class="docutils literal"><span class="pre">merge</span></code> provides a simple example of how to apply this wrapper:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@dataframe_op</span>
 <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Replaces the first series with the sum of all the series</span>
-    <span class="k">return</span>
+    <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 </div>
 </div>
@@ -104,13 +95,8 @@
 <p>With similar features:</p>
 <blockquote>
 <div><ul class="simple">
-<li>The function is proceeded by the &#64;series_op wrapper (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
-<li>The first argument (<code class="docutils literal"><span class="pre">series</span></code>) must be of pandas.Series type.</li>
-</ul>
-</div></blockquote>
-<p>However, <em>dissimilar to class 1 functions</em>, class 2 functions must:</p>
-<blockquote>
-<div><ul class="simple">
+<li>The function is proceeded by the <code class="docutils literal"><span class="pre">&#64;series_op</span></code> decorator (imported from <code class="docutils literal"><span class="pre">libfuncs_wrappers</span></code>).</li>
+<li>The first argument (<code class="docutils literal"><span class="pre">series</span></code>) must be of <code class="docutils literal"><span class="pre">pandas.Series</span></code> type.</li>
 <li>Return an object of <code class="docutils literal"><span class="pre">pandas.Series</span></code> type (<code class="docutils literal"><span class="pre">pandas_series</span></code>). <code class="docutils literal"><span class="pre">pandas_series</span></code> must be of the     same <code class="docutils literal"><span class="pre">shape</span></code> as <code class="docutils literal"><span class="pre">series</span></code>.</li>
 </ul>
 </div></blockquote>
@@ -166,22 +152,28 @@
 </div>
 <div class="section" id="wrapper-less-functions">
 <h2>Wrapper-less Functions<a class="headerlink" href="#wrapper-less-functions" title="Permalink to this headline">¶</a></h2>
-<p>A function that is defined in <code class="docutils literal"><span class="pre">libfuncs</span></code> can be accessed by <code class="docutils literal"><span class="pre">FromCERO</span></code>, though there are some constraints necessary to enable <code class="docutils literal"><span class="pre">FromCERO</span></code> to act in a programmatic way. A function (in <code class="docutils literal"><span class="pre">libfuncs.py</span></code>) <em>that is called upon by</em> <code class="docutils literal"><span class="pre">FromCERO</span></code> must have the following function signature:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plotdf</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<p>It is <strong>strongly recommended</strong> that a user use the defined wrappers to encapsulate functions. This section should only be used as guidance to understand how the wrappers operate with the <code class="docutils literal"><span class="pre">FromCERO</span></code> module, and for understanding how to write additional wrappers (which is a non-trivial exercise).</p>
+<p>A function that is not decorated with a pre-defined wrapper (as discussed previously) must have the following function signature to be compatible with the <code class="docutils literal"><span class="pre">FromCERO</span></code> module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">func_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="o">...</span>
-    <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">cero</span>
 </pre></div>
 </div>
-<p>Where <code class="docutils literal"><span class="pre">df</span></code> is the entire CERO provided to the calling class (so is therefore of <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> type), and <code class="docutils literal"><span class="pre">locs</span></code>, if provided, is a list of all identifiers specifying which series of the CERO have been specified.</p>
-<p><strong>Note that any changes made to</strong> <code class="docutils literal"><span class="pre">df</span></code> <strong>will be applied in the calling class (i.e. the</strong> <code class="docutils literal"><span class="pre">FromCERO</span></code> <strong>class).</strong></p>
-<p>Use of wrapper-less functions for use with <code class="docutils literal"><span class="pre">FromCERO</span></code> is <strong>not recommended</strong>, though if it is none-the-less desirable, <code class="docutils literal"><span class="pre">libfuncs.plotdf()</span></code> serves as an example.</p>
+<p>Where:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">df</span></code> receives the entire CERO (as handled by the calling class), and</li>
+<li><code class="docutils literal"><span class="pre">locs</span></code> receives a list of all identifiers specifying which series of the CERO have been specified, and</li>
+<li><code class="docutils literal"><span class="pre">cero</span></code> is the returned dataframe and must be of CERO type. The FromCERO module will overwrite any values of its own CERO with those provided by <code class="docutils literal"><span class="pre">cero</span></code>, based on an index match (after renaming takes place).</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="other-notes">
 <h2>Other Notes<a class="headerlink" href="#other-notes" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li>Avoid trying to create a renaming function - use <code class="docutils literal"><span class="pre">libfuncs._rename</span></code> - it has been designed to work     around a bug in Pandas (Issue #19497).</li>
-<li><code class="docutils literal"><span class="pre">libfuncs</span></code> also serves as a source of examples for how to use the function wrappers.</li>
+<li>Avoid trying to create a renaming function - use the <code class="docutils literal"><span class="pre">cero.rename_index_values()</span></code> method - it has been designed to work     around a bug in Pandas (Issue #19497).</li>
+<li>The system module <code class="docutils literal"><span class="pre">libfuncs</span></code> serves as a source of examples for how to use the function wrappers.</li>
 </ul>
 </div></blockquote>
 </div>
@@ -190,7 +182,7 @@
 <dl class="function">
 <dt id="libfuncs_wrappers.dataframe_op">
 <code class="descclassname">libfuncs_wrappers.</code><code class="descname">dataframe_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#dataframe_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.dataframe_op" title="Permalink to this definition">¶</a></dt>
-<dd><p>This decorator is designed to provide <code class="docutils literal"><span class="pre">func</span></code> (the encapsulated function) with a restricted form     of <code class="docutils literal"><span class="pre">df</span></code> (a CERO). A     <em>restricted</em> <code class="docutils literal"><span class="pre">df</span></code> is the original <code class="docutils literal"><span class="pre">df</span></code> limited to a subset of rows and/or columns. All of the key-word     arguments, with the exception of <code class="docutils literal"><span class="pre">rename</span></code>, define the restriction. Note that a restriction on <code class="docutils literal"><span class="pre">df.columns</span></code>     will be <em>compact</em>, but this is not necessarily the case for restriction on <code class="docutils literal"><span class="pre">df.index</span></code>.</p>
+<dd><p>This decorator is designed to provide <code class="docutils literal"><span class="pre">func</span></code> (the encapsulated function) with a restricted form     of <code class="docutils literal"><span class="pre">df</span></code> (a CERO). A     <em>restricted</em> <code class="docutils literal"><span class="pre">df</span></code> is the original <code class="docutils literal"><span class="pre">df</span></code> limited to a subset of rows and/or columns. Note that a restriction on <code class="docutils literal"><span class="pre">df.columns</span></code>     will be <em>compact</em> (the mathematical property), but this is not necessarily the case for restriction on <code class="docutils literal"><span class="pre">df.index</span></code>.</p>
 </dd></dl>
 
 <dl class="function">
