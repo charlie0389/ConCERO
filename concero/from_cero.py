@@ -623,13 +623,20 @@ class FromCERO(dict):
             return True
 
         @staticmethod
-        def run_checks(self, raise_exception=True):
+        def run_checks(proc, cero, raise_exception=True):
             """
-            Checks that the _Procedure ``self`` is valid and can be executed by the current user.
+            Checks that the _Procedure ``proc`` is valid and can be executed by the current user.
             :return:
             """
-            #TODO: Write check to see if inputs in CERO
 
+            cero_index = cero.index.tolist()
+            invalid_inputs = [v for v in proc["inputs"] if v not in cero_index]
+            if invalid_inputs:
+                msg = "Inputs %s are not valid." % invalid_inputs
+                FromCERO._logger.error(msg)
+                if raise_exception:
+                    raise FromCERO._Procedure.InvalidInputs(msg)
+                return False
             return True
 
         def get_inputs(self):
@@ -654,6 +661,9 @@ class FromCERO(dict):
             ret = os.path.join(self["ref_dir"], filename)
             FromCERO._logger.debug("get_filepath() returns: %s" % ret)
             return ret
+
+        class InvalidInputs(ValueError):
+            pass
 
     def __init__(self, conf: dict, *args, parent=None, **kwargs):
         """
@@ -852,16 +862,16 @@ class FromCERO(dict):
         return True
 
     @staticmethod
-    def run_checks(conf: dict, raise_exception=True):
+    def run_checks(conf: dict, cero: pd.DataFrame, raise_exception=True):
         """
-        Performs runtime checks on ``conf``.
+        Performs runtime checks on ``conf``, given ``cero``.
 
         :param dict conf:
         :param bool raise_exception:
         :return bool:
         """
         for procedure in conf["procedures"]:
-            if not procedure.run_checks(raise_exception=raise_exception):
+            if not procedure.run_checks(cero, raise_exception=raise_exception):
                 return False
 
         return True

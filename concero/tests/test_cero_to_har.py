@@ -12,6 +12,8 @@ import unittest
 import numpy as np
 import shutil
 
+import harpy
+
 from concero.from_cero import FromCERO
 from concero.tests.data_tools import DataTools
 
@@ -33,7 +35,8 @@ class TestCERO2HAR(unittest.TestCase):
         h2c = FromCERO(TestCERO2HAR._dd + r'test_cero_to_har.yaml')
         h2c.exec_procedures(df)
 
-        header = DataTools.get_test_data(output_har, header_name="MAR1")
+        hf = harpy.HarFileObj.loadFromDisk(output_har)
+        header = hf.getHeaderArrayObj(ha_name="MAR1")
         self.assertTrue(np.isclose(header["array"][0, 0, 0, 0, 0, 0], 2.44571))
         self.assertTrue(np.isclose(header["array"][0, 0, 0, 1, 0, 0], 0.637938))
         self.assertTrue(np.isclose(header["array"][0, 0, 2, 0, 0, 0], 0.381556))

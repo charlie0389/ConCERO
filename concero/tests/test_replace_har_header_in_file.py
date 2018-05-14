@@ -4,6 +4,8 @@ import unittest
 import os
 import shutil
 
+import harpy
+
 from concero.from_cero import FromCERO
 from concero.tests.data_tools import DataTools
 
@@ -22,9 +24,9 @@ class TestHARHeaderReplace(unittest.TestCase):
         fc.exec_procedures(df)
 
         test_har = DataTools.get_test_data("test_Forenew7.shk")
-
         tn = test_har.getHeaderArrayNames()
-        gn = DataTools.get_test_data("Forenew7.shk").getHeaderArrayNames()
+
+        gn = harpy.HarFileObj.loadFromDisk(filename="Forenew7.shk").getHeaderArrayNames()
 
         try:
             self.assertTrue(all([x == y for x, y  in zip(tn, gn)]))

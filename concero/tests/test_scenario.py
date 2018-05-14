@@ -9,6 +9,7 @@ import unittest
 import shutil
 
 import numpy as np
+import harpy
 
 import concero.conf
 import concero.scenario as sn
@@ -36,7 +37,7 @@ class TestScenario(DefaultTestCase):
         # Run the scenario
         scens.run()
 
-        har = DataTools.get_test_data('test_scen_outputs.har')
+        har = harpy.HarFileObj.loadFromDisk(filename='test_scen_outputs.har')
 
         self.assertEqual(har.getHeaderArrayNames(), ["CAPS"])
 
