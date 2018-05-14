@@ -549,6 +549,8 @@ class FromCERO(dict):
                 renamed = CERO.rename_index_values(ret.loc[list(rename.keys())], rename, inplace=False)
                 ret = renamed.loc[list(rename.values())]  # Restrict renamed to only the rows that have been specified
 
+                # Note that ret will be restricted to only those values that have been renamed.
+
             return ret
 
         def _check_ops(self, raise_exception=True):

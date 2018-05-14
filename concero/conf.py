@@ -1,4 +1,3 @@
-#------DON'T EDIT BELOW THIS STATEMENT UNLESS YOU KNOW WHAT YOU'RE DOING
 import os
 import logging
 
@@ -6,7 +5,6 @@ project_dir = os.path.dirname(__file__)
 d_t = os.path.join(project_dir, "tests", "") # Test directory with trailing /
 d_td = os.path.join(d_t, "data", "") # test data directory with trailing /
 _search_paths = [project_dir, d_t, d_td]
-# _search_paths = []
 
 _logd = None
 
@@ -42,17 +40,12 @@ def rm_search_path():
     _search_paths.pop()
 
 def find_file(filename):
-    orig_filename = filename
     filename = os.path.normpath(filename)
-    if os.path.isfile(filename):
-        return filename
+    for sp in _search_paths:
+        if os.path.isfile(os.path.join(sp, filename)):
+            return os.path.join(sp, filename)
     else:
-        filename = os.path.relpath(filename)
-        for sp in _search_paths:
-            if os.path.isfile(os.path.join(sp, filename)):
-                return os.path.join(sp, filename)
-        else:
-            raise FileNotFoundError("File '%s' not found in any of the locations: %s." % (orig_filename, _search_paths))
+        raise FileNotFoundError("File '%s' not found in any of the locations: %s." % (filename, _search_paths))
 
 try:
     __import__("gdxpds")
