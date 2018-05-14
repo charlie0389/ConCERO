@@ -320,9 +320,6 @@ class FromCERO(dict):
             super().__init__(proc, *args, **kwargs)
             FromCERO._Procedure.is_valid(self)
 
-            if "lstrip" in self:
-                # TODO: Move this such that it can accomodate case that all inputs are imported
-                self["inputs"] = [_Identifier.lstrip_identifier(self["lstrip"], inp) for inp in self["inputs"]]
 
         @staticmethod
         def load_config(proc_dict: dict, parent: 'FromCERO' = None):
@@ -409,6 +406,9 @@ class FromCERO(dict):
                     pass
                 else:
                     raise ValueError("'outputs' must be provided as a list, True or None.")
+
+            if "lstrip" in defaults:
+                defaults["inputs"] = [_Identifier.lstrip_identifier(defaults["lstrip"], inp) for inp in defaults["inputs"]]
 
             return defaults
 
@@ -615,8 +615,14 @@ class FromCERO(dict):
                 file_type = os.path.splitext(proc["file"])[1][1:]  # get file extension without full stop
 
                 if file_type not in FromCERO._Procedure._sup_procedure_output_types:
-                    raise TypeError("Output type '%s' not supported. Supported types are: %s." % (file_type,
-                                                                                                  FromCERO._Procedure._sup_procedure_output_types))
+                    msg = "Output type '%s' not supported. Supported types are: %s." % (file_type,
+                                                                                        FromCERO._Procedure._sup_procedure_output_types)
+                    FromCERO._logger.error(msg)
+                    if raise_exception:
+                        raise TypeError(msg)
+                    print(msg)
+                    return False
+
                 if not FromCERO._check_permissions(proc["file"], raise_exception=raise_exception):
                     return False
 
