@@ -95,6 +95,7 @@ class CERO(object):
     _msg_col_nunique = "Column values are not unique."
     _msg_val_type = "Values are not of numpy.float32 type."
     _msg_empty_cero = "Object is empty - not a valid CERO."
+    _msg_invalid_ids = "Values in object's index are not valid identifiers."
 
     class InvalidCERO(TypeError):
         pass
@@ -122,8 +123,6 @@ class CERO(object):
         :param empty_ok: If `True`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `False` by default.
         :return:
         """
-
-        # TODO: Check index contains only valid identifiers
 
         try:
             assert isinstance(obj, pd.DataFrame)
@@ -161,12 +160,20 @@ class CERO(object):
             return False
 
         try:
-            assert all([issubclass(x.type, (np.float32)) for x in obj.dtypes])
+            assert all([issubclass(x.type, (np.float32,)) for x in obj.dtypes])
             # Note that this 'float32 requirement' is because df.to_pickle() automatically downsizes \
             # float64 to float32, and there is no option to change this behaviour.
         except AssertionError:
             if raise_exception:
                 raise CERO.InvalidCERO(CERO._msg_val_type)
+            return False
+
+        invalid_idents = list(filter(lambda x: not _Identifier.is_valid(x), obj.index.tolist()))
+        try:
+            assert (not invalid_idents)
+        except AssertionError:
+            if raise_exception:
+                raise CERO.InvalidCERO(CERO._msg_invalid_ids + (" Invalid index values are: %s." % invalid_idents))
             return False
 
         if not empty_ok:

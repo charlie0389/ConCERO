@@ -178,3 +178,15 @@ class _Identifier(object):
             idents = [id[key] for id in idents if issubclass(type(id), tuple)]
 
         return list(set(idents))
+
+    @staticmethod
+    def is_valid(ident, raise_exception=True):
+        try:
+            assert issubclass(type(ident), (str, tuple))
+            if issubclass(type(ident), tuple):
+                assert all([issubclass(type(f), str) for f in ident])
+        except AssertionError:
+            if raise_exception:
+                raise TypeError("Invalid identifer %s. Identifier is of type %s, not str or tuple of str." % ident)
+            return False
+        return True

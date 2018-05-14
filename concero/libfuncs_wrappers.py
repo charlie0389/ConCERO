@@ -295,7 +295,7 @@ def _rename(df,
     """If list provided for ``old_names`` and ``new_names``, must be of equal length. This method is an \
     obtuse way to do this in comparison to `rename` method, but pandas has a bug that this method is designed to \
     work around... (GitHub pandas issue #19497)"""
-    if isinstance(old_names,(str, tuple)):
+    if isinstance(old_names, (str, tuple)):
         old_names = [old_names]
         new_names = [new_names]
 
