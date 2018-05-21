@@ -140,6 +140,55 @@ class Test_Identifier(DefaultTestCase):
         res = _Identifier.prepend_identifier("abc", ("def", "efg"))
         self.assertEqual(res, ("abc", "def", "efg"))
 
+    def test_get_matching_idents(self):
+        universal_set = ["abc", "abd", "def", "1ab", "123", "de3"]
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "*")
+        self.assertEqual(fil_set, ["abc", "abd", "def", "1ab", "123", "de3"])
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "ab*")
+        self.assertEqual(fil_set, ["abc", "abd"])
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "*3")
+        self.assertEqual(fil_set, ["123", "de3"])
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "1*")
+        self.assertEqual(fil_set, ["1ab", "123"])
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "de[f3]")
+        self.assertEqual(fil_set, ["def", "de3"])
+
+        fil_set = _Identifier.get_matching_idents(universal_set, "f*")
+        self.assertEqual(fil_set, [])
+
+    def test_get_identifiers(self):
+
+        uset = ["a", "b",
+               ("a", "b"),
+               ("a", "b", "c"),
+               ("d", "b", "c"),
+               ("a", "d", "c"),
+               ("d", "d", "c"),
+               ("a", "b", "d"),
+               ("d", "b", "d"),
+               ("a", "d", "d"),
+               ("d", "d", "d")]
+
+        fil_ids = _Identifier.get_identifiers("*", universal_set=uset)
+        self.assertEqual(fil_ids, ["a", "b"])
+
+        fil_ids = _Identifier.get_identifiers("*,b,c", universal_set=uset)
+        self.assertEqual(fil_ids, [("a", "b", "c"), ("d", "b", "c")])
+
+        fil_ids = _Identifier.get_identifiers("a,*,c", universal_set=uset)
+        self.assertEqual(fil_ids, [("a", "b", "c"), ("a", "d", "c")])
+
+        fil_ids = _Identifier.get_identifiers("a,b,*", universal_set=uset)
+        self.assertEqual(fil_ids, [("a", "b", "c"), ("a", "b", "d")])
+
+        fil_ids = _Identifier.get_identifiers("a,b", universal_set=uset)
+        self.assertEqual(fil_ids, [("a", "b")])
+
 
 if __name__ == "__main__":
     unittest.main()

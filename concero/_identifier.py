@@ -8,6 +8,7 @@ Created on Jan 30 17:34:37 2018
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
 from collections import OrderedDict
+import fnmatch
 
 import itertools as it
 import re
@@ -61,31 +62,51 @@ class _Identifier(object):
         return strings
 
     @staticmethod
-    def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None, sep: str=",") -> "List[tuple]":
+    def get_identifiers(string: str, sets: "Dict[str, List[str]]" = None,
+                        sep: str=",",
+                        universal_set: "List[Union[str, tuple[str]]]"=None) -> "List[tuple]":
 
         if sets is None:
             sets = {}
 
         tupled_name = _Identifier.tupleize_name(string, sep=sep)
-        if isinstance(tupled_name, tuple):
-            new_fields = []
-            for field in tupled_name:
-                if field in sets:
-                    # field refers to a set
-                    new_fields.append(sets[field])
-                else:
-                    # specific field in set
-                    new_fields.append([field])
-            return list(it.product(*new_fields))
-        elif isinstance(tupled_name, str):
-            if tupled_name in sets:
-                # tupled_name is a str
-                return sets[tupled_name]
+
+        tup_f = lambda x: (x,) if issubclass(type(x), str) else x
+        tupled_name = tup_f(tupled_name) # Temporarily convert to tuple
+
+        if not isinstance(tupled_name, tuple):
+            raise TypeError("Index field converted to unrecognised type.")
+
+        if issubclass(type(universal_set), list):
+            universal_set = [tup_f(us) for us in universal_set]
+
+        new_fields = []
+        for fno, field in enumerate(tupled_name):
+            if field in sets:
+                # field refers to a set
+                new_fields.append(sets[field])
+            elif (universal_set is not None) and (field not in universal_set):
+                # Assume field must be glob pattern...
+
+                universal_set = [us for us in universal_set if (len(us) == len(tupled_name))] # Only idents with same number of fields can be considered matched
+                matches = _Identifier.get_matching_idents([us[fno] for us in universal_set], field)
+
+                # Uniqify the matches...
+                u_matches = []
+                u_m_set = set()
+                for m in matches:
+                    if m not in u_m_set:
+                        u_m_set.add(m)
+                        u_matches.append(m)
+
+                new_fields.append(u_matches)
             else:
                 # specific field in set
-                return [tupled_name]
-        else:
-            raise TypeError("Index field converted to unrecognised type.")
+                new_fields.append([field])
+
+        f = lambda x: x[0] if len(x)==1 else x # Converts back to string if necessary
+        return [f(_id) for _id in list(it.product(*new_fields))]
+
 
     @staticmethod
     def tupleize_name(name: "Union[str, tuple, list]", sep=",") -> "Union[tuple, str]":
@@ -191,3 +212,13 @@ class _Identifier(object):
                 raise TypeError("Invalid identifer %s. Identifier is of type %s, not str or tuple of str." % ident)
             return False
         return True
+
+    @staticmethod
+    def get_matching_idents(idents: list, pattern):
+        """
+
+        :param list idents: A `list` of valid ``_Identifier``.
+        :param pattern: The glob pattern for matching.
+        :return list: A filtered `list` - only items of ``idents`` that match ``pattern`` are returned.
+        """
+        return fnmatch.filter(idents, pattern)
