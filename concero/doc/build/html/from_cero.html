@@ -45,7 +45,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <li><code class="docutils literal notranslate"><span class="pre">procedures:</span> <span class="pre">(list[dict|str])</span></code>, where <code class="docutils literal notranslate"><span class="pre">procedures</span></code> is a list of one or more <em>procedure</em> objects.     <a class="reference internal" href="#procedure-objects"><span class="std std-ref">Procedure Objects</span></a> are explained below .</li>
 </ul>
 </div></blockquote>
-<p>Procedures define the mutation and, if desired, the export of the mutated data to a file. It a procedure does not specify a file to export data to, then ConCERO will, by default, output the procedure to a <code class="docutils literal notranslate"><span class="pre">file</span></code> specified as part of the FromCERO object, if given. If <code class="docutils literal notranslate"><span class="pre">file</span></code> is not defined for the FromCERO object, then ConCERO will output the procedure to <code class="docutils literal notranslate"><span class="pre">output.csv</span></code> in the current working directory.</p>
+<p>Procedures define the mutation(s) and, if desired, the export of the mutated data to a file. If a procedure does not specify an export file then ConCERO will, by default, output the procedure to <code class="docutils literal notranslate"><span class="pre">output.csv</span></code> in the current working directory. The default output file can be overwridden by specifying the <code class="docutils literal notranslate"><span class="pre">file</span></code> option of the FromCERO object.</p>
 <p>It is <em>recommended</em> that the following option be specified:</p>
 <blockquote>
 <div><ul>
@@ -53,7 +53,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <blockquote>
 <div><ul class="simple">
 <li>Numpy arrays - <code class="docutils literal notranslate"><span class="pre">npy</span></code></li>
-<li>GAMS Data eXchange format -<code class="docutils literal notranslate"><span class="pre">gdx</span></code> (temporarily unsupported)</li>
+<li>GAMS Data eXchange format - <code class="docutils literal notranslate"><span class="pre">gdx</span></code> (temporarily unsupported)</li>
 <li>HAR files - <code class="docutils literal notranslate"><span class="pre">har</span></code></li>
 <li>Shock files - <code class="docutils literal notranslate"><span class="pre">shk</span></code></li>
 <li>Portable Network Graphics format - <code class="docutils literal notranslate"><span class="pre">png</span></code></li>
@@ -69,7 +69,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <p>Other options include:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">sets:</span> <span class="pre">(dict:</span> <span class="pre">str</span> <span class="pre">-&gt;</span> <span class="pre">List[str])</span></code> - sets is a dictionary mapping <code class="docutils literal notranslate"><span class="pre">str</span></code> to a <code class="docutils literal notranslate"><span class="pre">list</span></code> of  <code class="docutils literal notranslate"><span class="pre">str</span></code>. <code class="docutils literal notranslate"><span class="pre">sets</span></code> provides     an easy and convenient way to select groups of CERO identifiers (see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>), as opposed to simply listing     all the identifiers that are of interest for output. More detail about sets is provided below - <a class="reference internal" href="#sets"><span class="std std-ref">Sets</span></a>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">sets:</span> <span class="pre">(dict:</span> <span class="pre">str</span> <span class="pre">-&gt;</span> <span class="pre">List[str])</span></code> - sets is a dictionary mapping <code class="docutils literal notranslate"><span class="pre">str</span></code> to a <code class="docutils literal notranslate"><span class="pre">list</span></code> of  <code class="docutils literal notranslate"><span class="pre">str</span></code>. <code class="docutils literal notranslate"><span class="pre">sets</span></code> provides     an easy and convenient way to select groups of CERO identifiers (see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>), as opposed to simply listing     all the identifiers that are of interest for output. More detail about sets is provided below in the section <a class="reference internal" href="#sets"><span class="std std-ref">Sets</span></a>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">map:</span> <span class="pre">(dict:</span> <span class="pre">str</span> <span class="pre">-&gt;</span> <span class="pre">str)</span></code> - key-value pairs that maps the “old” identifier to a “new” identifier.</li>
 <li><code class="docutils literal notranslate"><span class="pre">ref_dir:</span> <span class="pre">(str)</span></code> where <code class="docutils literal notranslate"><span class="pre">ref_dir</span></code> is a file path relative to the current working directory. By default, all     file names are interpreted as being relative to the configuration file. Providing this option overrides the default.</li>
 <li><code class="docutils literal notranslate"><span class="pre">lstrip:</span> <span class="pre">(str)</span></code> where <code class="docutils literal notranslate"><span class="pre">str</span></code>, if provided, strips the left-most substring from all identifiers that make up the input. If the string does not match the start of the identifier (if the identifier is a <cite>str</cite>), or the first field of the identifier (if the identifier is a <cite>tuple</cite>), then a <cite>ValueError</cite> is raised. This option is designed to correspond to CEROs generated using ToCERO with the <code class="docutils literal notranslate"><span class="pre">auto_prepend</span></code> option provided.</li>
@@ -122,9 +122,8 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <p>Below is an outline of how options are inherited:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">inputs</span></code> - If inputs is undefined, then <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is the identifier <code class="docutils literal notranslate"><span class="pre">name</span></code>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">outputs</span></code> - If outputs is undefined, it is assumed to be equivalent to <code class="docutils literal notranslate"><span class="pre">inputs</span></code>. By extension, if <code class="docutils literal notranslate"><span class="pre">inputs</span></code>     is undefined, then <code class="docutils literal notranslate"><span class="pre">outputs</span></code> is the identifer <code class="docutils literal notranslate"><span class="pre">name</span></code>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">operations</span></code> - Inherits from the outputs object, if unspecified. It is not necessary to specify a value     for <code class="docutils literal notranslate"><span class="pre">operations</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">inputs</span></code> - If inputs is undefined, then <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is the entire CERO (whatever that may be at runtime).</li>
+<li><code class="docutils literal notranslate"><span class="pre">outputs</span></code> - If outputs is undefined or <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all <code class="docutils literal notranslate"><span class="pre">inputs</span></code> are <code class="docutils literal notranslate"><span class="pre">outputs</span></code>. If <code class="docutils literal notranslate"><span class="pre">outputs</span></code> is <cite>False</cite> or <cite>None</cite>, then there are no <code class="docutils literal notranslate"><span class="pre">outputs</span></code>. A <cite>list</cite> or <cite>str</cite> can be provided to select specific <code class="docutils literal notranslate"><span class="pre">outputs</span></code>.</li>
 </ul>
 </div></blockquote>
 </div>
@@ -134,27 +133,27 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <blockquote>
 <div><ul class="simple">
 <li><dl class="first docutils">
-<dt><code class="docutils literal notranslate"><span class="pre">func:</span> <span class="pre">(str)</span></code> - <code class="docutils literal notranslate"><span class="pre">func</span></code> is the name of a function present in a <code class="docutils literal notranslate"><span class="pre">libfuncs</span></code> library that is applied to     <code class="docutils literal notranslate"><span class="pre">arrays</span></code> (see below). If <code class="docutils literal notranslate"><span class="pre">arrays</span></code> is not provided, <code class="docutils literal notranslate"><span class="pre">func</span></code> is applied to <code class="docutils literal notranslate"><span class="pre">inputs</span></code>. The functions available     can be easily expanded by:</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">func:</span> <span class="pre">(str)</span></code> - <code class="docutils literal notranslate"><span class="pre">func</span></code> is the name of a function present in a <code class="docutils literal notranslate"><span class="pre">libfuncs</span></code> library that is applied to     <code class="docutils literal notranslate"><span class="pre">arrays</span></code> (see below). The functions available     can be easily expanded by:</dt>
 <dd><ol class="first last arabic">
 <li>Correctly identifying the class of the new function - see <a class="reference internal" href="libfuncs_wrappers.html#func-classes"><span class="std std-ref">Classes of User-Specified Functions for operating on CEROs</span></a>.</li>
-<li>Adding the function to a python source code file, <em>with the associated function decorator</em> (as explained in         <a class="reference internal" href="libfuncs_wrappers.html#func-classes"><span class="std std-ref">Classes of User-Specified Functions for operating on CEROs</span></a>), and referencing that file with the <code class="docutils literal notranslate"><span class="pre">libfuncs</span></code> <em>procedure</em> option. The system <code class="docutils literal notranslate"><span class="pre">libfuncs.py</span></code> will be searched after any referenced files.</li>
+<li>Adding the function to a python source code file, <em>with the associated function decorator</em> (as explained in <a class="reference internal" href="libfuncs_wrappers.html#func-classes"><span class="std std-ref">Classes of User-Specified Functions for operating on CEROs</span></a>), and providing that file to ConCERO with the <code class="docutils literal notranslate"><span class="pre">libfuncs</span></code> <em>procedure</em> option. The system <code class="docutils literal notranslate"><span class="pre">libfuncs.py</span></code> will be searched after any referenced files.</li>
 </ol>
 </dd>
 </dl>
 </li>
-<li><code class="docutils literal notranslate"><span class="pre">arrays:</span> <span class="pre">list(str|list(str))</span></code> - <code class="docutils literal notranslate"><span class="pre">arrays</span></code> must be of the same form as <code class="docutils literal notranslate"><span class="pre">inputs</span></code> and <code class="docutils literal notranslate"><span class="pre">outputs</span></code>. <code class="docutils literal notranslate"><span class="pre">arrays</span></code>     specifies which of the <code class="docutils literal notranslate"><span class="pre">inputs</span></code> that <code class="docutils literal notranslate"><span class="pre">func</span></code> will manipulate. Note that any manipulation to applied to     <code class="docutils literal notranslate"><span class="pre">arrays</span></code> will be in effect for all subsequent <code class="docutils literal notranslate"><span class="pre">operations</span></code>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">rename:</span> <span class="pre">(list|dict)</span></code> - providing this option as a list renames <code class="docutils literal notranslate"><span class="pre">arrays</span></code> (or the inherited <code class="docutils literal notranslate"><span class="pre">inputs</span></code>) to the values of the list, parsed as identifiers (see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>). The list must be of the same length as <code class="docutils literal notranslate"><span class="pre">arrays</span></code>. If provided as a <cite>dict</cite>, only those <code class="docutils literal notranslate"><span class="pre">arrays</span></code> identifiers matching keys in the dict are renamed to the corresponding value. Regardless of the form of rename (i.e. <cite>list</cite> or <cite>dict</cite>), references to <code class="docutils literal notranslate"><span class="pre">sets</span></code> can be made. In the specific case that there is one and only one <code class="docutils literal notranslate"><span class="pre">arrays</span></code>, then <code class="docutils literal notranslate"><span class="pre">rename</span></code> can be provided as a <cite>str</cite>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">arrays:</span> <span class="pre">list(str|list(str))</span></code> - <code class="docutils literal notranslate"><span class="pre">arrays</span></code> defines which of the <code class="docutils literal notranslate"><span class="pre">inputs</span></code> that <code class="docutils literal notranslate"><span class="pre">func</span></code> will manipulate. If <code class="docutils literal notranslate"><span class="pre">arrays</span></code> is not provided, <code class="docutils literal notranslate"><span class="pre">arrays</span></code> defaults to all procedure object <code class="docutils literal notranslate"><span class="pre">inputs</span></code>.  Note that any manipulation applied to <code class="docutils literal notranslate"><span class="pre">arrays</span></code> will be in effect for all subsequent <code class="docutils literal notranslate"><span class="pre">operations</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">rename:</span> <span class="pre">(list|dict)</span></code> - providing this option as a list renames <code class="docutils literal notranslate"><span class="pre">arrays</span></code> after the application of <code class="docutils literal notranslate"><span class="pre">func</span></code> (if provided). If <code class="docutils literal notranslate"><span class="pre">rename</span></code> is provided as a <cite>list</cite>, then the list is parsed as identifiers (see <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>) and must be the same length as <code class="docutils literal notranslate"><span class="pre">arrays</span></code>. If provided as a <cite>dict</cite>, only those <code class="docutils literal notranslate"><span class="pre">arrays</span></code> matching keys in the dict are renamed to the corresponding value. Regardless of the form of <code class="docutils literal notranslate"><span class="pre">rename</span></code> (i.e. <cite>list</cite> or <cite>dict</cite>), references to <code class="docutils literal notranslate"><span class="pre">sets</span></code> can be made. In the specific case that there is one and only one <code class="docutils literal notranslate"><span class="pre">arrays</span></code>, then <code class="docutils literal notranslate"><span class="pre">rename</span></code> can be provided as a <cite>str</cite>. If <cite>rename</cite> is provided and the new identifier values are not already in <code class="docutils literal notranslate"><span class="pre">arrays</span></code>, then <code class="docutils literal notranslate"><span class="pre">rename</span></code> expands <code class="docutils literal notranslate"><span class="pre">arrays</span></code> to include the new identifers (and the data series corresponding to the original identifiers are left untouched). By using this behaviour, <code class="docutils literal notranslate"><span class="pre">rename</span></code> can be used to apply <code class="docutils literal notranslate"><span class="pre">func</span></code> to specific <code class="docutils literal notranslate"><span class="pre">arrays</span></code> without altering the original <code class="docutils literal notranslate"><span class="pre">arrays</span></code>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">start_year:</span> <span class="pre">(int)</span></code> - this option constrains the dataset to years after and <strong>including</strong> <code class="docutils literal notranslate"><span class="pre">start_year</span></code>. This     option may be useful to avoid attempting to apply <code class="docutils literal notranslate"><span class="pre">func</span></code> to missing data.</li>
-<li><code class="docutils literal notranslate"><span class="pre">end_year:</span> <span class="pre">(int)</span></code> - this option constrains the dataset to years before and <strong>excluding</strong> <code class="docutils literal notranslate"><span class="pre">end_year</span></code>. This     option may be useful to avoid attempting to apply <code class="docutils literal notranslate"><span class="pre">func</span></code> to missing data.</li>
+<li><code class="docutils literal notranslate"><span class="pre">end_year:</span> <span class="pre">(int)</span></code> - this option constrains the dataset to years before and <strong>including</strong> <code class="docutils literal notranslate"><span class="pre">end_year</span></code>. This     option may be useful to avoid attempting to apply <code class="docutils literal notranslate"><span class="pre">func</span></code> to missing data.</li>
 </ul>
 </div></blockquote>
-<p>Additional options can be provided, and are passed to <code class="docutils literal notranslate"><span class="pre">func</span></code> as keyword arguments.</p>
+<p>Any additional options are passed to <code class="docutils literal notranslate"><span class="pre">func</span></code> as keyword arguments.</p>
 </div>
 <div class="section" id="sets">
 <span id="id3"></span><h4>Sets<a class="headerlink" href="#sets" title="Permalink to this headline">¶</a></h4>
-<p>The option:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sets</span></code> option must have the following form:</p>
 <p><code class="docutils literal notranslate"><span class="pre">sets:</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">list(str)]</span></code></p>
-<p>Providing the <code class="docutils literal notranslate"><span class="pre">sets</span></code> option to the outputs object provides a powerful way to list many identifiers with a small amount of references. An example configuration of sets is:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sets</span></code> option provides a powerful way to list many identifiers with a small amount of references. An example configuration of sets is:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sets</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">ASET</span><span class="p p-Indicator">:</span>
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
@@ -162,7 +161,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
 </pre></div>
 </div>
-<p>A user, could then specify all the elements of the set for the purposes of <code class="docutils literal notranslate"><span class="pre">inputs</span></code> and <code class="docutils literal notranslate"><span class="pre">arrays</span></code> by referencing the set as an item in the procedure option <code class="docutils literal notranslate"><span class="pre">inputs</span></code> or the operation option <code class="docutils literal notranslate"><span class="pre">arrays</span></code>. For example:</p>
+<p>A user can then specify all the elements of the set (for <code class="docutils literal notranslate"><span class="pre">inputs</span></code>, <code class="docutils literal notranslate"><span class="pre">arrays</span></code> and <code class="docutils literal notranslate"><span class="pre">outputs</span></code>) by referencing the set. For example:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sets</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">ASET</span><span class="p p-Indicator">:</span>
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
@@ -172,15 +171,16 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
 <span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_procedure</span>
-      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
       <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_func</span>
-          <span class="l l-Scalar l-Scalar-Plain">arrays</span><span class="p p-Indicator">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_procedure</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ASET</span>
+      <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_func</span>
 </pre></div>
 </div>
-<p>Which is equivalent to (the more verbose):</p>
+<p>Which is equivalent to the more verbose:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_procedure</span>
       <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
@@ -191,12 +191,15 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
       <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_func</span>
-          <span class="l l-Scalar l-Scalar-Plain">arrays</span><span class="p p-Indicator">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_procedure</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">a</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">b</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e</span>
+      <span class="l l-Scalar l-Scalar-Plain">operations</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">func</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_func</span>
 </pre></div>
 </div>
 <p>Specifying <code class="docutils literal notranslate"><span class="pre">sets</span></code> is even more powerful when using them in the context of tuple-identifiers. For example, consider that these (100*100 = 10,000) identifiers were in the CERO (in python list form):</p>
@@ -231,17 +234,18 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 </div>
 <div class="section" id="description-of-the-output-process-flow">
 <span id="output-process-flow"></span><h2>Description of the output process-flow<a class="headerlink" href="#description-of-the-output-process-flow" title="Permalink to this headline">¶</a></h2>
-<p>Each procedure object - that is, an item in the mandatory outputs object option <code class="docutils literal notranslate"><span class="pre">procedures</span></code> - corresponds to the output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not at all), and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO to an output file, the general process flow is:</p>
+<p>Each procedure object corresponds to the output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not  and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO to an output file, the general process flow is:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>From the given CERO, identify as <code class="docutils literal notranslate"><span class="pre">inputs</span></code> the relevant data series by their identifier.</li>
+<li>From the given CERO, identify using <code class="docutils literal notranslate"><span class="pre">inputs</span></code> the relevant data series by their identifier.</li>
 <li>Copy those <code class="docutils literal notranslate"><span class="pre">inputs</span></code> to avoid disturbing/mutating the original CERO.</li>
 <li><dl class="first docutils">
 <dt>From the copied inputs, perform a sequence of operations where, for each operation:</dt>
 <dd><ol class="first last arabic">
-<li>A subset of the copied <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is selected (that is, the <code class="docutils literal notranslate"><span class="pre">arrays</span></code>).</li>
-<li>A function mutates the <code class="docutils literal notranslate"><span class="pre">arrays</span></code>. By default, the result of the mutation is stored as the first item in         <code class="docutils literal notranslate"><span class="pre">arrays</span></code>.</li>
-<li>The copied inputs get updated with the mutated <code class="docutils literal notranslate"><span class="pre">arrays</span></code>, such that subsequent operations that mutate         the same data series operate on the mutated result, not the original <code class="docutils literal notranslate"><span class="pre">inputs</span></code>. The updated form of         the <code class="docutils literal notranslate"><span class="pre">inputs</span></code>, in the context of a procedure object, is referred to as the <em>updated inputs</em>.</li>
+<li>All of the <code class="docutils literal notranslate"><span class="pre">inputs</span></code>, or a subset of <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is selected (that is, the <code class="docutils literal notranslate"><span class="pre">arrays</span></code>).</li>
+<li>A function mutates the <code class="docutils literal notranslate"><span class="pre">arrays</span></code>.</li>
+<li>If given, <code class="docutils literal notranslate"><span class="pre">arrays</span></code> are <code class="docutils literal notranslate"><span class="pre">rename</span></code> d.</li>
+<li>The copied inputs get updated with the mutated <code class="docutils literal notranslate"><span class="pre">arrays</span></code>. For values of <code class="docutils literal notranslate"><span class="pre">arrays</span></code> that match <code class="docutils literal notranslate"><span class="pre">inputs</span></code>, those <code class="docutils literal notranslate"><span class="pre">inputs</span></code> are overwritten. Otherwise (in the event <code class="docutils literal notranslate"><span class="pre">arrays</span></code> have been <code class="docutils literal notranslate"><span class="pre">rename</span></code> ‘d) they are added to <code class="docutils literal notranslate"><span class="pre">inputs</span></code>.</li>
 </ol>
 </dd>
 </dl>
@@ -250,8 +254,8 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <dt>Export <code class="docutils literal notranslate"><span class="pre">outputs</span></code> to either:</dt>
 <dd><ol class="first last arabic">
 <li><code class="docutils literal notranslate"><span class="pre">file</span></code>, if <code class="docutils literal notranslate"><span class="pre">file</span></code> is specified the procedure object, or</li>
-<li><code class="docutils literal notranslate"><span class="pre">file</span></code> as defined in the outputs object, <em>if specified</em>, or</li>
-<li><code class="docutils literal notranslate"><span class="pre">output.csv</span></code> if <code class="docutils literal notranslate"><span class="pre">file</span></code> is unspecified.</li>
+<li><code class="docutils literal notranslate"><span class="pre">file</span></code> as defined in the FromCERO object, <em>if specified</em>, or</li>
+<li><code class="docutils literal notranslate"><span class="pre">output.csv</span></code> if <code class="docutils literal notranslate"><span class="pre">file</span></code> is unspecified in either the procedure or FromCERO objects.</li>
 </ol>
 </dd>
 </dl>

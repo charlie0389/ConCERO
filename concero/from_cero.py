@@ -111,10 +111,7 @@ Inheritance paths
 Below is an outline of how options are inherited:
 
     * ``inputs`` - If inputs is undefined, then ``inputs`` is the entire CERO (whatever that may be at runtime).
-    * ``outputs`` - If outputs is undefined, it is assumed to be equivalent to ``inputs``. By extension, if ``inputs`` \
-    is undefined, then ``outputs`` is the identifer ``name``.
-    * ``operations`` - Inherits from the outputs object, if unspecified. It is not necessary to specify a value \
-    for ``operations``.
+    * ``outputs`` - If outputs is undefined or ``True``, then all ``inputs`` are ``outputs``. If ``outputs`` is `False` or `None`, then there are no ``outputs``. A `list` or `str` can be provided to select specific ``outputs``.
 
 .. _operations_objects:
 
@@ -127,33 +124,29 @@ therefore the order of ``operations`` is significant. Each item of the list ``op
 *operation object* - that is, a ``dict``, which may contain the options:
 
     * ``func: (str)`` - ``func`` is the name of a function present in a ``libfuncs`` library that is applied to \
-    ``arrays`` (see below). If ``arrays`` is not provided, ``func`` is applied to ``inputs``. The functions available \
+    ``arrays`` (see below). The functions available \
     can be easily expanded by:
         #. Correctly identifying the class of the new function - see :ref:`func_classes`.
-        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in \
-        :ref:`func_classes`), and referencing that file with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.
-    * ``arrays: list(str|list(str))`` - ``arrays`` must be of the same form as ``inputs`` and ``outputs``. ``arrays`` \
-    specifies which of the ``inputs`` that ``func`` will manipulate. Note that any manipulation to applied to \
-    ``arrays`` will be in effect for all subsequent ``operations``.
-    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` (or the inherited ``inputs``) to the values of the list, parsed as identifiers (see :ref:`cero_ids`). The list must be of the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` identifiers matching keys in the dict are renamed to the corresponding value. Regardless of the form of rename (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`.
+        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in :ref:`func_classes`), and providing that file to ConCERO with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.
+    * ``arrays: list(str|list(str))`` - ``arrays`` defines which of the ``inputs`` that ``func`` will manipulate. If ``arrays`` is not provided, ``arrays`` defaults to all procedure object ``inputs``.  Note that any manipulation applied to ``arrays`` will be in effect for all subsequent ``operations``.
+    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` after the application of ``func`` (if provided). If ``rename`` is provided as a `list`, then the list is parsed as identifiers (see :ref:`cero_ids`) and must be the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` matching keys in the dict are renamed to the corresponding value. Regardless of the form of ``rename`` (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`. If `rename` is provided and the new identifier values are not already in ``arrays``, then ``rename`` expands ``arrays`` to include the new identifers (and the data series corresponding to the original identifiers are left untouched). By using this behaviour, ``rename`` can be used to apply ``func`` to specific ``arrays`` without altering the original ``arrays``.
     * ``start_year: (int)`` - this option constrains the dataset to years after and **including** ``start_year``. This \
     option may be useful to avoid attempting to apply ``func`` to missing data.
-    * ``end_year: (int)`` - this option constrains the dataset to years before and **excluding** ``end_year``. This \
+    * ``end_year: (int)`` - this option constrains the dataset to years before and **including** ``end_year``. This \
     option may be useful to avoid attempting to apply ``func`` to missing data.
 
-Additional options can be provided, and are passed to ``func`` as keyword arguments.
+Any additional options are passed to ``func`` as keyword arguments.
 
 .. _sets:
 
 Sets
 ####
 
-The option:
+The ``sets`` option must have the following form:
 
 ``sets: dict[str -> list(str)]``
 
-Providing the ``sets`` option to the outputs object provides a powerful way to list many identifiers with a small \
-amount of references. An example configuration of sets is:
+The ``sets`` option provides a powerful way to list many identifiers with a small amount of references. An example configuration of sets is:
 
 .. code-block:: yaml
 
@@ -163,8 +156,8 @@ amount of references. An example configuration of sets is:
             - b
             - c
 
-A user, could then specify all the elements of the set for the purposes of ``inputs`` and ``arrays`` by referencing \
-the set as an item in the procedure option ``inputs`` or the operation option ``arrays``. For example:
+A user can then specify all the elements of the set (for ``inputs``, ``arrays`` and ``outputs``) by referencing \
+the set. For example:
 
 .. code-block:: yaml
 
@@ -177,14 +170,15 @@ the set as an item in the procedure option ``inputs`` or the operation option ``
             - e
     procedures:
         - name: a_procedure
-          inputs:
-            - ASET
+          inputs: ASET
           operations:
             - func: a_func
-              arrays:
-                - ASET
+        - name: b_procedure
+          inputs: ASET
+          operations:
+            - func: b_func
 
-Which is equivalent to (the more verbose):
+Which is equivalent to the more verbose:
 
 .. code-block:: yaml
 
@@ -198,12 +192,15 @@ Which is equivalent to (the more verbose):
             - e
           operations:
             - func: a_func
-              arrays:
-                - a
-                - b
-                - c
-                - d
-                - e
+        - name: b_procedure
+          inputs:
+            - a
+            - b
+            - c
+            - d
+            - e
+          operations:
+            - func: b_func
 
 Specifying ``sets`` is even more powerful when using them in the context of tuple-identifiers. For example, \
 consider that these (100*100 = 10,000) identifiers were in the CERO (in python list form):
@@ -251,24 +248,20 @@ Where the ``double_values`` function will simply double the value of all input s
 Description of the output process-flow
 --------------------------------------
 
-Each procedure object - that is, an item in the mandatory outputs object option ``procedures`` - corresponds to the \
-output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not at \
-all), and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO \
+Each procedure object corresponds to the output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not  and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO \
 to an output file, the general process flow is:
 
-    1. From the given CERO, identify as ``inputs`` the relevant data series by their identifier.
-    2. Copy those ``inputs`` to avoid disturbing/mutating the original CERO.
+    #. From the given CERO, identify using ``inputs`` the relevant data series by their identifier.
+    #. Copy those ``inputs`` to avoid disturbing/mutating the original CERO.
     #. From the copied inputs, perform a sequence of operations where, for each operation:
-        #. A subset of the copied ``inputs`` is selected (that is, the ``arrays``).
-        #. A function mutates the ``arrays``. By default, the result of the mutation is stored as the first item in \
-        ``arrays``.
-        #. The copied inputs get updated with the mutated ``arrays``, such that subsequent operations that mutate \
-        the same data series operate on the mutated result, not the original ``inputs``. The updated form of \
-        the ``inputs``, in the context of a procedure object, is referred to as the *updated inputs*.
+        #. All of the ``inputs``, or a subset of ``inputs`` is selected (that is, the ``arrays``).
+        #. A function mutates the ``arrays``.
+        #. If given, ``arrays`` are ``rename`` d.
+        #. The copied inputs get updated with the mutated ``arrays``. For values of ``arrays`` that match ``inputs``, those ``inputs`` are overwritten. Otherwise (in the event ``arrays`` have been ``rename`` 'd) they are added to ``inputs``.
     #. Export ``outputs`` to either:
         #. ``file``, if ``file`` is specified the procedure object, or
-        #. ``file`` as defined in the outputs object, *if specified*, or
-        #. ``output.csv`` if ``file`` is unspecified.
+        #. ``file`` as defined in the FromCERO object, *if specified*, or
+        #. ``output.csv`` if ``file`` is unspecified in either the procedure or FromCERO objects.
 
 
 FromCERO Technical Specification
@@ -392,6 +385,9 @@ class FromCERO(dict):
             # Determine identifiers for all inputs
             defaults["inputs"] = _Identifier.get_all_idents(defaults["inputs"], sets=defaults["sets"])
 
+            if "lstrip" in defaults:
+                defaults["inputs"] = [_Identifier.lstrip_identifier(defaults["lstrip"], inp) for inp in defaults["inputs"]]
+
             if "outputs" in defaults:
                 if isinstance(defaults["outputs"], str):
                     defaults["outputs"] = [defaults["outputs"]]
@@ -406,9 +402,6 @@ class FromCERO(dict):
                     pass
                 else:
                     raise ValueError("'outputs' must be provided as a list, True or None.")
-
-            if "lstrip" in defaults:
-                defaults["inputs"] = [_Identifier.lstrip_identifier(defaults["lstrip"], inp) for inp in defaults["inputs"]]
 
             return defaults
 

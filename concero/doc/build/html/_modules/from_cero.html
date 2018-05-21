@@ -45,7 +45,7 @@
 <span class="sd">    * ``procedures: (list[dict|str])``, where ``procedures`` is a list of one or more *procedure* objects. \</span>
 <span class="sd">    :ref:`procedure objects` are explained below .</span>
 
-<span class="sd">Procedures define the mutation and, if desired, the export of the mutated data to a file. It a procedure does not specify a file to export data to, then ConCERO will, by default, output the procedure to a ``file`` specified as part of the FromCERO object, if given. If ``file`` is not defined for the FromCERO object, then ConCERO will output the procedure to ``output.csv`` in the current working directory.</span>
+<span class="sd">Procedures define the mutation(s) and, if desired, the export of the mutated data to a file. If a procedure does not specify an export file then ConCERO will, by default, output the procedure to ``output.csv`` in the current working directory. The default output file can be overwridden by specifying the ``file`` option of the FromCERO object.</span>
 
 <span class="sd">It is *recommended* that the following option be specified:</span>
 
@@ -54,7 +54,7 @@
 <span class="sd">     the exported file type. Supported file types are:</span>
 
 <span class="sd">        * Numpy arrays - ``npy``</span>
-<span class="sd">        * GAMS Data eXchange format -``gdx`` (temporarily unsupported)</span>
+<span class="sd">        * GAMS Data eXchange format - ``gdx`` (temporarily unsupported)</span>
 <span class="sd">        * HAR files - ``har``</span>
 <span class="sd">        * Shock files - ``shk``</span>
 <span class="sd">        * Portable Network Graphics format - ``png``</span>
@@ -67,7 +67,7 @@
 
 <span class="sd">    * ``sets: (dict: str -&gt; List[str])`` - sets is a dictionary mapping ``str`` to a ``list`` of  ``str``. ``sets`` provides \</span>
 <span class="sd">    an easy and convenient way to select groups of CERO identifiers (see :ref:`cero_ids`), as opposed to simply listing \</span>
-<span class="sd">    all the identifiers that are of interest for output. More detail about sets is provided below - :ref:`sets`.</span>
+<span class="sd">    all the identifiers that are of interest for output. More detail about sets is provided below in the section :ref:`sets`.</span>
 <span class="sd">    * ``map: (dict: str -&gt; str)`` - key-value pairs that maps the &quot;old&quot; identifier to a &quot;new&quot; identifier.</span>
 <span class="sd">    * ``ref_dir: (str)`` where ``ref_dir`` is a file path relative to the current working directory. By default, all \</span>
 <span class="sd">    file names are interpreted as being relative to the configuration file. Providing this option overrides the default.</span>
@@ -143,11 +143,8 @@
 
 <span class="sd">Below is an outline of how options are inherited:</span>
 
-<span class="sd">    * ``inputs`` - If inputs is undefined, then ``inputs`` is the identifier ``name``.</span>
-<span class="sd">    * ``outputs`` - If outputs is undefined, it is assumed to be equivalent to ``inputs``. By extension, if ``inputs`` \</span>
-<span class="sd">    is undefined, then ``outputs`` is the identifer ``name``.</span>
-<span class="sd">    * ``operations`` - Inherits from the outputs object, if unspecified. It is not necessary to specify a value \</span>
-<span class="sd">    for ``operations``.</span>
+<span class="sd">    * ``inputs`` - If inputs is undefined, then ``inputs`` is the entire CERO (whatever that may be at runtime).</span>
+<span class="sd">    * ``outputs`` - If outputs is undefined or ``True``, then all ``inputs`` are ``outputs``. If ``outputs`` is `False` or `None`, then there are no ``outputs``. A `list` or `str` can be provided to select specific ``outputs``.</span>
 
 <span class="sd">.. _operations_objects:</span>
 
@@ -160,33 +157,29 @@
 <span class="sd">*operation object* - that is, a ``dict``, which may contain the options:</span>
 
 <span class="sd">    * ``func: (str)`` - ``func`` is the name of a function present in a ``libfuncs`` library that is applied to \</span>
-<span class="sd">    ``arrays`` (see below). If ``arrays`` is not provided, ``func`` is applied to ``inputs``. The functions available \</span>
+<span class="sd">    ``arrays`` (see below). The functions available \</span>
 <span class="sd">    can be easily expanded by:</span>
 <span class="sd">        #. Correctly identifying the class of the new function - see :ref:`func_classes`.</span>
-<span class="sd">        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in \</span>
-<span class="sd">        :ref:`func_classes`), and referencing that file with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.</span>
-<span class="sd">    * ``arrays: list(str|list(str))`` - ``arrays`` must be of the same form as ``inputs`` and ``outputs``. ``arrays`` \</span>
-<span class="sd">    specifies which of the ``inputs`` that ``func`` will manipulate. Note that any manipulation to applied to \</span>
-<span class="sd">    ``arrays`` will be in effect for all subsequent ``operations``.</span>
-<span class="sd">    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` (or the inherited ``inputs``) to the values of the list, parsed as identifiers (see :ref:`cero_ids`). The list must be of the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` identifiers matching keys in the dict are renamed to the corresponding value. Regardless of the form of rename (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`.</span>
+<span class="sd">        #. Adding the function to a python source code file, *with the associated function decorator* (as explained in :ref:`func_classes`), and providing that file to ConCERO with the ``libfuncs`` *procedure* option. The system ``libfuncs.py`` will be searched after any referenced files.</span>
+<span class="sd">    * ``arrays: list(str|list(str))`` - ``arrays`` defines which of the ``inputs`` that ``func`` will manipulate. If ``arrays`` is not provided, ``arrays`` defaults to all procedure object ``inputs``.  Note that any manipulation applied to ``arrays`` will be in effect for all subsequent ``operations``.</span>
+<span class="sd">    * ``rename: (list|dict)`` - providing this option as a list renames ``arrays`` after the application of ``func`` (if provided). If ``rename`` is provided as a `list`, then the list is parsed as identifiers (see :ref:`cero_ids`) and must be the same length as ``arrays``. If provided as a `dict`, only those ``arrays`` matching keys in the dict are renamed to the corresponding value. Regardless of the form of ``rename`` (i.e. `list` or `dict`), references to ``sets`` can be made. In the specific case that there is one and only one ``arrays``, then ``rename`` can be provided as a `str`. If `rename` is provided and the new identifier values are not already in ``arrays``, then ``rename`` expands ``arrays`` to include the new identifers (and the data series corresponding to the original identifiers are left untouched). By using this behaviour, ``rename`` can be used to apply ``func`` to specific ``arrays`` without altering the original ``arrays``.</span>
 <span class="sd">    * ``start_year: (int)`` - this option constrains the dataset to years after and **including** ``start_year``. This \</span>
 <span class="sd">    option may be useful to avoid attempting to apply ``func`` to missing data.</span>
-<span class="sd">    * ``end_year: (int)`` - this option constrains the dataset to years before and **excluding** ``end_year``. This \</span>
+<span class="sd">    * ``end_year: (int)`` - this option constrains the dataset to years before and **including** ``end_year``. This \</span>
 <span class="sd">    option may be useful to avoid attempting to apply ``func`` to missing data.</span>
 
-<span class="sd">Additional options can be provided, and are passed to ``func`` as keyword arguments.</span>
+<span class="sd">Any additional options are passed to ``func`` as keyword arguments.</span>
 
 <span class="sd">.. _sets:</span>
 
 <span class="sd">Sets</span>
 <span class="sd">####</span>
 
-<span class="sd">The option:</span>
+<span class="sd">The ``sets`` option must have the following form:</span>
 
 <span class="sd">``sets: dict[str -&gt; list(str)]``</span>
 
-<span class="sd">Providing the ``sets`` option to the outputs object provides a powerful way to list many identifiers with a small \</span>
-<span class="sd">amount of references. An example configuration of sets is:</span>
+<span class="sd">The ``sets`` option provides a powerful way to list many identifiers with a small amount of references. An example configuration of sets is:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
@@ -196,8 +189,8 @@
 <span class="sd">            - b</span>
 <span class="sd">            - c</span>
 
-<span class="sd">A user, could then specify all the elements of the set for the purposes of ``inputs`` and ``arrays`` by referencing \</span>
-<span class="sd">the set as an item in the procedure option ``inputs`` or the operation option ``arrays``. For example:</span>
+<span class="sd">A user can then specify all the elements of the set (for ``inputs``, ``arrays`` and ``outputs``) by referencing \</span>
+<span class="sd">the set. For example:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
@@ -210,14 +203,15 @@
 <span class="sd">            - e</span>
 <span class="sd">    procedures:</span>
 <span class="sd">        - name: a_procedure</span>
-<span class="sd">          inputs:</span>
-<span class="sd">            - ASET</span>
+<span class="sd">          inputs: ASET</span>
 <span class="sd">          operations:</span>
 <span class="sd">            - func: a_func</span>
-<span class="sd">              arrays:</span>
-<span class="sd">                - ASET</span>
+<span class="sd">        - name: b_procedure</span>
+<span class="sd">          inputs: ASET</span>
+<span class="sd">          operations:</span>
+<span class="sd">            - func: b_func</span>
 
-<span class="sd">Which is equivalent to (the more verbose):</span>
+<span class="sd">Which is equivalent to the more verbose:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
@@ -231,12 +225,15 @@
 <span class="sd">            - e</span>
 <span class="sd">          operations:</span>
 <span class="sd">            - func: a_func</span>
-<span class="sd">              arrays:</span>
-<span class="sd">                - a</span>
-<span class="sd">                - b</span>
-<span class="sd">                - c</span>
-<span class="sd">                - d</span>
-<span class="sd">                - e</span>
+<span class="sd">        - name: b_procedure</span>
+<span class="sd">          inputs:</span>
+<span class="sd">            - a</span>
+<span class="sd">            - b</span>
+<span class="sd">            - c</span>
+<span class="sd">            - d</span>
+<span class="sd">            - e</span>
+<span class="sd">          operations:</span>
+<span class="sd">            - func: b_func</span>
 
 <span class="sd">Specifying ``sets`` is even more powerful when using them in the context of tuple-identifiers. For example, \</span>
 <span class="sd">consider that these (100*100 = 10,000) identifiers were in the CERO (in python list form):</span>
@@ -284,24 +281,20 @@
 <span class="sd">Description of the output process-flow</span>
 <span class="sd">--------------------------------------</span>
 
-<span class="sd">Each procedure object - that is, an item in the mandatory outputs object option ``procedures`` - corresponds to the \</span>
-<span class="sd">output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not at \</span>
-<span class="sd">all), and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO \</span>
+<span class="sd">Each procedure object corresponds to the output of an object into a file. Every procedure takes inputs (from a CERO), mutates this inputs in some way (or not  and then outputs some, if not all, of the mutated inputs into a file. More specifically, in converting a CERO \</span>
 <span class="sd">to an output file, the general process flow is:</span>
 
-<span class="sd">    1. From the given CERO, identify as ``inputs`` the relevant data series by their identifier.</span>
-<span class="sd">    2. Copy those ``inputs`` to avoid disturbing/mutating the original CERO.</span>
+<span class="sd">    #. From the given CERO, identify using ``inputs`` the relevant data series by their identifier.</span>
+<span class="sd">    #. Copy those ``inputs`` to avoid disturbing/mutating the original CERO.</span>
 <span class="sd">    #. From the copied inputs, perform a sequence of operations where, for each operation:</span>
-<span class="sd">        #. A subset of the copied ``inputs`` is selected (that is, the ``arrays``).</span>
-<span class="sd">        #. A function mutates the ``arrays``. By default, the result of the mutation is stored as the first item in \</span>
-<span class="sd">        ``arrays``.</span>
-<span class="sd">        #. The copied inputs get updated with the mutated ``arrays``, such that subsequent operations that mutate \</span>
-<span class="sd">        the same data series operate on the mutated result, not the original ``inputs``. The updated form of \</span>
-<span class="sd">        the ``inputs``, in the context of a procedure object, is referred to as the *updated inputs*.</span>
+<span class="sd">        #. All of the ``inputs``, or a subset of ``inputs`` is selected (that is, the ``arrays``).</span>
+<span class="sd">        #. A function mutates the ``arrays``.</span>
+<span class="sd">        #. If given, ``arrays`` are ``rename`` d.</span>
+<span class="sd">        #. The copied inputs get updated with the mutated ``arrays``. For values of ``arrays`` that match ``inputs``, those ``inputs`` are overwritten. Otherwise (in the event ``arrays`` have been ``rename`` &#39;d) they are added to ``inputs``.</span>
 <span class="sd">    #. Export ``outputs`` to either:</span>
 <span class="sd">        #. ``file``, if ``file`` is specified the procedure object, or</span>
-<span class="sd">        #. ``file`` as defined in the outputs object, *if specified*, or</span>
-<span class="sd">        #. ``output.csv`` if ``file`` is unspecified.</span>
+<span class="sd">        #. ``file`` as defined in the FromCERO object, *if specified*, or</span>
+<span class="sd">        #. ``output.csv`` if ``file`` is unspecified in either the procedure or FromCERO objects.</span>
 
 
 <span class="sd">FromCERO Technical Specification</span>
@@ -425,6 +418,9 @@
             <span class="c1"># Determine identifiers for all inputs</span>
             <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">],</span> <span class="n">sets</span><span class="o">=</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;sets&quot;</span><span class="p">])</span>
 
+            <span class="k">if</span> <span class="s2">&quot;lstrip&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
+                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">lstrip_identifier</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;lstrip&quot;</span><span class="p">],</span> <span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]</span>
+
             <span class="k">if</span> <span class="s2">&quot;outputs&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]]</span>
@@ -439,9 +435,6 @@
                     <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;outputs&#39; must be provided as a list, True or None.&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="s2">&quot;lstrip&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
-                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">lstrip_identifier</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;lstrip&quot;</span><span class="p">],</span> <span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]</span>
 
             <span class="k">return</span> <span class="n">defaults</span>
 

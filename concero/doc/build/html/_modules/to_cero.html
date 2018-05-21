@@ -296,11 +296,10 @@
 <span class="sd">searching through the string, using the regular expression ``time_regex``. The default - ``&#39;.*(\d{4})$&#39;`` - will \</span>
 <span class="sd">attempt to interpret the last four characters of the string as the year. Importantly, the match returns the \</span>
 <span class="sd">year as the 1st &#39;group&#39; (regular expression lingo). It is the first group that ``time_fmt`` is used with to \</span>
-<span class="sd">convert the string to a datetime object. The default - ``&#39;%Y&#39;`` assumes that the string is 4 digits \</span>
-<span class="sd">corresponding to the year.</span>
+<span class="sd">convert the string to a datetime object. The default - ``&#39;%Y&#39;`` assumes that the string contains 4 digits \</span>
+<span class="sd">corresponding to the year (and only that).</span>
 
-<span class="sd">In the event that it date-time data isn&#39;t stored in the file \</span>
-<span class="sd">itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \</span>
+<span class="sd">In the event that the date-time data isn&#39;t stored in the file itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \</span>
 
 <span class="sd">What follows is an example, using the defaults of ``time_regex`` and ``time_fmt``, to \</span>
 <span class="sd">demonstrate how this works...</span>
@@ -327,7 +326,7 @@
 <span class="sd">        time_regex: .*(\d{4})$</span>
 <span class="sd">        time_fmt: &#39;%Y&#39;</span>
 
-<span class="sd">*Note*: if the default settings (as shown immediately above) are appropriate, specifying them is not necessary.</span>
+<span class="sd">*Note*: if the default settings (as per the example immediately above) are appropriate, specifying them is **not** necessary.</span>
 
 <span class="sd">.. [1] For a more thorough yet simple introduction to YAML files, `&lt;http://docs.ansible.com/ansible/latest/YAMLSyntax.html&gt;`_\</span>
 <span class="sd"> is recommended.</span>
@@ -891,17 +890,16 @@
 
         <span class="sd">&quot;&quot;&quot;Loads a ToCERO configuration, suitable for creating CEROs from data files.</span>
 
-<span class="sd">        :param &#39;Union[dict,str]&#39; conf: The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an obsolute path, or relative to the current working directory.</span>
+<span class="sd">        :param &#39;Union[dict,str]&#39; conf: The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an absolute path, or relative to the current working directory.</span>
 <span class="sd">        :param args: Passed to the superclass (`dict`) at initialisation.</span>
 <span class="sd">        :param kwargs: Passed to the superclass (`dict`) at initialisation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
-
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Loaded ToCERO configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">_conf</span>
-        <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Loaded ToCERO configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span>
+        <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ToCERO.create_cero"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.create_cero">[docs]</a>    <span class="k">def</span> <span class="nf">create_cero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -981,11 +979,11 @@
 <div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Tests the validity of ``conf`` as a ``ToCERO`` object.</span>
+<span class="sd">        Performs static validity checks on ``conf`` as a ``ToCERO`` object.</span>
 
 <span class="sd">        :param dict conf: An object, which may or may not suitable as a ToCERO object.</span>
-<span class="sd">        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) `False` is returned.</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and `False` is returned.</span>
+<span class="sd">        :return bool: A `bool` indicating the validity of ``conf`` as a ``ToCERO`` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
@@ -1015,15 +1013,22 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.run_checks"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs dynamic validity checks on ``conf`` as a ``ToCERO`` object.</span>
+
+<span class="sd">        :param dict conf: An object, which may or may not suitable as a ToCERO object.</span>
+<span class="sd">        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and `False` is returned.</span>
+<span class="sd">        :return bool: A `bool` indicating the validity of ``conf`` as a ``ToCERO`` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">file_obj</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1037,7 +1042,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Locates first occurance of ``file`` on ``search_paths`` and returns relative OS-specific path.</span>
 
-<span class="sd">        :return str:</span>
+<span class="sd">        :return str: The relative path to file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">orig_filename</span> <span class="o">=</span> <span class="n">file</span>
         <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
