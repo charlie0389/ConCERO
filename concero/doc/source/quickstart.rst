@@ -3,44 +3,68 @@ Common ConCERO-Related Commands
 
 This page serves to present some example commands on how to download, install and use ConCERO. To install ConCERO requires the installing git (a version control program).
 
+Installing ConCERO
+------------------
+
     #. Clone the source directory into ``DIR``:
 
-        ``git clone https://col530@bitbucket.csiro.au/scm/energy/concero.git DIR``
+        .. code-block:: shell
+
+            git clone https://col530@bitbucket.csiro.au/scm/energy/concero.git DIR
 
     #. Change to the directory:
 
-        ``cd DIR``
+        .. code-block:: python
+
+            cd DIR
 
     #. To get the latest version of the repository (if the first step was done a while ago):
 
-        ``git pull``
+        .. code-block:: python
+
+            git pull
 
     #. Check that your python interpreter is version 3.4 or above:
 
-        ``python --version``
+        .. code-block:: python
+
+            python --version
 
     #. Install ConCERO (may require administrator privileges):
 
-        ``python setup.py install``
+        .. code-block:: python
 
-    #. Test installation has been successful:
+            python setup.py install
 
-        ``cd ..``
-        ``python -m concero.tests.test_concero``
+    #. (Optional) Test installation has been successful:
+
+        .. code-block:: python
+
+            cd ..
+            python -m concero.tests.test_concero
+
+Other Commands
+--------------
 
        Note the for this example, the parent directory is chosen as the directory to run the tests. In practice, this could be any directory. Whatever directory is chosen, you must have write permissions.
 
-    #. Find help on how to use the ConCERO program:
+    * Find help on how to use the ConCERO program:
 
-        ``concero --help``
+        .. code-block:: python
 
-    #. Run the ConCERO scenario defined in ``scenario.yaml``:
+            concero --help
 
-        ``concero scenario.yaml``
+    * Run the ConCERO scenario defined in ``scenario.yaml``:
 
-    #. Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any 'obvious' errors with configuration files) ...
+        .. code-block:: python
 
-        ``concero --fake_run scenario.yaml``
+            concero scenario.yaml
+
+    * Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any 'obvious' errors with configuration files) ...
+
+        .. code-block:: python
+
+            concero --fake_run scenario.yaml
 
        Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).
 

@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Models &#8212; ConCERO 0.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
     <link rel="next" title="Guidelines for painless importing of data" href="import_guidelines.html" />
     <link rel="prev" title="Scenarios" href="scenarios.html" />
    
@@ -35,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -51,36 +39,35 @@
 <p>A model object must be of dictionary form and <em>must</em> have the following options:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the model (for referencing purposes). The value of <code class="docutils literal"><span class="pre">name</span></code> does not alter scenario execution.</li>
-<li><code class="docutils literal"><span class="pre">exec_cmd:</span> <span class="pre">(command</span> <span class="pre">object|list[command</span> <span class="pre">objects])</span></code> - a single <em>command object</em>, or a <em>list</em> of <em>command objects</em>. Command objects are discussed below here - <a class="reference internal" href="#command-objects"><span class="std std-ref">Command Objects</span></a>. A good placeholder command (to test if the data conversion process works for example) is <code class="docutils literal"><span class="pre">echo</span> <span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> which simply outputs the text <code class="docutils literal"><span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> to the terminal.</li>
-<li><code class="docutils literal"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - the input configuration file that specifies the export of data <em>from</em> the scenario-level CERO <em>into</em> appropriate input files for the model.</li>
-<li><code class="docutils literal"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code>- the output configuration file that specifies the import of data <em>into</em> the scenario-level CERO <em>from</em> the appropriate output files for the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the model (for referencing purposes). The value of <code class="docutils literal notranslate"><span class="pre">name</span></code> does not alter scenario execution.</li>
+<li><code class="docutils literal notranslate"><span class="pre">exec_cmd:</span> <span class="pre">(command</span> <span class="pre">object|list[command</span> <span class="pre">objects])</span></code> - a single <em>command object</em>, or a <em>list</em> of <em>command objects</em>. Command objects are discussed below here - <a class="reference internal" href="#command-objects"><span class="std std-ref">Command Objects</span></a>. A good placeholder command (to test if the data conversion process works for example) is <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> which simply outputs the text <code class="docutils literal notranslate"><span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> to the terminal.</li>
+<li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - the input configuration file that specifies the export of data <em>from</em> the scenario-level CERO <em>into</em> appropriate input files for the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code>- the output configuration file that specifies the import of data <em>into</em> the scenario-level CERO <em>from</em> the appropriate output files for the model.</li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="command-objects">
 <span id="id2"></span><h2>Command Objects<a class="headerlink" href="#command-objects" title="Permalink to this headline">¶</a></h2>
-<p>Command objects can be provided as either a <code class="docutils literal"><span class="pre">str</span></code>, or a <code class="docutils literal"><span class="pre">dict</span></code>. A <code class="docutils literal"><span class="pre">dict</span></code> is the more general form - if a command object is provided as a string <code class="docutils literal"><span class="pre">cmd</span></code>, this is immediately converted to the equivalent command object <code class="docutils literal"><span class="pre">{&quot;args&quot;:</span> <span class="pre">cmd}</span></code>.</p>
+<p>Command objects can be provided as either a <code class="docutils literal notranslate"><span class="pre">str</span></code>, or a <code class="docutils literal notranslate"><span class="pre">dict</span></code>. A <code class="docutils literal notranslate"><span class="pre">dict</span></code> is the more general form - if a command object is provided as a string <code class="docutils literal notranslate"><span class="pre">cmd</span></code>, this is immediately converted to the equivalent command object <code class="docutils literal notranslate"><span class="pre">{&quot;args&quot;:</span> <span class="pre">cmd}</span></code>.</p>
 <dl class="docutils">
 <dt>A command object <em>must</em> have the option:</dt>
 <dd><ul class="first last simple">
-<li><code class="docutils literal"><span class="pre">args:</span> <span class="pre">(str|list[str])</span></code> - how this is provided depends on the <code class="docutils literal"><span class="pre">type</span></code> of the command. If <code class="docutils literal"><span class="pre">type:</span> <span class="pre">shell</span></code> (the default), then a string corresponding to a console-based command should be provided. If <code class="docutils literal"><span class="pre">type:</span> <span class="pre">python_method</span></code>, then a list of positional arguments (to be given to a python method) should be provided.</li>
+<li><code class="docutils literal notranslate"><span class="pre">args:</span> <span class="pre">(str|list[str])</span></code> - how this is provided depends on the <code class="docutils literal notranslate"><span class="pre">type</span></code> of the command. If <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">shell</span></code> (the default), then a string corresponding to a console-based command should be provided. If <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">python_method</span></code>, then a list of positional arguments (to be given to a python method) should be provided.</li>
 </ul>
 </dd>
 </dl>
 <p>Currently, two different command types are supported, and is specified with the option:</p>
 <blockquote>
-<div><ul>
+<div><ul class="simple">
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">type:</span> <span class="pre">(&quot;shell&quot;|&quot;python_method&quot;)</span></code> - explanations of the two types follow (<code class="docutils literal"><span class="pre">&quot;shell&quot;</span></code> is default):</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">(&quot;shell&quot;|&quot;python_method&quot;)</span></code> - explanations of the two types follow (<code class="docutils literal notranslate"><span class="pre">&quot;shell&quot;</span></code> is default):</dt>
 <dd><ul class="first last">
-<li><p class="first"><code class="docutils literal"><span class="pre">&quot;shell&quot;</span></code> command is run from the command line and so therefore is, in general, operating-system <em>dependent</em>. Commands of this type take other options that correspond to keyword arguments of the <code class="docutils literal"><span class="pre">subprocess.check_output()</span></code> method - see the <a class="reference external" href="https://docs.python.org/3.4/library/subprocess.html">subprocess documentation</a> for more information. Commands of this type, by default, have the <code class="docutils literal"><span class="pre">shell:</span> <span class="pre">True</span></code> option provided as well (in contrast to the subprocess defaults). If this option needs to be changed, you&#8217;ll know why, so no explanation is given here.</p>
-</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;shell&quot;</span></code> command is run from the command line and so therefore is, in general, operating-system <em>dependent</em>. Commands of this type take other options that correspond to keyword arguments of the <code class="docutils literal notranslate"><span class="pre">subprocess.check_output()</span></code> method - see the <a class="reference external" href="https://docs.python.org/3.4/library/subprocess.html">subprocess documentation</a> for more information. Commands of this type, by default, have the <code class="docutils literal notranslate"><span class="pre">shell:</span> <span class="pre">True</span></code> option provided as well (in contrast to the subprocess defaults). If this option needs to be changed, you’ll know why, so no explanation is given here.</li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">&quot;python_method&quot;</span></code> - commands of this type execute a (python) method that has to be included in the module <code class="docutils literal"><span class="pre">modfuncs.py</span></code> so are, in general operating-system <em>independent</em>. For commands of this type, the <code class="docutils literal"><span class="pre">func</span></code> option must be provided. In addition to <code class="docutils literal"><span class="pre">args</span></code>, the available options are:</dt>
-<dd><ul class="first last simple">
-<li><code class="docutils literal"><span class="pre">func:</span> <span class="pre">(str)</span></code> - this (required) option specifies the method in the <code class="docutils literal"><span class="pre">modfuncs</span></code> module to execute.</li>
-<li><code class="docutils literal"><span class="pre">kwargs:</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">objects]</span></code> - <code class="docutils literal"><span class="pre">kwargs</span></code> is provided to the python method as keyword arguments.</li>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;python_method&quot;</span></code> - commands of this type execute a (python) method that has to be included in the module <code class="docutils literal notranslate"><span class="pre">modfuncs.py</span></code> so are, in general operating-system <em>independent</em>. For commands of this type, the <code class="docutils literal notranslate"><span class="pre">func</span></code> option must be provided. In addition to <code class="docutils literal notranslate"><span class="pre">args</span></code>, the available options are:</dt>
+<dd><ul class="first last">
+<li><code class="docutils literal notranslate"><span class="pre">func:</span> <span class="pre">(str)</span></code> - this (required) option specifies the method in the <code class="docutils literal notranslate"><span class="pre">modfuncs</span></code> module to execute.</li>
+<li><code class="docutils literal notranslate"><span class="pre">kwargs:</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">objects]</span></code> - <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> is provided to the python method as keyword arguments.</li>
 </ul>
 </dd>
 </dl>
@@ -103,7 +90,7 @@
 <div class="section" id="valid-commands">
 <h3>Valid commands<a class="headerlink" href="#valid-commands" title="Permalink to this headline">¶</a></h3>
 <p>To run VEDA, the following command is sufficient:</p>
-<p><code class="docutils literal"><span class="pre">C154.nexus.csiro.au\c:\VEDA\VEDA_FE\GAMS_WRKANO2\VTRun.cmd</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">C154.nexus.csiro.au\c:\VEDA\VEDA_FE\GAMS_WRKANO2\VTRun.cmd</span></code></p>
 <p>After appropriately creating this using the interactive version of VEDA.</p>
 <p>To provide alternative parameter input values, there will be a handful of files like (same folder)</p>
 <p>elc_only_a1.dd
@@ -159,18 +146,20 @@ Scen_transport_ci_sc.xls</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/models.txt"
+      <li><a href="_sources/models.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -181,11 +170,11 @@ Scen_transport_ci_sc.xls</p>
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/models.txt"
+      <a href="_sources/models.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

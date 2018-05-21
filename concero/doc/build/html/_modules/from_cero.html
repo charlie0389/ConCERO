@@ -1,41 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>from_cero &#8212; ConCERO 0.1 documentation</title>
-    
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="ConCERO 0.1 documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -290,7 +277,7 @@
 <span class="sd">    def double_values(x):</span>
 <span class="sd">        return 2*x</span>
 
-<span class="sd">Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible. For more information on how to use the wrappers, please consult :ref:`lfwrappers` .</span>
+<span class="sd">Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible. For more information on how to use the wrappers, please consult :ref:`func_classes` .</span>
 
 <span class="sd">.. _output_process_flow:</span>
 
@@ -366,17 +353,6 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-            <span class="c1"># TODO: Move this check to is_valid</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">):</span>
-                <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">))[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># get file extension without full stop</span>
-
-                <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Output type &#39;</span><span class="si">%s</span><span class="s2">&#39; not supported. Supported types are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_type</span><span class="p">,</span>
-                                                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="s2">&quot;lstrip&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-                <span class="c1"># TODO: Move this such that it can accomodate case that all inputs are imported</span>
-                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">lstrip_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;lstrip&quot;</span><span class="p">],</span> <span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]</span>
 
         <span class="nd">@staticmethod</span>
         <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">proc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s1">&#39;FromCERO&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -463,6 +439,9 @@
                     <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;outputs&#39; must be provided as a list, True or None.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;lstrip&quot;</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
+                <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">lstrip_identifier</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;lstrip&quot;</span><span class="p">],</span> <span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]]</span>
 
             <span class="k">return</span> <span class="n">defaults</span>
 
@@ -595,6 +574,8 @@
                 <span class="n">renamed</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">rename_index_values</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">rename</span><span class="o">.</span><span class="n">keys</span><span class="p">())],</span> <span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">renamed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">rename</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>  <span class="c1"># Restrict renamed to only the rows that have been specified</span>
 
+                <span class="c1"># Note that ret will be restricted to only those values that have been renamed.</span>
+
             <span class="k">return</span> <span class="n">ret</span>
 
         <span class="k">def</span> <span class="nf">_check_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -663,20 +644,38 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">_check_ops</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
-            <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">):</span>
+                <span class="n">file_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">proc</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># get file extension without full stop</span>
+
+                <span class="k">if</span> <span class="n">file_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Output type &#39;</span><span class="si">%s</span><span class="s2">&#39; not supported. Supported types are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_type</span><span class="p">,</span>
+                                                                                        <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">_sup_procedure_output_types</span><span class="p">)</span>
+                    <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_check_permissions</span><span class="p">(</span><span class="n">proc</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
                     <span class="k">return</span> <span class="kc">False</span>
 
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="nd">@staticmethod</span>
-        <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">cero</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Checks that the _Procedure ``self`` is valid and can be executed by the current user.</span>
+<span class="sd">            Checks that the _Procedure ``proc`` is valid and can be executed by the current user.</span>
 <span class="sd">            :return:</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="c1">#TODO: Write check to see if inputs in CERO</span>
 
+            <span class="n">cero_index</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">invalid_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">proc</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cero_index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">invalid_inputs</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Inputs </span><span class="si">%s</span><span class="s2"> are not valid.&quot;</span> <span class="o">%</span> <span class="n">invalid_inputs</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">InvalidInputs</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -701,6 +700,9 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">],</span> <span class="n">filename</span><span class="p">)</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;get_filepath() returns: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ret</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">class</span> <span class="nc">InvalidInputs</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -788,8 +790,8 @@
         <span class="k">return</span> <span class="nb">set</span>
 
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as configuration filename. Otherwise conf must be a dictionary.</span>
 
@@ -858,8 +860,8 @@
 
         <span class="k">return</span> <span class="n">_conf</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="FromCERO.is_valid"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="FromCERO.is_valid"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs static checks on ``conf``.</span>
 
@@ -898,17 +900,17 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="FromCERO.run_checks"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.run_checks">[docs]</a>    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="FromCERO.run_checks"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cero</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs runtime checks on ``conf``.</span>
+<span class="sd">        Performs runtime checks on ``conf``, given ``cero``.</span>
 
 <span class="sd">        :param dict conf:</span>
 <span class="sd">        :param bool raise_exception:</span>
 <span class="sd">        :return bool:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">procedure</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">procedure</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">procedure</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">cero</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span></div>
@@ -1056,12 +1058,14 @@
 </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1072,7 +1076,7 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>

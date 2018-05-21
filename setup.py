@@ -26,7 +26,7 @@ setup(name='concero',
     url=r'https://svnserv.csiro.au/svn/OSM_CBR_LW_NATOUTLOOK2_work/ISAM/trunk/iam/integration/',
     packages=find_packages(),
     python_requires=">=3.4",
-    setup_requres=["numpy", "pandas"], # Necessary for bug: https://github.com/numpy/numpy/issues/2434
+    setup_requires=["numpy", "pandas"], # Necessary for bug: https://github.com/numpy/numpy/issues/2434
     install_requires=["scipy", "pandas>=0.22", "numpy", "pyyaml", "seaborn>=0.8.1", "xlrd>=1.1.0", "openpyxl", "pytz",
                       "python-dateutil", "six"],
     tests_require=["harpy", "gdxpds"],

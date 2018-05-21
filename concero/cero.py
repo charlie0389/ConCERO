@@ -5,7 +5,7 @@
 
 A core concept in the operation of ConCERO is that of a 'Collins Economic Results Object' - a CERO - which \
 serves as a standard format for data-interchange between economic modelling programs. Conceptually, the CERO \
-is a set of instances of a 'fundamental data type', a discussion of which can be found in the :ref:`Design Philosophy` \
+is a set of instances of a 'fundamental data type', a discussion of which can be found in the :ref:`Design_Philosophy` \
 documentation.
 
 Software-wise, the CERO is a ``pandas.DataFrame`` with some additional constraints. Those constraints are:
@@ -13,6 +13,7 @@ Software-wise, the CERO is a ``pandas.DataFrame`` with some additional constrain
     * ``cero.index`` must be an instance of the ``pandas.Index`` class, and
     * ``cero.columns`` must be an instance of the ``pandas.DatetimeIndex`` class, and
     * both ``cero.index`` and ``cero.columns`` values must be unique and
+    * all index values must be valid *identifiers* (see below) and
     * ``cero`` data/array values must all be of 32-bit floating-point type (specifically, be instances of a \
     subclass of the ``numpy.float32`` class),
 
@@ -37,7 +38,7 @@ if a configuration file contains the string:
 
     ``"hello,world"``
 
-*in a 'CERO identifiers context'*, then this will be interpreted as the python tuple:
+in the context of CERO *identifiers*, then this will be interpreted as the python tuple:
 
     ``('hello','world')``
 
@@ -51,7 +52,7 @@ also becomes:
 
 and this:
 
-    ``"L_OUTPUT, Electricity, AUS"``
+    ``" L_OUTPUT, Electricity, AUS"``
 
 becomes:
 

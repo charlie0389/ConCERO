@@ -1,41 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>to_cero &#8212; ConCERO 0.1 documentation</title>
-    
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="ConCERO 0.1 documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -71,7 +58,7 @@
 <span class="sd">    ``{&quot;files&quot;: None}``</span>
 
 <span class="sd">This top-level dictionary object - is referred to as a *ToCERO* object. The obvious next step is to specify some input files to convert. \</span>
-<span class="sd">This is done by adding **indented** [2]_ subsequent lines with a hyphen followed by the relevant data. For example:</span>
+<span class="sd">This is done by adding **indented** [2]_ subsequent lines with a hyphen, **followed by a space**, followed by the relevant data. For example:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
@@ -99,23 +86,21 @@
 <span class="sd">Where ``name_of_file`` is a file path *relative to the configuration file*. The option \</span>
 <span class="sd">``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</span>
 
-<span class="sd">Without further specification, if the file *type* is comma-separated-values (``CSV``) and the file name has the</span>
-<span class="sd">``.csv`` extension and if the data is of the default format, ConCERO can import the entire file. The \</span>
-<span class="sd">&#39;default format&#39; is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:</span>
+<span class="sd">Without further specification, if the file *type* is comma-separated-values (``CSV``) *and* if the data is of the default format, ConCERO can import the entire file. The &#39;default format&#39; is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:</span>
 
 <span class="sd">    1. by the key-value pair ``type: &lt;ext&gt;`` in the *file object*, and if not provided then</span>
-<span class="sd">    2. by the key-value pair ``type: &lt;ext&gt;`` in the *definition object*, and if not provided then</span>
-<span class="sd">    3. by determining the extension of the value of ``file`` in the *file object*, and then if not determined</span>
+<span class="sd">    2. by the key-value pair ``type: &lt;ext&gt;`` in the *ToCERO object*, and if not provided then</span>
+<span class="sd">    3. by determining the extension of the value of ``file`` in the *file object*, and if not determined then</span>
 <span class="sd">    4. an error is raised.</span>
 
 <span class="sd">Providing the ``type`` option allows the user to potentially extend the program to import files that the \</span>
-<span class="sd">program author was not aware existed, and are of a similar format to one of the known and supported formats. \</span>
-<span class="sd">For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them),\</span>
+<span class="sd">program author was not aware existed, if the file is of a similar format to one of the known and supported formats. \</span>
+<span class="sd">For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), \</span>
 <span class="sd">``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, \</span>
 <span class="sd">``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on \</span>
 <span class="sd">whether the underlying library allows importing that file type.</span>
 
-<span class="sd">With respect to step 2, it can be said that the file object *inherits* from the ToCERO \</span>
+<span class="sd">With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO \</span>
 <span class="sd">object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant \</span>
 <span class="sd">information in the case that some properties apply to all the input files. Given that every key-value pair \</span>
 <span class="sd">has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an \</span>
@@ -128,12 +113,12 @@
 <span class="sd">        - file: b_file</span>
 <span class="sd">          type: &#39;csv&#39;</span>
 
-<span class="sd">In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported. \</span>
+<span class="sd">In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported (assuming they are both of default format). \</span>
 <span class="sd">The file extension can be discerned with respect to ``a_file.csv``, and \</span>
 <span class="sd">``b_file`` has the corresponding ``type`` specified. Note that the ``type`` option (for ``b_file`` is indented at \</span>
 <span class="sd">the same level as file option, *not* the list).</span>
 
-<span class="sd">A minimal configuration form that demonstrates inheritance (and assuming ``c_file`` is of ``csv`` type) is:</span>
+<span class="sd">A minimal configuration form that demonstrates inheritance (and assuming ``c_file`` is of default ``csv`` type) is:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
@@ -175,24 +160,23 @@
 
 <span class="sd">**series: (list)**</span>
 
-<span class="sd">the list specifies the series in the index that are \</span>
-<span class="sd">    relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to \</span>
-<span class="sd">    as a *series object*, which is a dictionary with the following options:</span>
+<span class="sd">   the list specifies the series in the index that are \</span>
+<span class="sd">   relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to \</span>
+<span class="sd">   as a *series object*, which is a dictionary with the following options:</span>
 
 <span class="sd">        **name: (str)**</span>
 
-<span class="sd">        ``name`` identifies the elements of the index that will be converted into a CERO. ``name`` is a mandatory option.</span>
+<span class="sd">           ``name`` identifies the elements of the index that will be converted into a CERO. ``name`` is a mandatory option.</span>
 
 <span class="sd">        **rename: (str)**</span>
 
-<span class="sd">        If provided, after export into the CERO changes ``name`` to value provided by ``rename``.</span>
+<span class="sd">           If provided, after export into the CERO changes ``name`` to value provided by ``rename``.</span>
 
-<span class="sd">A series object can be provided as a string, but this is equivalent to the series object ``{&#39;name&#39;: series_name}``.</span>
+<span class="sd">A series object can be provided as a string - this is equivalent to the series object ``{&#39;name&#39;: series_name}``.</span>
 
 <span class="sd">**orientation: (str)**</span>
 
-<span class="sd">``&#39;rows&#39;`` by default. If the data is in columns with respect to time, change this \</span>
-<span class="sd">    option to ``&#39;cols&#39;``, (and therefore effectively calling a transposition operation).</span>
+<span class="sd">   ``&#39;rows&#39;`` by default. If the data is in columns with respect to time, change this option to ``&#39;cols&#39;``, (and therefore effectively calling a transposition operation).</span>
 
 <span class="sd">**skip_cols: (str|list)**</span>
 
@@ -202,27 +186,19 @@
 
 <span class="sd">**usecols: (list)**</span>
 
-<span class="sd">From pandas documentation - Return a subset of the columns. If array-like, all \</span>
-<span class="sd">    elements must either be positional (i.e. integer indices into the document columns) or strings that \</span>
-<span class="sd">    correspond to column names provided either by the user in names or inferred from the document header \</span>
-<span class="sd">    row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’].</span>
-<span class="sd">Note that ``usecols`` will take precedence over ``skip_cols``, and that the argument format for ``usecols`` \</span>
-<span class="sd">    for a ``csv`` file differs slightly to that for an ``xlsx`` file.</span>
+<span class="sd">   From pandas documentation - Return a subset of the columns. If array-like, all elements must either be positional (i.e. integer indices into the document columns) or strings that correspond to column names provided either by the user in names or inferred from the document header row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’]. Note that ``usecols`` will take precedence over ``skip_cols``, and that the argument format for ``usecols`` for a ``csv`` file differs slightly to that for an ``xlsx`` file.</span>
 
 <span class="sd">**index_col: (int|list)**</span>
 
-<span class="sd">The column or list of columns (zero-indexed) in which the identifiers \</span>
-<span class="sd">    reside or, if ``orientation==&quot;cols&quot;``, the column with the date index.</span>
+<span class="sd">   The column or list of columns (zero-indexed) in which the identifiers reside or, if ``orientation==&quot;cols&quot;``, the column with the date index.</span>
 
 <span class="sd">**header: (int|list)**</span>
 
-<span class="sd">The row or list of rows (zero-indexed) in which the date index resides or, if \</span>
-<span class="sd">    ``orientation==&quot;cols&quot;``, the rows with the data identifiers.</span>
+<span class="sd">   The row or list of rows (zero-indexed) in which the date index resides or, if ``orientation==&quot;cols&quot;``, the rows with the data identifiers.</span>
 
 <span class="sd">**nrows: (int)**</span>
 
-<span class="sd">Number of rows of the file to read. May be useful with very large ``csv`` files that have a \</span>
-<span class="sd">    lot of irrelevant data.</span>
+<span class="sd">   Number of rows of the file to read. May be useful with very large ``csv`` files that have a lot of irrelevant data.</span>
 
 <span class="sd">For further documentation, please consult the \</span>
 <span class="sd">`pandas documentation &lt;http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html&gt;`_ \</span>
@@ -240,12 +216,12 @@
 
 <span class="sd">**sheet: (str)** or **sheet_name: (str)**</span>
 
-<span class="sd">The name of the sheet in the workbook to be imported.</span>
+<span class="sd">   The name of the sheet in the workbook to be imported.</span>
 
 <span class="sd">**usecols: (list[int]|str)**</span>
 
-<span class="sd">Similar to the ``csv`` form of the option, ``usecols`` accepts a list of zero-indexed integers to identify the \</span>
-<span class="sd">columns to be imported. Unlike the csv option, ``usecols`` will **not** accept a ``list`` of ``str``, but will accept \</span>
+<span class="sd">   Similar to the ``csv`` form of the option, ``usecols`` accepts a list of zero-indexed integers to identify the \</span>
+<span class="sd">columns to be imported. **Unlike the csv option**, ``usecols`` will **not** accept a ``list`` of ``str``, but will accept \</span>
 <span class="sd">a single ``str`` with an excel-like specification of columns. For example, ``usecols: A,C,E:H`` specifies the \</span>
 <span class="sd">import of columns ``A``, ``C`` and all columns between ``E`` and ``H`` *inclusive*.</span>
 
@@ -310,7 +286,11 @@
 
 <span class="sd">The options in this section are relevant to all input files, regardless of their type. They are:</span>
 
-<span class="sd">**time_regex: (str)**, **time_fmt: (str)** and **default_year: (int)**</span>
+<span class="sd">**time_regex: (str)**</span>
+
+<span class="sd">**time_fmt: (str)**</span>
+
+<span class="sd">**default_year: (int)**</span>
 
 <span class="sd">A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by \</span>
 <span class="sd">searching through the string, using the regular expression ``time_regex``. The default - ``&#39;.*(\d{4})$&#39;`` - will \</span>
@@ -939,8 +919,8 @@
         <span class="c1"># cero = CERO.combine_ceros(cero_series, overwrite=False)</span>
         <span class="k">return</span> <span class="n">cero</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ToCERO.load_config"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ToCERO.load_config"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param &#39;Union[dict,str]&#39; conf: A configuration dictionary, or a `str` to a path containing a configuration dictionary.</span>
@@ -998,8 +978,8 @@
 
         <span class="k">return</span> <span class="n">_conf</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tests the validity of ``conf`` as a ``ToCERO`` object.</span>
 
@@ -1091,12 +1071,14 @@
 </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1107,7 +1089,7 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>

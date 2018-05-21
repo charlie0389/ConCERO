@@ -1,9 +1,4 @@
 """
-.. _lfwrappers:
-
-Classes of User-Specified Functions for operating on CEROs
-==========================================================
-
 The set of functions that *could* be applied to the CERO, and data series within the CERO, is infinitely large, \
 so it is obviously impossible to provide all these functions. It is therefore necessary that the user provide \
 functions as they are needed, by writing the appropriate python 3 code and including this function in ``libfuncs.py``. \
@@ -27,18 +22,14 @@ function. For example, to encapsulate ``func`` with the ``dataframe_op`` wrapper
         return cero
 
 
-The wrapper functions themselves are stored in  the ``libfuncs_wrappers`` module, but the wrappers themselves should \
-*never* be altered by the user.
+The wrapper functions themselves are stored in  the ``libfuncs_wrappers`` module, but the wrappers themselves should *never* be altered by the user.
 
-What the 3 classes of wrappers are, and how to apply the function wrappers, are explained below, in addition to the \
-case where no wrapper/decorator is provided.
+What the 3 classes of wrappers are, and how to apply the function wrappers, are explained below, in addition to the case where no wrapper/decorator is provided.
 
 Class 1 Functions - DataFrame Operations
 ----------------------------------------
 
-Class 1 functions are the most general type of wrapper functions, and can be considered a superset of the other two. \
-Class 1 functions operate on a ``pandas.DataFrame`` object, and therefore can operate on an entire CERO if need be. \
-A class 1 function must have the following function signature:
+Class 1 functions are the most general type of wrapper functions, and can be considered a superset of the other two. Class 1 functions operate on a ``pandas.DataFrame`` object, and therefore can operate on an entire CERO if need be. A class 1 function must have the following function signature:
 
 .. code-block:: python
 

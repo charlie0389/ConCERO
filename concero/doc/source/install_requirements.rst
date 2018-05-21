@@ -53,7 +53,7 @@ Installing gdxpds (necessary for gdx files)
 
 If working with the ``.gdx`` data type, in addition to the previous install requirements, it is necessary to install:
 
- 1. GAMS python API - more details of which can be found at :ref:`install_gams` - and
+ 1. GAMS python API - more details of which can be found at `the GAMS website <https://www.gams.com/latest/docs/API_PY_TUTORIAL.html#PY_GETTING_STARTED>`_ - and
  2. gdxpds,
 
 *in that order*.

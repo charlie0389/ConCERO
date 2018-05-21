@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>The Collins Economics Result Object (CERO) &#8212; ConCERO 0.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
     <link rel="next" title="Converting TO the Collins Economics Result Object (CERO) format" href="to_cero.html" />
     <link rel="prev" title="Running Tests" href="tests.html" />
    
@@ -35,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -46,28 +34,28 @@
             
   <div class="section" id="module-cero">
 <span id="the-collins-economics-result-object-cero"></span><span id="cero"></span><h1>The Collins Economics Result Object (CERO)<a class="headerlink" href="#module-cero" title="Permalink to this headline">¶</a></h1>
-<p>A core concept in the operation of ConCERO is that of a &#8216;Collins Economic Results Object&#8217; - a CERO - which serves as a standard format for data-interchange between economic modelling programs. Conceptually, the CERO is a set of instances of a &#8216;fundamental data type&#8217;, a discussion of which can be found in the <span class="xref std std-ref">Design Philosophy</span> documentation.</p>
-<p>Software-wise, the CERO is a <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> with some additional constraints. Those constraints are:</p>
+<p>A core concept in the operation of ConCERO is that of a ‘Collins Economic Results Object’ - a CERO - which serves as a standard format for data-interchange between economic modelling programs. Conceptually, the CERO is a set of instances of a ‘fundamental data type’, a discussion of which can be found in the <a class="reference internal" href="design_philosophy.html#design-philosophy"><span class="std std-ref">ConCERO’s Design Philosophy</span></a> documentation.</p>
+<p>Software-wise, the CERO is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> with some additional constraints. Those constraints are:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">cero.index</span></code> must be an instance of the <code class="docutils literal"><span class="pre">pandas.Index</span></code> class, and</li>
-<li><code class="docutils literal"><span class="pre">cero.columns</span></code> must be an instance of the <code class="docutils literal"><span class="pre">pandas.DatetimeIndex</span></code> class, and</li>
-<li>both <code class="docutils literal"><span class="pre">cero.index</span></code> and <code class="docutils literal"><span class="pre">cero.columns</span></code> values must be unique and</li>
-<li><code class="docutils literal"><span class="pre">cero</span></code> data/array values must all be of 32-bit floating-point type (specifically, be instances of a     subclass of the <code class="docutils literal"><span class="pre">numpy.float32</span></code> class),</li>
+<li><code class="docutils literal notranslate"><span class="pre">cero.index</span></code> must be an instance of the <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> class, and</li>
+<li><code class="docutils literal notranslate"><span class="pre">cero.columns</span></code> must be an instance of the <code class="docutils literal notranslate"><span class="pre">pandas.DatetimeIndex</span></code> class, and</li>
+<li>both <code class="docutils literal notranslate"><span class="pre">cero.index</span></code> and <code class="docutils literal notranslate"><span class="pre">cero.columns</span></code> values must be unique and</li>
+<li>all index values must be valid <em>identifiers</em> (see below) and</li>
+<li><code class="docutils literal notranslate"><span class="pre">cero</span></code> data/array values must all be of 32-bit floating-point type (specifically, be instances of a     subclass of the <code class="docutils literal notranslate"><span class="pre">numpy.float32</span></code> class),</li>
 </ul>
 </div></blockquote>
-<p>where <code class="docutils literal"><span class="pre">cero</span></code> is a CERO. The values of <code class="docutils literal"><span class="pre">cero.index</span></code> are referred as <em>identifiers</em>.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">cero</span></code> is a CERO. The values of <code class="docutils literal notranslate"><span class="pre">cero.index</span></code> are referred as <em>identifiers</em>.</p>
 <div class="section" id="cero-identifiers">
 <span id="cero-ids"></span><h2>CERO Identifiers<a class="headerlink" href="#cero-identifiers" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned previously, values of the index of a CERO are referred to as <em>identifiers</em>. Identifiers are subject to a couple of restrictions. They are:</p>
 <blockquote>
-<div><ul>
-<li><p class="first">The identifier must be unique - that is, no other value of <code class="docutils literal"><span class="pre">cero.index</span></code> can be exactly the same.</p>
-</li>
+<div><ul class="simple">
+<li>The identifier must be unique - that is, no other value of <code class="docutils literal notranslate"><span class="pre">cero.index</span></code> can be exactly the same.</li>
 <li><dl class="first docutils">
 <dt>The identifier must be either:</dt>
-<dd><ul class="first last simple">
-<li>a string (<code class="docutils literal"><span class="pre">str</span></code>) <em>with no commas</em>, or</li>
+<dd><ul class="first last">
+<li>a string (<code class="docutils literal notranslate"><span class="pre">str</span></code>) <em>with no commas</em>, or</li>
 <li>a tuple of strings, where each string does not have any commas.</li>
 </ul>
 </dd>
@@ -77,23 +65,23 @@
 </div></blockquote>
 <p>The comma constraint is a result of how ConCERO interprets commas when reading YAML files - ConCERO interprets commas as a string-splitting character. Thus, if a configuration file contains the string:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">&quot;hello,world&quot;</span></code></div></blockquote>
-<p><em>in a &#8216;CERO identifiers context&#8217;</em>, then this will be interpreted as the python tuple:</p>
+<div><code class="docutils literal notranslate"><span class="pre">&quot;hello,world&quot;</span></code></div></blockquote>
+<p>in the context of CERO <em>identifiers</em>, then this will be interpreted as the python tuple:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">('hello','world')</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">('hello','world')</span></code></div></blockquote>
 <p>Note also that any white spaced is stripped when the string is split, so the string:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">&quot;hello,</span> <span class="pre">world&quot;</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">&quot;hello,</span> <span class="pre">world&quot;</span></code></div></blockquote>
 <p>also becomes:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">('hello','world')</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">('hello','world')</span></code></div></blockquote>
 <p>and this:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">&quot;L_OUTPUT,</span> <span class="pre">Electricity,</span> <span class="pre">AUS&quot;</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">&quot;</span> <span class="pre">L_OUTPUT,</span> <span class="pre">Electricity,</span> <span class="pre">AUS&quot;</span></code></div></blockquote>
 <p>becomes:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">(&quot;L_OUTPUT&quot;,&quot;Electricity&quot;,&quot;AUS&quot;)</span></code></div></blockquote>
-<p>The advantage of the tuple form of identifier is that it preserves ordered relationships, even though that ordered relationship has no meaning within the CERO itself. This is necessary to store data that is more than 2-dimensional in nature in 2-dimensions. It also allows for the implementation of <code class="docutils literal"><span class="pre">sets</span></code> (see <a class="reference internal" href="from_cero.html#sets"><span class="std std-ref">Sets</span></a>),which provide the user with significant flexibility and power with respect to selecting identifiers of interest. In summary, <code class="docutils literal"><span class="pre">sets</span></code> allow the user to select large amounts of identifiers by just listing sets, as opposed to all the identifiers.</p>
+<div><code class="docutils literal notranslate"><span class="pre">(&quot;L_OUTPUT&quot;,&quot;Electricity&quot;,&quot;AUS&quot;)</span></code></div></blockquote>
+<p>The advantage of the tuple form of identifier is that it preserves ordered relationships, even though that ordered relationship has no meaning within the CERO itself. This is necessary to store data that is more than 2-dimensional in nature in 2-dimensions. It also allows for the implementation of <code class="docutils literal notranslate"><span class="pre">sets</span></code> (see <a class="reference internal" href="from_cero.html#sets"><span class="std std-ref">Sets</span></a>),which provide the user with significant flexibility and power with respect to selecting identifiers of interest. In summary, <code class="docutils literal notranslate"><span class="pre">sets</span></code> allow the user to select large amounts of identifiers by just listing sets, as opposed to all the identifiers.</p>
 <p>Created on Wed Dec 20 10:20:32 2017</p>
 <p>&#64;author: Lyle Collins
 &#64;email: <a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;au">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a></p>
@@ -127,18 +115,20 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/cero.txt"
+      <li><a href="_sources/cero.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -149,11 +139,11 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/cero.txt"
+      <a href="_sources/cero.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

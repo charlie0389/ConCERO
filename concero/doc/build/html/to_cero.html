@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Converting TO the Collins Economics Result Object (CERO) format &#8212; ConCERO 0.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="ConCERO 0.1 documentation" href="index.html" />
     <link rel="next" title="Converting FROM the Collins Economics Result Object (CERO) format" href="from_cero.html" />
     <link rel="prev" title="The Collins Economics Result Object (CERO)" href="cero.html" />
    
@@ -35,8 +24,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -47,17 +35,17 @@
   <div class="section" id="module-to_cero">
 <span id="converting-to-the-collins-economics-result-object-cero-format"></span><span id="to-cero"></span><h1>Converting TO the Collins Economics Result Object (CERO) format<a class="headerlink" href="#module-to_cero" title="Permalink to this headline">¶</a></h1>
 <p>The ToCERO class provides methods for converting data files <strong>to</strong> the CERO format.</p>
-<p>Critical to the successful use of this class is a configuration file in YAML format. Do not be intimidated by the acronym - the YAML format is very simple and human readable. Typically, study <a class="footnote-reference" href="#id4" id="id1">[1]</a> of the YAML format should be unnecessary - copying a working configuration file and then altering it for the desired purpose should satisfy most users (the <code class="docutils literal"><span class="pre">tests/data</span></code> subdirectory provides many examples). This documentation will show you how to build a YAML configuration file for use with the <cite>ToCERO</cite> class in a gradual, example-by-example process. A technical reference to the <code class="docutils literal"><span class="pre">ToCERO</span></code> class will follows.</p>
+<p>Critical to the successful use of this class is a configuration file in YAML format. Do not be intimidated by the acronym - the YAML format is very simple and human readable. Typically, study <a class="footnote-reference" href="#id4" id="id1">[1]</a> of the YAML format should be unnecessary - copying a working configuration file and then altering it for the desired purpose should satisfy most users (the <code class="docutils literal notranslate"><span class="pre">tests/data</span></code> subdirectory provides many examples). This documentation will show you how to build a YAML configuration file for use with the <cite>ToCERO</cite> class in a gradual, example-by-example process. A technical reference to the <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> class will follows.</p>
 <div class="section" id="building-a-yaml-file-from-scratch-to-convert-to-the-cero-format">
 <h2>Building a YAML file from scratch to convert <em>TO</em> the CERO format<a class="headerlink" href="#building-a-yaml-file-from-scratch-to-convert-to-the-cero-format" title="Permalink to this headline">¶</a></h2>
-<p>The configuration file can differ significantly depending on the type of file from which data is imported, but one aspect that all configuration files <strong>must</strong> have in common is the <code class="docutils literal"><span class="pre">files</span></code> field. As the name suggests, <code class="docutils literal"><span class="pre">files</span></code> specifies the input files that are sources of data for the conversion process. It therefore follows that a minimal (albeit useless) YAML configuration file will look like this:</p>
+<p>The configuration file can differ significantly depending on the type of file from which data is imported, but one aspect that all configuration files <strong>must</strong> have in common is the <code class="docutils literal notranslate"><span class="pre">files</span></code> field. As the name suggests, <code class="docutils literal notranslate"><span class="pre">files</span></code> specifies the input files that are sources of data for the conversion process. It therefore follows that a minimal (albeit useless) YAML configuration file will look like this:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">files:</span></code></div></blockquote>
-<p>That is, a single line that doesn&#8217;t specify anything. This simple file is interpreted as a <cite>dict</cite> with the key <code class="docutils literal"><span class="pre">&quot;files&quot;</span></code> with a corresponding value of <cite>None</cite> - the <code class="docutils literal"><span class="pre">:</span></code> identifies the key-value nature of the data. That is:</p>
+<div><code class="docutils literal notranslate"><span class="pre">files:</span></code></div></blockquote>
+<p>That is, a single line that doesn’t specify anything. This simple file is interpreted as a <cite>dict</cite> with the key <code class="docutils literal notranslate"><span class="pre">&quot;files&quot;</span></code> with a corresponding value of <cite>None</cite> - the <code class="docutils literal notranslate"><span class="pre">:</span></code> identifies the key-value nature of the data. That is:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">{&quot;files&quot;:</span> <span class="pre">None}</span></code></div></blockquote>
-<p>This top-level dictionary object - is referred to as a <em>ToCERO</em> object. The obvious next step is to specify some input files to convert. This is done by adding <strong>indented</strong> <a class="footnote-reference" href="#id5" id="id2">[2]</a> subsequent lines with a hyphen followed by the relevant data. For example:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">files</span><span class="p p-Indicator">:</span>
+<div><code class="docutils literal notranslate"><span class="pre">{&quot;files&quot;:</span> <span class="pre">None}</span></code></div></blockquote>
+<p>This top-level dictionary object - is referred to as a <em>ToCERO</em> object. The obvious next step is to specify some input files to convert. This is done by adding <strong>indented</strong> <a class="footnote-reference" href="#id5" id="id2">[2]</a> subsequent lines with a hyphen, <strong>followed by a space</strong>, followed by the relevant data. For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">files</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;File Object A&gt;</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;File Object B&gt;</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">&lt;File Object C&gt;</span>
@@ -65,144 +53,155 @@
 </pre></div>
 </div>
 <p>The hyphens (followed by a space) on subsequent lines identify separate items that collectively are interpreted as a python <cite>list</cite>. The indented nature of the list identifies that this list is the value for the key in the line above. Basically the previous example is interpreted as the python object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Python</span> <span class="n">interpretation</span> <span class="n">of</span> <span class="n">File</span> <span class="n">Object</span> <span class="n">A</span><span class="o">&gt;</span><span class="p">,</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">Python</span> <span class="n">interpretation</span> <span class="n">of</span> <span class="n">File</span> <span class="n">Object</span> <span class="n">A</span><span class="o">&gt;</span><span class="p">,</span>
                   <span class="o">&lt;</span><span class="n">Python</span> <span class="n">interpretation</span> <span class="n">of</span> <span class="n">File</span> <span class="n">Object</span> <span class="n">B</span><span class="o">&gt;</span><span class="p">,</span>
                   <span class="o">&lt;</span><span class="n">Python</span> <span class="n">interpretation</span> <span class="n">of</span> <span class="n">File</span> <span class="n">Object</span> <span class="n">C</span><span class="o">&gt;</span><span class="p">,</span>
                   <span class="o">&lt;</span><span class="n">etc</span><span class="o">.&gt;</span><span class="p">]}</span>
 </pre></div>
 </div>
-<p>Note that each item of the <code class="docutils literal"><span class="pre">&quot;files&quot;</span></code> list can be either a <cite>str</cite> or a <cite>dict</cite>. If a <cite>str</cite>, the string must refer to a YAML file containing a <cite>dict</cite> defining a <em>file</em> object. If a <cite>dict</cite>, then that dict must be a file object. A file object is a dictionary with one mandatory key-value pair - that is, (in YAML form):</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name_of_file</span>
+<p>Note that each item of the <code class="docutils literal notranslate"><span class="pre">&quot;files&quot;</span></code> list can be either a <cite>str</cite> or a <cite>dict</cite>. If a <cite>str</cite>, the string must refer to a YAML file containing a <cite>dict</cite> defining a <em>file</em> object. If a <cite>dict</cite>, then that dict must be a file object. A file object is a dictionary with one mandatory key-value pair - that is, (in YAML form):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name_of_file</span>
 </pre></div>
 </div>
-<p>Where <code class="docutils literal"><span class="pre">name_of_file</span></code> is a file path <em>relative to the configuration file</em>. The option <code class="docutils literal"><span class="pre">search_paths:</span> <span class="pre">List[str]</span></code> provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</p>
-<p>Without further specification, if the file <em>type</em> is comma-separated-values (<code class="docutils literal"><span class="pre">CSV</span></code>) and the file name has the
-<code class="docutils literal"><span class="pre">.csv</span></code> extension and if the data is of the default format, ConCERO can import the entire file. The &#8216;default format&#8217; is discussed on this page <a class="reference internal" href="import_guidelines.html#import-guidelines"><span class="std std-ref">Guidelines for painless importing of data</span></a>. ConCERO determines the file type:</p>
+<p>Where <code class="docutils literal notranslate"><span class="pre">name_of_file</span></code> is a file path <em>relative to the configuration file</em>. The option <code class="docutils literal notranslate"><span class="pre">search_paths:</span> <span class="pre">List[str]</span></code> provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</p>
+<p>Without further specification, if the file <em>type</em> is comma-separated-values (<code class="docutils literal notranslate"><span class="pre">CSV</span></code>) <em>and</em> if the data is of the default format, ConCERO can import the entire file. The ‘default format’ is discussed on this page <a class="reference internal" href="import_guidelines.html#import-guidelines"><span class="std std-ref">Guidelines for painless importing of data</span></a>. ConCERO determines the file type:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>by the key-value pair <code class="docutils literal"><span class="pre">type:</span> <span class="pre">&lt;ext&gt;</span></code> in the <em>file object</em>, and if not provided then</li>
-<li>by the key-value pair <code class="docutils literal"><span class="pre">type:</span> <span class="pre">&lt;ext&gt;</span></code> in the <em>definition object</em>, and if not provided then</li>
-<li>by determining the extension of the value of <code class="docutils literal"><span class="pre">file</span></code> in the <em>file object</em>, and then if not determined</li>
+<li>by the key-value pair <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">&lt;ext&gt;</span></code> in the <em>file object</em>, and if not provided then</li>
+<li>by the key-value pair <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">&lt;ext&gt;</span></code> in the <em>ToCERO object</em>, and if not provided then</li>
+<li>by determining the extension of the value of <code class="docutils literal notranslate"><span class="pre">file</span></code> in the <em>file object</em>, and if not determined then</li>
 <li>an error is raised.</li>
 </ol>
 </div></blockquote>
-<p>Providing the <code class="docutils literal"><span class="pre">type</span></code> option allows the user to potentially extend the program to import files that the program author was not aware existed, and are of a similar format to one of the known and supported formats. For example, if the program author was not aware <code class="docutils literal"><span class="pre">shk</span></code> files existed (and thus did not provide support for them),``shk`` files could be imported by specifying <code class="docutils literal"><span class="pre">type:</span> <span class="pre">har</span></code> (given their similarity to <code class="docutils literal"><span class="pre">har</span></code> files). As it is, <code class="docutils literal"><span class="pre">shk</span></code> files <em>are</em> supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on whether the underlying library allows importing that file type.</p>
-<p>With respect to step 2, it can be said that the file object <em>inherits</em> from the ToCERO object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant information in the case that some properties apply to all the input files. Given that every key-value pair has some effect on configuration, the term <em>option</em> is used to refer to a key-value pair collectively. So an example of a YAML file including all points discussed so far is:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
+<p>Providing the <code class="docutils literal notranslate"><span class="pre">type</span></code> option allows the user to potentially extend the program to import files that the program author was not aware existed, if the file is of a similar format to one of the known and supported formats. For example, if the program author was not aware <code class="docutils literal notranslate"><span class="pre">shk</span></code> files existed (and thus did not provide support for them), <code class="docutils literal notranslate"><span class="pre">shk</span></code> files could be imported by specifying <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">har</span></code> (given their similarity to <code class="docutils literal notranslate"><span class="pre">har</span></code> files). As it is, <code class="docutils literal notranslate"><span class="pre">shk</span></code> files <em>are</em> supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on whether the underlying library allows importing that file type.</p>
+<p>With respect to step 2 (of determining the file type), it can be said that the file object <em>inherits</em> from the ToCERO object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant information in the case that some properties apply to all the input files. Given that every key-value pair has some effect on configuration, the term <em>option</em> is used to refer to a key-value pair collectively. So an example of a YAML file including all points discussed so far is:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_file.csv</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_file</span>
       <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="s">&#39;csv&#39;</span>
 </pre></div>
 </div>
-<p>In the example above, <code class="docutils literal"><span class="pre">a_file.csv</span></code> and <code class="docutils literal"><span class="pre">b_file</span></code> would be successfully imported. The file extension can be discerned with respect to <code class="docutils literal"><span class="pre">a_file.csv</span></code>, and <code class="docutils literal"><span class="pre">b_file</span></code> has the corresponding <code class="docutils literal"><span class="pre">type</span></code> specified. Note that the <code class="docutils literal"><span class="pre">type</span></code> option (for <code class="docutils literal"><span class="pre">b_file</span></code> is indented at the same level as file option, <em>not</em> the list).</p>
-<p>A minimal configuration form that demonstrates inheritance (and assuming <code class="docutils literal"><span class="pre">c_file</span></code> is of <code class="docutils literal"><span class="pre">csv</span></code> type) is:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="s">&#39;csv&#39;</span>
+<p>In the example above, <code class="docutils literal notranslate"><span class="pre">a_file.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">b_file</span></code> would be successfully imported (assuming they are both of default format). The file extension can be discerned with respect to <code class="docutils literal notranslate"><span class="pre">a_file.csv</span></code>, and <code class="docutils literal notranslate"><span class="pre">b_file</span></code> has the corresponding <code class="docutils literal notranslate"><span class="pre">type</span></code> specified. Note that the <code class="docutils literal notranslate"><span class="pre">type</span></code> option (for <code class="docutils literal notranslate"><span class="pre">b_file</span></code> is indented at the same level as file option, <em>not</em> the list).</p>
+<p>A minimal configuration form that demonstrates inheritance (and assuming <code class="docutils literal notranslate"><span class="pre">c_file</span></code> is of default <code class="docutils literal notranslate"><span class="pre">csv</span></code> type) is:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="s">&#39;csv&#39;</span>
 <span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_file.csv</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">b_file</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c_file</span>
 </pre></div>
 </div>
-<p>Note that, alternatively, the file name of c_file could be changed to include a file extension. An important point is that the inheritance of <code class="docutils literal"><span class="pre">type</span></code> does not mean you - the user - can lazily drop the file extensions. The file extension is part of the file name, and so it must be provided, if it exists, to find the correct file.</p>
-<p>In most cases, more specification in the file object is necessary to import data. The necessary and additional options in the file object depend on the type of the file - whether it be <a class="reference internal" href="#csv-files">CSV files</a>, <a class="reference internal" href="#excel-files">Excel files</a>, <a class="reference internal" href="#har-files">HAR files</a> or <a class="reference internal" href="#gdx-files">GDX files</a>. That is, the supported types are <code class="docutils literal"><span class="pre">ToCERO.supported_file_types</span></code> - a set of:</p>
+<p>Note that, alternatively, the file name of c_file could be changed to include a file extension. An important point is that the inheritance of <code class="docutils literal notranslate"><span class="pre">type</span></code> does not mean you - the user - can lazily drop the file extensions. The file extension is part of the file name, and so it must be provided, if it exists, to find the correct file.</p>
+<p>In most cases, more specification in the file object is necessary to import data. The necessary and additional options in the file object depend on the type of the file - whether it be <a class="reference internal" href="#csv-files">CSV files</a>, <a class="reference internal" href="#excel-files">Excel files</a>, <a class="reference internal" href="#har-files">HAR files</a> or <a class="reference internal" href="#gdx-files">GDX files</a>. That is, the supported types are <code class="docutils literal notranslate"><span class="pre">ToCERO.supported_file_types</span></code> - a set of:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">&quot;csv&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;xlsx&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;har&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;shk&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;csv&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;xlsx&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;har&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;shk&quot;</span></code></li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="file-objects-csv-files">
 <span id="csv-files"></span><h2>File Objects - CSV files<a class="headerlink" href="#file-objects-csv-files" title="Permalink to this headline">¶</a></h2>
-<p>CSV files can be considered the simplest case with respect to data import. &#8216;Under the hood&#8217; ConCERO uses the <code class="docutils literal"><span class="pre">pandas.read_csv()</span></code> method to implement data import from CSVs (documentation for which can be found <a class="reference external" href="http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html">here</a> ). Any option available for the <code class="docutils literal"><span class="pre">pandas.read_csv()</span></code> method is also available to ConCERO by including that option in the file object.</p>
+<p>CSV files can be considered the simplest case with respect to data import. ‘Under the hood’ ConCERO uses the <code class="docutils literal notranslate"><span class="pre">pandas.read_csv()</span></code> method to implement data import from CSVs (documentation for which can be found <a class="reference external" href="http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html">here</a> ). Any option available for the <code class="docutils literal notranslate"><span class="pre">pandas.read_csv()</span></code> method is also available to ConCERO by including that option in the file object.</p>
 <p>There are also a few additional options that can be provided that provide specific functionality for ConCERO. These options are:</p>
 <p><strong>series: (list)</strong></p>
-<p>the list specifies the series in the index that are     relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to     as a <em>series object</em>, which is a dictionary with the following options:</p>
+<blockquote>
+<div><p>the list specifies the series in the index that are    relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to    as a <em>series object</em>, which is a dictionary with the following options:</p>
 <blockquote>
 <div><p><strong>name: (str)</strong></p>
-<p><code class="docutils literal"><span class="pre">name</span></code> identifies the elements of the index that will be converted into a CERO. <code class="docutils literal"><span class="pre">name</span></code> is a mandatory option.</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">name</span></code> identifies the elements of the index that will be converted into a CERO. <code class="docutils literal notranslate"><span class="pre">name</span></code> is a mandatory option.</div></blockquote>
 <p><strong>rename: (str)</strong></p>
-<p>If provided, after export into the CERO changes <code class="docutils literal"><span class="pre">name</span></code> to value provided by <code class="docutils literal"><span class="pre">rename</span></code>.</p>
+<blockquote>
+<div>If provided, after export into the CERO changes <code class="docutils literal notranslate"><span class="pre">name</span></code> to value provided by <code class="docutils literal notranslate"><span class="pre">rename</span></code>.</div></blockquote>
 </div></blockquote>
-<p>A series object can be provided as a string, but this is equivalent to the series object <code class="docutils literal"><span class="pre">{'name':</span> <span class="pre">series_name}</span></code>.</p>
+</div></blockquote>
+<p>A series object can be provided as a string - this is equivalent to the series object <code class="docutils literal notranslate"><span class="pre">{'name':</span> <span class="pre">series_name}</span></code>.</p>
 <p><strong>orientation: (str)</strong></p>
-<p><code class="docutils literal"><span class="pre">'rows'</span></code> by default. If the data is in columns with respect to time, change this     option to <code class="docutils literal"><span class="pre">'cols'</span></code>, (and therefore effectively calling a transposition operation).</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">'rows'</span></code> by default. If the data is in columns with respect to time, change this option to <code class="docutils literal notranslate"><span class="pre">'cols'</span></code>, (and therefore effectively calling a transposition operation).</div></blockquote>
 <p><strong>skip_cols: (str|list)</strong></p>
 <blockquote>
 <div>A column name, or a list of column names to ignore.</div></blockquote>
-<p>And other <code class="docutils literal"><span class="pre">pandas.read_csv()</span></code> options that are regularly used include:</p>
+<p>And other <code class="docutils literal notranslate"><span class="pre">pandas.read_csv()</span></code> options that are regularly used include:</p>
 <p><strong>usecols: (list)</strong></p>
-<p>From pandas documentation - Return a subset of the columns. If array-like, all     elements must either be positional (i.e. integer indices into the document columns) or strings that     correspond to column names provided either by the user in names or inferred from the document header     row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’].
-Note that <code class="docutils literal"><span class="pre">usecols</span></code> will take precedence over <code class="docutils literal"><span class="pre">skip_cols</span></code>, and that the argument format for <code class="docutils literal"><span class="pre">usecols</span></code>     for a <code class="docutils literal"><span class="pre">csv</span></code> file differs slightly to that for an <code class="docutils literal"><span class="pre">xlsx</span></code> file.</p>
+<blockquote>
+<div>From pandas documentation - Return a subset of the columns. If array-like, all elements must either be positional (i.e. integer indices into the document columns) or strings that correspond to column names provided either by the user in names or inferred from the document header row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’]. Note that <code class="docutils literal notranslate"><span class="pre">usecols</span></code> will take precedence over <code class="docutils literal notranslate"><span class="pre">skip_cols</span></code>, and that the argument format for <code class="docutils literal notranslate"><span class="pre">usecols</span></code> for a <code class="docutils literal notranslate"><span class="pre">csv</span></code> file differs slightly to that for an <code class="docutils literal notranslate"><span class="pre">xlsx</span></code> file.</div></blockquote>
 <p><strong>index_col: (int|list)</strong></p>
-<p>The column or list of columns (zero-indexed) in which the identifiers     reside or, if <code class="docutils literal"><span class="pre">orientation==&quot;cols&quot;</span></code>, the column with the date index.</p>
+<blockquote>
+<div>The column or list of columns (zero-indexed) in which the identifiers reside or, if <code class="docutils literal notranslate"><span class="pre">orientation==&quot;cols&quot;</span></code>, the column with the date index.</div></blockquote>
 <p><strong>header: (int|list)</strong></p>
-<p>The row or list of rows (zero-indexed) in which the date index resides or, if     <code class="docutils literal"><span class="pre">orientation==&quot;cols&quot;</span></code>, the rows with the data identifiers.</p>
+<blockquote>
+<div>The row or list of rows (zero-indexed) in which the date index resides or, if <code class="docutils literal notranslate"><span class="pre">orientation==&quot;cols&quot;</span></code>, the rows with the data identifiers.</div></blockquote>
 <p><strong>nrows: (int)</strong></p>
-<p>Number of rows of the file to read. May be useful with very large <code class="docutils literal"><span class="pre">csv</span></code> files that have a     lot of irrelevant data.</p>
+<blockquote>
+<div>Number of rows of the file to read. May be useful with very large <code class="docutils literal notranslate"><span class="pre">csv</span></code> files that have a lot of irrelevant data.</div></blockquote>
 <p>For further documentation, please consult the <a class="reference external" href="http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html">pandas documentation</a> documentation.</p>
 </div>
 <div class="section" id="file-objects-excel-files">
 <span id="excel-files"></span><h2>File Objects - Excel files<a class="headerlink" href="#file-objects-excel-files" title="Permalink to this headline">¶</a></h2>
-<p>The process for importing Excel files is very similar to that of csv files. Underneath, the <code class="docutils literal"><span class="pre">pandas.read_excel()</span></code> method is used, with virtually identical options with identical meanings. Consequently, not all the standard options will be mentioned here - just the differences in contrast to those for <code class="docutils literal"><span class="pre">csv</span></code> files. For a complete list of available options, please consult <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_excel.html">the pandas documentation</a>.</p>
+<p>The process for importing Excel files is very similar to that of csv files. Underneath, the <code class="docutils literal notranslate"><span class="pre">pandas.read_excel()</span></code> method is used, with virtually identical options with identical meanings. Consequently, not all the standard options will be mentioned here - just the differences in contrast to those for <code class="docutils literal notranslate"><span class="pre">csv</span></code> files. For a complete list of available options, please consult <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_excel.html">the pandas documentation</a>.</p>
 <p><strong>sheet: (str)</strong> or <strong>sheet_name: (str)</strong></p>
-<p>The name of the sheet in the workbook to be imported.</p>
+<blockquote>
+<div>The name of the sheet in the workbook to be imported.</div></blockquote>
 <p><strong>usecols: (list[int]|str)</strong></p>
-<p>Similar to the <code class="docutils literal"><span class="pre">csv</span></code> form of the option, <code class="docutils literal"><span class="pre">usecols</span></code> accepts a list of zero-indexed integers to identify the columns to be imported. Unlike the csv option, <code class="docutils literal"><span class="pre">usecols</span></code> will <strong>not</strong> accept a <code class="docutils literal"><span class="pre">list</span></code> of <code class="docutils literal"><span class="pre">str</span></code>, but will accept a single <code class="docutils literal"><span class="pre">str</span></code> with an excel-like specification of columns. For example, <code class="docutils literal"><span class="pre">usecols:</span> <span class="pre">A,C,E:H</span></code> specifies the import of columns <code class="docutils literal"><span class="pre">A</span></code>, <code class="docutils literal"><span class="pre">C</span></code> and all columns between <code class="docutils literal"><span class="pre">E</span></code> and <code class="docutils literal"><span class="pre">H</span></code> <em>inclusive</em>.</p>
+<blockquote>
+<div>Similar to the <code class="docutils literal notranslate"><span class="pre">csv</span></code> form of the option, <code class="docutils literal notranslate"><span class="pre">usecols</span></code> accepts a list of zero-indexed integers to identify the columns to be imported. <strong>Unlike the csv option</strong>, <code class="docutils literal notranslate"><span class="pre">usecols</span></code> will <strong>not</strong> accept a <code class="docutils literal notranslate"><span class="pre">list</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>, but will accept a single <code class="docutils literal notranslate"><span class="pre">str</span></code> with an excel-like specification of columns. For example, <code class="docutils literal notranslate"><span class="pre">usecols:</span> <span class="pre">A,C,E:H</span></code> specifies the import of columns <code class="docutils literal notranslate"><span class="pre">A</span></code>, <code class="docutils literal notranslate"><span class="pre">C</span></code> and all columns between <code class="docutils literal notranslate"><span class="pre">E</span></code> and <code class="docutils literal notranslate"><span class="pre">H</span></code> <em>inclusive</em>.</div></blockquote>
 </div>
 <div class="section" id="file-objects-har-or-shk-files">
 <span id="har-files"></span><h2>File Objects - HAR (or SHK) files<a class="headerlink" href="#file-objects-har-or-shk-files" title="Permalink to this headline">¶</a></h2>
-<p>In reading this section of the documentation, <code class="docutils literal"><span class="pre">shk</span></code> files can be considered equivalent to <code class="docutils literal"><span class="pre">har</span></code> files, so references to <code class="docutils literal"><span class="pre">shk</span></code> files can be dropped.</p>
-<p><code class="docutils literal"><span class="pre">har</span></code> files contain one or more <em>header arrays</em>, and with each header array is an array of one or more dimensions (to a maximum of 7). Each dimension of each array has an associated <em>set</em>. Note that the terminology <em>set</em> can be considered misleading because, unlike the mathematical concept of a set, HAR sets <em>have an order</em>. The order of the set corresponds to the placement of items within the array.</p>
-<p>To specify the import of a har file, only one option in the file object is necessary - that is, <code class="docutils literal"><span class="pre">head_arrs</span></code> with an associated list of strings specifying the names of header arrays to import from the file. Therefore, an example configuration file that specifies the import of a <code class="docutils literal"><span class="pre">har</span></code> file could look like:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
+<p>In reading this section of the documentation, <code class="docutils literal notranslate"><span class="pre">shk</span></code> files can be considered equivalent to <code class="docutils literal notranslate"><span class="pre">har</span></code> files, so references to <code class="docutils literal notranslate"><span class="pre">shk</span></code> files can be dropped.</p>
+<p><code class="docutils literal notranslate"><span class="pre">har</span></code> files contain one or more <em>header arrays</em>, and with each header array is an array of one or more dimensions (to a maximum of 7). Each dimension of each array has an associated <em>set</em>. Note that the terminology <em>set</em> can be considered misleading because, unlike the mathematical concept of a set, HAR sets <em>have an order</em>. The order of the set corresponds to the placement of items within the array.</p>
+<p>To specify the import of a har file, only one option in the file object is necessary - that is, <code class="docutils literal notranslate"><span class="pre">head_arrs</span></code> with an associated list of strings specifying the names of header arrays to import from the file. Therefore, an example configuration file that specifies the import of a <code class="docutils literal notranslate"><span class="pre">har</span></code> file could look like:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">har_file.har</span>
     <span class="l l-Scalar l-Scalar-Plain">head_arrs</span><span class="p p-Indicator">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HEA1</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HEA2</span>
 </pre></div>
 </div>
-<p>With the example configuration, header arrays <code class="docutils literal"><span class="pre">HEA1</span></code> and <code class="docutils literal"><span class="pre">HEA2</span></code> would be imported from file <code class="docutils literal"><span class="pre">har_file.har</span></code>. <em>Note</em> that it is a restriction of the <code class="docutils literal"><span class="pre">har</span></code> format itself that header names can not be longer than 4 characters.</p>
-<p>In the example above, each header array name is interpreted as a string. The more general format for a header definition is a <code class="docutils literal"><span class="pre">dict</span></code>, referred to as <code class="docutils literal"><span class="pre">header_dict</span></code>. Each <code class="docutils literal"><span class="pre">header_dict</span></code> <em>must</em> have the option:</p>
+<p>With the example configuration, header arrays <code class="docutils literal notranslate"><span class="pre">HEA1</span></code> and <code class="docutils literal notranslate"><span class="pre">HEA2</span></code> would be imported from file <code class="docutils literal notranslate"><span class="pre">har_file.har</span></code>. <em>Note</em> that it is a restriction of the <code class="docutils literal notranslate"><span class="pre">har</span></code> format itself that header names can not be longer than 4 characters.</p>
+<p>In the example above, each header array name is interpreted as a string. The more general format for a header definition is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>, referred to as <code class="docutils literal notranslate"><span class="pre">header_dict</span></code>. Each <code class="docutils literal notranslate"><span class="pre">header_dict</span></code> <em>must</em> have the option:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">name:</span> <span class="pre">header_name</span></code>, where <code class="docutils literal"><span class="pre">header_name</span></code> is the name of the header.</li>
+<li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">header_name</span></code>, where <code class="docutils literal notranslate"><span class="pre">header_name</span></code> is the name of the header.</li>
 </ul>
 </div></blockquote>
-<p><code class="docutils literal"><span class="pre">header_dict</span></code> <em>must</em> also have the following option <em>if one of the dimensions of the array is to be interpreted as a time dimension</em>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">header_dict</span></code> <em>must</em> also have the following option <em>if one of the dimensions of the array is to be interpreted as a time dimension</em>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">time_dim:</span> <span class="pre">(str)</span></code>, where the string is the name of the set indexing the time-dimension (note that the     format/data-type of the time dimension is irrelevant).</li>
+<li><code class="docutils literal notranslate"><span class="pre">time_dim:</span> <span class="pre">(str)</span></code>, where the string is the name of the set indexing the time-dimension (note that the     format/data-type of the time dimension is irrelevant).</li>
 </ul>
 </div></blockquote>
-<p>If the data has no time dimension (which <em>definitely should be avoided</em>) and therefore <code class="docutils literal"><span class="pre">time_dim</span></code> is not specified, then <code class="docutils literal"><span class="pre">default_year</span></code> <strong>must</strong> be provided (or inherited from the file object) - otherwise a ValueError will be thrown.</p>
+<p>If the data has no time dimension (which <em>definitely should be avoided</em>) and therefore <code class="docutils literal notranslate"><span class="pre">time_dim</span></code> is not specified, then <code class="docutils literal notranslate"><span class="pre">default_year</span></code> <strong>must</strong> be provided (or inherited from the file object) - otherwise a ValueError will be thrown.</p>
 <p>Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format that deviates from the default. Please see <a class="reference internal" href="#file-independent-options">File independent options</a> for more information.</p>
 </div>
 <div class="section" id="file-objects-gdx-files">
 <span id="gdx-files"></span><h2>File Objects - GDX files<a class="headerlink" href="#file-objects-gdx-files" title="Permalink to this headline">¶</a></h2>
-<p>Currently, <code class="docutils literal"><span class="pre">GDX</span></code> files are not supported (though large amounts of the framework is in place).</p>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">GDX</span></code> files are not supported (though large amounts of the framework is in place).</p>
 </div>
 <div class="section" id="file-independent-options">
 <span id="id3"></span><h2>File Independent Options:<a class="headerlink" href="#file-independent-options" title="Permalink to this headline">¶</a></h2>
 <p>The options in this section are relevant to all input files, regardless of their type. They are:</p>
-<p><strong>time_regex: (str)</strong>, <strong>time_fmt: (str)</strong> and <strong>default_year: (int)</strong></p>
-<p>A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by searching through the string, using the regular expression <code class="docutils literal"><span class="pre">time_regex</span></code>. The default - <code class="docutils literal"><span class="pre">'.*(\d{4})$'</span></code> - will attempt to interpret the last four characters of the string as the year. Importantly, the match returns the year as the 1st &#8216;group&#8217; (regular expression lingo). It is the first group that <code class="docutils literal"><span class="pre">time_fmt</span></code> is used with to convert the string to a datetime object. The default - <code class="docutils literal"><span class="pre">'%Y'</span></code> assumes that the string is 4 digits corresponding to the year.</p>
-<p>In the event that it date-time data isn&#8217;t stored in the file itself, a <code class="docutils literal"><span class="pre">default_year</span></code> option (a single integer corresponding to the year - e.g. <code class="docutils literal"><span class="pre">2017</span></code>) <strong>must</strong> be provided. 
-What follows is an example, using the defaults of <code class="docutils literal"><span class="pre">time_regex</span></code> and <code class="docutils literal"><span class="pre">time_fmt</span></code>, to demonstrate how this works...</p>
-<p>Let&#8217;s assume the time index series is given, in CSV form, by:</p>
+<p><strong>time_regex: (str)</strong></p>
+<p><strong>time_fmt: (str)</strong></p>
+<p><strong>default_year: (int)</strong></p>
+<p>A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by searching through the string, using the regular expression <code class="docutils literal notranslate"><span class="pre">time_regex</span></code>. The default - <code class="docutils literal notranslate"><span class="pre">'.*(\d{4})$'</span></code> - will attempt to interpret the last four characters of the string as the year. Importantly, the match returns the year as the 1st ‘group’ (regular expression lingo). It is the first group that <code class="docutils literal notranslate"><span class="pre">time_fmt</span></code> is used with to convert the string to a datetime object. The default - <code class="docutils literal notranslate"><span class="pre">'%Y'</span></code> assumes that the string is 4 digits corresponding to the year.</p>
+<p>In the event that it date-time data isn’t stored in the file itself, a <code class="docutils literal notranslate"><span class="pre">default_year</span></code> option (a single integer corresponding to the year - e.g. <code class="docutils literal notranslate"><span class="pre">2017</span></code>) <strong>must</strong> be provided. 
+What follows is an example, using the defaults of <code class="docutils literal notranslate"><span class="pre">time_regex</span></code> and <code class="docutils literal notranslate"><span class="pre">time_fmt</span></code>, to demonstrate how this works…</p>
+<p>Let’s assume the time index series is given, in CSV form, by:</p>
 <blockquote>
-<div><div class="highlight-text"><div class="highlight"><pre><span></span>bs1b-2017,bs1b-br1r-pl1p-2018,bs1b-br1r-pl1p-2019,...
+<div><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>bs1b-2017,bs1b-br1r-pl1p-2018,bs1b-br1r-pl1p-2019,...
 </pre></div>
 </div>
 </div></blockquote>
 <p>which is typically seen with VURM-related data. The last four digits is obviously the year, so the default setting is appropriate. The regex essentially simplifies the data to a list of strings:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">['2017',</span> <span class="pre">'2018',</span> <span class="pre">'2019',</span> <span class="pre">etc...]</span></code></div></blockquote>
-<p>However, ConCERO needs to convert these strings to <code class="docutils literal"><span class="pre">pandas.datetime</span></code> format. This is done by the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior">pandas.datetime.strftime()</a> method, which relies on matching the strings with a pattern. The default - <code class="docutils literal"><span class="pre">'%Y'</span></code> - will interpret the strings as four digits corresponding to the year - an obviously satisfactory result. Hence, the following options are appropriate to include in the YAML configuration file.</p>
+<div><code class="docutils literal notranslate"><span class="pre">['2017',</span> <span class="pre">'2018',</span> <span class="pre">'2019',</span> <span class="pre">etc...]</span></code></div></blockquote>
+<p>However, ConCERO needs to convert these strings to <code class="docutils literal notranslate"><span class="pre">pandas.datetime</span></code> format. This is done by the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior">pandas.datetime.strftime()</a> method, which relies on matching the strings with a pattern. The default - <code class="docutils literal notranslate"><span class="pre">'%Y'</span></code> - will interpret the strings as four digits corresponding to the year - an obviously satisfactory result. Hence, the following options are appropriate to include in the YAML configuration file.</p>
 <blockquote>
-<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">time_regex</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.*(\d{4})$</span>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">time_regex</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.*(\d{4})$</span>
 <span class="l l-Scalar l-Scalar-Plain">time_fmt</span><span class="p p-Indicator">:</span> <span class="s">&#39;%Y&#39;</span>
 </pre></div>
 </div>
@@ -217,7 +216,7 @@ What follows is an example, using the defaults of <code class="docutils literal"
 <table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><em>&#8216;Indented&#8217;</em> can refer to a tab, 4 spaces or any combination of tabs/spaces. It is however critical that the indentation pattern <em>remains consistent</em> (which is a requirement in common with python).</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><em>‘Indented’</em> can refer to a tab, 4 spaces or any combination of tabs/spaces. It is however critical that the indentation pattern <em>remains consistent</em> (which is a requirement in common with python).</td></tr>
 </tbody>
 </table>
 </div>
@@ -225,16 +224,16 @@ What follows is an example, using the defaults of <code class="docutils literal"
 <h2>ToCERO Technical Specification<a class="headerlink" href="#tocero-technical-specification" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="to_cero.ToCERO">
-<em class="property">class </em><code class="descclassname">to_cero.</code><code class="descname">ToCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>*</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span> &rarr; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/to_cero.html#ToCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">to_cero.</code><code class="descname">ToCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/to_cero.html#ToCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a ToCERO configuration, suitable for creating CEROs from data files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>conf</strong> (<em>'Union[dict,str]'</em>) &#8211; The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an obsolute path, or relative to the current working directory.</li>
-<li><strong>args</strong> &#8211; Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
-<li><strong>kwargs</strong> &#8211; Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
+<li><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>]</em><em>'</em>) – The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an obsolute path, or relative to the current working directory.</li>
+<li><strong>args</strong> – Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
+<li><strong>kwargs</strong> – Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
 </ul>
 </td>
 </tr>
@@ -243,13 +242,13 @@ What follows is an example, using the defaults of <code class="docutils literal"
 <dl class="method">
 <dt id="to_cero.ToCERO.create_cero">
 <code class="descname">create_cero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.create_cero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.create_cero" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a CERO from the configuration (defined by <code class="docutils literal"><span class="pre">self</span></code>).</p>
+<dd><p>Create a CERO from the configuration (defined by <code class="docutils literal notranslate"><span class="pre">self</span></code>).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">Return pd.DataFrame:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">A CERO is returned.</td>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">A CERO is returned.</td>
 </tr>
 </tbody>
 </table>
@@ -258,14 +257,14 @@ What follows is an example, using the defaults of <code class="docutils literal"
 <dl class="staticmethod">
 <dt id="to_cero.ToCERO.is_valid">
 <em class="property">static </em><code class="descname">is_valid</code><span class="sig-paren">(</span><em>conf</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.is_valid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tests the validity of <code class="docutils literal"><span class="pre">conf</span></code> as a <code class="docutils literal"><span class="pre">ToCERO</span></code> object.</p>
+<dd><p>Tests the validity of <code class="docutils literal notranslate"><span class="pre">conf</span></code> as a <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; An object, which may or may not suitable as a ToCERO object.</li>
-<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If <cite>True</cite> (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) <cite>False</cite> is returned.</li>
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – An object, which may or may not suitable as a ToCERO object.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) <cite>False</cite> is returned.</li>
 </ul>
 </td>
 </tr>
@@ -284,8 +283,8 @@ What follows is an example, using the defaults of <code class="docutils literal"
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conf</strong> (<em>'Union[dict,str]'</em>) &#8211; A configuration dictionary, or a <cite>str</cite> to a path containing a configuration dictionary.</li>
-<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; A dict from which to inherit.</li>
+<li><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>]</em><em>'</em>) – A configuration dictionary, or a <cite>str</cite> to a path containing a configuration dictionary.</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A dict from which to inherit.</li>
 </ul>
 </td>
 </tr>
@@ -335,18 +334,20 @@ What follows is an example, using the defaults of <code class="docutils literal"
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/to_cero.txt"
+      <li><a href="_sources/to_cero.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -357,11 +358,11 @@ What follows is an example, using the defaults of <code class="docutils literal"
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/to_cero.txt"
+      <a href="_sources/to_cero.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

@@ -25,7 +25,7 @@ That is, a single line that doesn't specify anything. This simple file is interp
     ``{"files": None}``
 
 This top-level dictionary object - is referred to as a *ToCERO* object. The obvious next step is to specify some input files to convert. \
-This is done by adding **indented** [2]_ subsequent lines with a hyphen followed by the relevant data. For example:
+This is done by adding **indented** [2]_ subsequent lines with a hyphen, **followed by a space**, followed by the relevant data. For example:
 
 .. code-block:: yaml
 
@@ -53,23 +53,21 @@ Note that each item of the ``"files"`` list can be either a `str` or a `dict`. I
 Where ``name_of_file`` is a file path *relative to the configuration file*. The option \
 ``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).
 
-Without further specification, if the file *type* is comma-separated-values (``CSV``) and the file name has the
-``.csv`` extension and if the data is of the default format, ConCERO can import the entire file. The \
-'default format' is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:
+Without further specification, if the file *type* is comma-separated-values (``CSV``) *and* if the data is of the default format, ConCERO can import the entire file. The 'default format' is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:
 
     1. by the key-value pair ``type: <ext>`` in the *file object*, and if not provided then
-    2. by the key-value pair ``type: <ext>`` in the *definition object*, and if not provided then
-    3. by determining the extension of the value of ``file`` in the *file object*, and then if not determined
+    2. by the key-value pair ``type: <ext>`` in the *ToCERO object*, and if not provided then
+    3. by determining the extension of the value of ``file`` in the *file object*, and if not determined then
     4. an error is raised.
 
 Providing the ``type`` option allows the user to potentially extend the program to import files that the \
-program author was not aware existed, and are of a similar format to one of the known and supported formats. \
-For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them),\
+program author was not aware existed, if the file is of a similar format to one of the known and supported formats. \
+For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), \
 ``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, \
 ``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on \
 whether the underlying library allows importing that file type.
 
-With respect to step 2, it can be said that the file object *inherits* from the ToCERO \
+With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO \
 object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant \
 information in the case that some properties apply to all the input files. Given that every key-value pair \
 has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an \
@@ -82,12 +80,12 @@ example of a YAML file including all points discussed so far is:
         - file: b_file
           type: 'csv'
 
-In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported. \
+In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported (assuming they are both of default format). \
 The file extension can be discerned with respect to ``a_file.csv``, and \
 ``b_file`` has the corresponding ``type`` specified. Note that the ``type`` option (for ``b_file`` is indented at \
 the same level as file option, *not* the list).
 
-A minimal configuration form that demonstrates inheritance (and assuming ``c_file`` is of ``csv`` type) is:
+A minimal configuration form that demonstrates inheritance (and assuming ``c_file`` is of default ``csv`` type) is:
 
 .. code-block:: yaml
 
@@ -129,24 +127,23 @@ options are:
 
 **series: (list)**
 
-the list specifies the series in the index that are \
-    relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to \
-    as a *series object*, which is a dictionary with the following options:
+   the list specifies the series in the index that are \
+   relevant, so therefore providing a way to select data for export to the CERO. Each item in the list is referred to \
+   as a *series object*, which is a dictionary with the following options:
 
         **name: (str)**
 
-        ``name`` identifies the elements of the index that will be converted into a CERO. ``name`` is a mandatory option.
+           ``name`` identifies the elements of the index that will be converted into a CERO. ``name`` is a mandatory option.
 
         **rename: (str)**
 
-        If provided, after export into the CERO changes ``name`` to value provided by ``rename``.
+           If provided, after export into the CERO changes ``name`` to value provided by ``rename``.
 
-A series object can be provided as a string, but this is equivalent to the series object ``{'name': series_name}``.
+A series object can be provided as a string - this is equivalent to the series object ``{'name': series_name}``.
 
 **orientation: (str)**
 
-``'rows'`` by default. If the data is in columns with respect to time, change this \
-    option to ``'cols'``, (and therefore effectively calling a transposition operation).
+   ``'rows'`` by default. If the data is in columns with respect to time, change this option to ``'cols'``, (and therefore effectively calling a transposition operation).
 
 **skip_cols: (str|list)**
 
@@ -156,27 +153,19 @@ And other ``pandas.read_csv()`` options that are regularly used include:
 
 **usecols: (list)**
 
-From pandas documentation - Return a subset of the columns. If array-like, all \
-    elements must either be positional (i.e. integer indices into the document columns) or strings that \
-    correspond to column names provided either by the user in names or inferred from the document header \
-    row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’].
-Note that ``usecols`` will take precedence over ``skip_cols``, and that the argument format for ``usecols`` \
-    for a ``csv`` file differs slightly to that for an ``xlsx`` file.
+   From pandas documentation - Return a subset of the columns. If array-like, all elements must either be positional (i.e. integer indices into the document columns) or strings that correspond to column names provided either by the user in names or inferred from the document header row(s). For example, a valid array-like usecols parameter would be [0, 1, 2] or [‘foo’, ‘bar’, ‘baz’]. Note that ``usecols`` will take precedence over ``skip_cols``, and that the argument format for ``usecols`` for a ``csv`` file differs slightly to that for an ``xlsx`` file.
 
 **index_col: (int|list)**
 
-The column or list of columns (zero-indexed) in which the identifiers \
-    reside or, if ``orientation=="cols"``, the column with the date index.
+   The column or list of columns (zero-indexed) in which the identifiers reside or, if ``orientation=="cols"``, the column with the date index.
 
 **header: (int|list)**
 
-The row or list of rows (zero-indexed) in which the date index resides or, if \
-    ``orientation=="cols"``, the rows with the data identifiers.
+   The row or list of rows (zero-indexed) in which the date index resides or, if ``orientation=="cols"``, the rows with the data identifiers.
 
 **nrows: (int)**
 
-Number of rows of the file to read. May be useful with very large ``csv`` files that have a \
-    lot of irrelevant data.
+   Number of rows of the file to read. May be useful with very large ``csv`` files that have a lot of irrelevant data.
 
 For further documentation, please consult the \
 `pandas documentation <http://pandas.pydata.org/pandas-docs/version/0.22/generated/pandas.read_csv.html>`_ \
@@ -194,12 +183,12 @@ options, please consult `the pandas documentation <https://pandas.pydata.org/pan
 
 **sheet: (str)** or **sheet_name: (str)**
 
-The name of the sheet in the workbook to be imported.
+   The name of the sheet in the workbook to be imported.
 
 **usecols: (list[int]|str)**
 
-Similar to the ``csv`` form of the option, ``usecols`` accepts a list of zero-indexed integers to identify the \
-columns to be imported. Unlike the csv option, ``usecols`` will **not** accept a ``list`` of ``str``, but will accept \
+   Similar to the ``csv`` form of the option, ``usecols`` accepts a list of zero-indexed integers to identify the \
+columns to be imported. **Unlike the csv option**, ``usecols`` will **not** accept a ``list`` of ``str``, but will accept \
 a single ``str`` with an excel-like specification of columns. For example, ``usecols: A,C,E:H`` specifies the \
 import of columns ``A``, ``C`` and all columns between ``E`` and ``H`` *inclusive*.
 
@@ -264,17 +253,20 @@ File Independent Options:
 
 The options in this section are relevant to all input files, regardless of their type. They are:
 
-**time_regex: (str)**, **time_fmt: (str)** and **default_year: (int)**
+**time_regex: (str)**
+
+**time_fmt: (str)**
+
+**default_year: (int)**
 
 A fundamental principle ConCERO relies upon is that all data has some reference to time (noting that all data to date has been observed to reference the year only). The time-index data will typically be in a string format, and the year is interpreted by \
 searching through the string, using the regular expression ``time_regex``. The default - ``'.*(\d{4})$'`` - will \
 attempt to interpret the last four characters of the string as the year. Importantly, the match returns the \
 year as the 1st 'group' (regular expression lingo). It is the first group that ``time_fmt`` is used with to \
-convert the string to a datetime object. The default - ``'%Y'`` assumes that the string is 4 digits \
-corresponding to the year.
+convert the string to a datetime object. The default - ``'%Y'`` assumes that the string contains 4 digits \
+corresponding to the year (and only that).
 
-In the event that it date-time data isn't stored in the file \
-itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \
+In the event that the date-time data isn't stored in the file itself, a ``default_year`` option (a single integer corresponding to the year - e.g. ``2017``) **must** be provided. \
 
 What follows is an example, using the defaults of ``time_regex`` and ``time_fmt``, to \
 demonstrate how this works...
@@ -301,7 +293,7 @@ following options are appropriate to include in the YAML configuration file.
         time_regex: .*(\d{4})$
         time_fmt: '%Y'
 
-*Note*: if the default settings (as shown immediately above) are appropriate, specifying them is not necessary.
+*Note*: if the default settings (as per the example immediately above) are appropriate, specifying them is **not** necessary.
 
 .. [1] For a more thorough yet simple introduction to YAML files, `<http://docs.ansible.com/ansible/latest/YAMLSyntax.html>`_\
  is recommended.
@@ -865,17 +857,16 @@ class ToCERO(dict):
 
         """Loads a ToCERO configuration, suitable for creating CEROs from data files.
 
-        :param 'Union[dict,str]' conf: The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an obsolute path, or relative to the current working directory.
+        :param 'Union[dict,str]' conf: The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an absolute path, or relative to the current working directory.
         :param args: Passed to the superclass (`dict`) at initialisation.
         :param kwargs: Passed to the superclass (`dict`) at initialisation.
         """
 
         _conf = ToCERO.load_config(conf, parent=parent)
-
-        msg = "Loaded ToCERO configuration: %s" % _conf
-        ToCERO._logger.debug(msg)
-
         super().__init__(_conf, *args, **kwargs)
+
+        msg = "Loaded ToCERO configuration: %s" % self
+        ToCERO._logger.debug(msg)
 
     def create_cero(self):
         """
@@ -955,11 +946,11 @@ class ToCERO(dict):
     @staticmethod
     def is_valid(conf, raise_exception=True):
         """
-        Tests the validity of ``conf`` as a ``ToCERO`` object.
+        Performs static validity checks on ``conf`` as a ``ToCERO`` object.
 
         :param dict conf: An object, which may or may not suitable as a ToCERO object.
-        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) `False` is returned.
-        :return:
+        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and `False` is returned.
+        :return bool: A `bool` indicating the validity of ``conf`` as a ``ToCERO`` object.
         """
 
         if not issubclass(type(conf["files"]), list):
@@ -991,6 +982,13 @@ class ToCERO(dict):
 
     @staticmethod
     def run_checks(conf, raise_exception=True):
+        """
+        Performs dynamic validity checks on ``conf`` as a ``ToCERO`` object.
+
+        :param dict conf: An object, which may or may not suitable as a ToCERO object.
+        :param bool raise_exception: If `True` (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and `False` is returned.
+        :return bool: A `bool` indicating the validity of ``conf`` as a ``ToCERO`` object.
+        """
 
         for file_obj in conf["files"]:
 
@@ -1011,7 +1009,7 @@ class ToCERO(dict):
         """
         Locates first occurance of ``file`` on ``search_paths`` and returns relative OS-specific path.
 
-        :return str:
+        :return str: The relative path to file.
         """
         orig_filename = file
         file = os.path.relpath(os.path.normpath(file))

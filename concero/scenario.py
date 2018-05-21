@@ -263,9 +263,8 @@ class Scenario(dict):
     @staticmethod
     def load_scenario(scen_def: str, scenarios_set: 'ScenariosSet' = None, parent=None):
         """
-        :param scen_def: The file containing a single scenario definition, or a scenario definition `dict`.
-        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \
-        definition.
+        :param scen_def: The file containing a single scenario definition, or a scenario definition `dict` .
+        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` definition.
         :return 'Scenario': A single ``Scenario`` object.
         """
 

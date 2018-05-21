@@ -12,7 +12,7 @@ It is **necessary** (for the configuration to output anything meaningful) to def
     * ``procedures: (list[dict|str])``, where ``procedures`` is a list of one or more *procedure* objects. \
     :ref:`procedure objects` are explained below .
 
-Procedures define the mutation and, if desired, the export of the mutated data to a file. It a procedure does not specify a file to export data to, then ConCERO will, by default, output the procedure to a ``file`` specified as part of the FromCERO object, if given. If ``file`` is not defined for the FromCERO object, then ConCERO will output the procedure to ``output.csv`` in the current working directory.
+Procedures define the mutation(s) and, if desired, the export of the mutated data to a file. If a procedure does not specify an export file then ConCERO will, by default, output the procedure to ``output.csv`` in the current working directory. The default output file can be overwridden by specifying the ``file`` option of the FromCERO object.
 
 It is *recommended* that the following option be specified:
 
@@ -21,7 +21,7 @@ It is *recommended* that the following option be specified:
      the exported file type. Supported file types are:
 
         * Numpy arrays - ``npy``
-        * GAMS Data eXchange format -``gdx`` (temporarily unsupported)
+        * GAMS Data eXchange format - ``gdx`` (temporarily unsupported)
         * HAR files - ``har``
         * Shock files - ``shk``
         * Portable Network Graphics format - ``png``
@@ -34,7 +34,7 @@ Other options include:
 
     * ``sets: (dict: str -> List[str])`` - sets is a dictionary mapping ``str`` to a ``list`` of  ``str``. ``sets`` provides \
     an easy and convenient way to select groups of CERO identifiers (see :ref:`cero_ids`), as opposed to simply listing \
-    all the identifiers that are of interest for output. More detail about sets is provided below - :ref:`sets`.
+    all the identifiers that are of interest for output. More detail about sets is provided below in the section :ref:`sets`.
     * ``map: (dict: str -> str)`` - key-value pairs that maps the "old" identifier to a "new" identifier.
     * ``ref_dir: (str)`` where ``ref_dir`` is a file path relative to the current working directory. By default, all \
     file names are interpreted as being relative to the configuration file. Providing this option overrides the default.
@@ -110,7 +110,7 @@ Inheritance paths
 
 Below is an outline of how options are inherited:
 
-    * ``inputs`` - If inputs is undefined, then ``inputs`` is the identifier ``name``.
+    * ``inputs`` - If inputs is undefined, then ``inputs`` is the entire CERO (whatever that may be at runtime).
     * ``outputs`` - If outputs is undefined, it is assumed to be equivalent to ``inputs``. By extension, if ``inputs`` \
     is undefined, then ``outputs`` is the identifer ``name``.
     * ``operations`` - Inherits from the outputs object, if unspecified. It is not necessary to specify a value \
@@ -244,7 +244,7 @@ A libfuncs file is a standard python source file. However, to use the definition
     def double_values(x):
         return 2*x
 
-Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible. For more information on how to use the wrappers, please consult :ref:`lfwrappers` .
+Where the ``double_values`` function will simply double the value of all input series. Note that ``series_op`` and ``dataframe_op`` are also wrappers to encapsulate functions to ensure they are ConCERO-compatible. For more information on how to use the wrappers, please consult :ref:`func_classes` .
 
 .. _output_process_flow:
 
