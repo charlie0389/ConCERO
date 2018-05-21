@@ -143,22 +143,22 @@ class Test_Identifier(DefaultTestCase):
     def test_get_matching_idents(self):
         universal_set = ["abc", "abd", "def", "1ab", "123", "de3"]
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "*")
+        fil_set = _Identifier.get_matching_strs(universal_set, "*")
         self.assertEqual(fil_set, ["abc", "abd", "def", "1ab", "123", "de3"])
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "ab*")
+        fil_set = _Identifier.get_matching_strs(universal_set, "ab*")
         self.assertEqual(fil_set, ["abc", "abd"])
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "*3")
+        fil_set = _Identifier.get_matching_strs(universal_set, "*3")
         self.assertEqual(fil_set, ["123", "de3"])
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "1*")
+        fil_set = _Identifier.get_matching_strs(universal_set, "1*")
         self.assertEqual(fil_set, ["1ab", "123"])
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "de[f3]")
+        fil_set = _Identifier.get_matching_strs(universal_set, "de[f3]")
         self.assertEqual(fil_set, ["def", "de3"])
 
-        fil_set = _Identifier.get_matching_idents(universal_set, "f*")
+        fil_set = _Identifier.get_matching_strs(universal_set, "f*")
         self.assertEqual(fil_set, [])
 
     def test_get_identifiers(self):

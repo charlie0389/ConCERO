@@ -371,5 +371,27 @@ class TestLibfuncsWrappers(DefaultTestCase):
         self.assertTrue(df.equals(cero))  # Check cero hasn't been modified
         self.assertTrue(test_df.equals(df_new))
 
+    def test_series_to_dataframe(self):
+
+        @libfuncs_wrappers.dataframe_op
+        def first_series(df):
+            return df.iloc[0, :] # Returns a pandas.Series
+
+        test_df = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                          "B": [6, 4, 5, 6, 7],
+                                          },
+                                         orient="index",
+                                         dtype=pd.np.float32)
+
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        ret = first_series(test_df)
+
+        self.assertTrue(isinstance(ret, pd.DataFrame))
+        self.assertEqual(ret.shape, (1, 5))
+        self.assertEqual(ret.iloc[0].tolist(), [1, 2, 3, 4, 5])
+        self.assertEqual(ret.index.tolist(), ["A"])
+
 if __name__ == '__main__':
     unittest.main()

@@ -89,7 +89,7 @@ class _Identifier(object):
                 # Assume field must be glob pattern...
 
                 universal_set = [us for us in universal_set if (len(us) == len(tupled_name))] # Only idents with same number of fields can be considered matched
-                matches = _Identifier.get_matching_idents([us[fno] for us in universal_set], field)
+                matches = _Identifier.get_matching_strs([us[fno] for us in universal_set], field)
 
                 # Uniqify the matches...
                 u_matches = []
@@ -214,11 +214,11 @@ class _Identifier(object):
         return True
 
     @staticmethod
-    def get_matching_idents(idents: list, pattern):
+    def get_matching_strs(strs: list, pattern):
         """
 
-        :param list idents: A `list` of valid ``_Identifier``.
+        :param list strs: A `list` of valid `str`.
         :param pattern: The glob pattern for matching.
         :return list: A filtered `list` - only items of ``idents`` that match ``pattern`` are returned.
         """
-        return fnmatch.filter(idents, pattern)
+        return fnmatch.filter(strs, pattern)

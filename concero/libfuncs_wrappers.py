@@ -272,7 +272,9 @@ def dataframe_op(func):
         ret = func(df_cp, *args, **kwargs)
         if ret is None:
             return ret
-        # TODO: If series, convert to dataframe
+        elif issubclass(type(ret), pd.Series):
+            # If series, convert to dataframe
+            ret = pd.DataFrame(data=[ret])
 
         CERO.is_cero(ret) # Performs checks to ensure ret is a valid CERO
         return ret
