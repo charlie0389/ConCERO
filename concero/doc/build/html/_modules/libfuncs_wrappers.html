@@ -83,7 +83,7 @@
 <span class="sd">.. code-block:: python</span>
 
 <span class="sd">    @dataframe_op</span>
-<span class="sd">    def merge(df, *args, **kwargs):</span>
+<span class="sd">    def merge(df):</span>
 <span class="sd">        df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series</span>
 <span class="sd">        return df</span>
 

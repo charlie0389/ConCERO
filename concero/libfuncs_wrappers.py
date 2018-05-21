@@ -50,14 +50,14 @@ The ``libfuncs`` function ``merge`` provides a simple example of how to apply th
 .. code-block:: python
 
     @dataframe_op
-    def merge(df, *args, **kwargs):
+    def merge(df):
         df.iloc[0, :] = df.sum(axis=0) # Replaces the first series with the sum of all the series
         return df
 
 Class 2 Functions - Series Operations
 -------------------------------------
 
-Class 2 functions operate on a single ``pandas.Series`` object - note that a single row of a ``pandas.DataFrame`` is \
+Class 2 functions operate on a single ``pandas.Series`` object. Note that a single row of a ``pandas.DataFrame`` is \
 an instance of a ``pandas.Series``. The series operations class can be considered a subset of DataFrame operations, \
 and a superset of all recursive operations (discussed below).
 
@@ -235,9 +235,9 @@ def dataframe_op(func):
         provided (corresponding to the row number of ``df``). An \
         error is raised if both ``locs`` and ``ilocs`` is specified.
         :param start_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \
-        ``start_year`` restricts the CERO to years after *and including* ``start_year``.
+        ``start_year`` restricts the CERO to years after and including ``start_year``.
         :param end_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \
-        ``end_year`` restricts the CERO to years before, *but excluding* ``end_year``.
+        ``end_year`` restricts the CERO to years up to and including ``end_year``.
         :param kwargs: Keyword arguments to be passed to the encapsulated function.
         :return: The return value of the encapsulated function.
         """
@@ -357,13 +357,8 @@ def recursive_op(func):
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.
         :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.
         :param list post: ``post`` is post-pended to ``array`` before the recursive operation is applied.
-        :arg (bool) inplace: If ``True``, the operation will be applied on the array \
-        inplace, such that the result from a previous iteration is used in subsequent \
-        iterations. If ``False``, the operation proceeds ignorant of the results of \
-        previous iterations. ``True`` by default.
-        :returns (pandas.Series): Returns the result of the recursively-\
-        applied function. Will copy ``name`` and ``index`` \
-        properties of the provided ``pandas.Series`` object to the returned object.'''
+        :arg (bool) inplace: If `True` (the default), the operation will be applied on the array inplace, such that the result from a previous iteration is used in subsequent iterations. If `False`, the operation proceeds ignorant of the results of previous iterations.
+        :returns (pandas.Series): Returns the result of the recursively-applied function. Will copy ``name`` and ``index`` properties of the provided ``pandas.Series`` object to the returned object.'''
 
         if [bool(init), bool(auto_init), bool(init_cols)].count(True) >= 2:
             msg = "Only one of the keyword arguments 'init', 'auto_init' and 'init_cols' must be provided."

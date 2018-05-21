@@ -666,11 +666,10 @@ class FromCERO(dict):
 
     def __init__(self, conf: dict, *args, parent=None, **kwargs):
         """
-
-        :arg 'Union[str, dict]' conf: A dictionary containing the configuration. If a `str` is provided, it is interpreted as the filename, relative to the current working directory, of a configuration file (in YAML format).
-        :arg dict parent: If provided, the created object will inherit from the parent `dict`.
-
         Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the `dict` class).
+
+        :arg "Union[str,dict]" conf: A dictionary containing the configuration. If a `str` is provided, it is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory).
+        :arg dict parent: If provided, the created object will inherit from ``parent`` (a `dict`).
         """
 
         _conf = FromCERO.load_config(conf, parent=parent)
@@ -681,10 +680,9 @@ class FromCERO(dict):
         FromCERO._logger.debug("self.procedures: %s" % self["procedures"])
 
     def exec_procedures(self, cero):
-        """
-
-        :param pandas.DataFrame cero: A CERO object on which to apply the procedures. The argument is not mutated/modified.
-        :return:
+        """ Execute all the procedures of the FromCERO object
+        .
+        :param pandas.DataFrame cero: A CERO to serve as input for the procedures. The argument is not mutated/modified.
         """
 
         CERO.is_cero(cero, raise_exception=True, empty_ok=False)
@@ -753,9 +751,9 @@ class FromCERO(dict):
     @staticmethod
     def load_config(conf, parent=None):
         """
-        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as configuration filename. Otherwise conf must be a dictionary.
+        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory). Otherwise conf must be a dictionary.
 
-        :param 'Union[str, dict]' conf:
+        :param 'Union[str,dict]' conf:
         :return dict:
         """
 
@@ -823,15 +821,16 @@ class FromCERO(dict):
     @staticmethod
     def is_valid(conf: dict, raise_exception=True):
         """
-        Performs static checks on ``conf``.
+        Performs static checks on ``conf`` to verify if ``conf`` can be converted to a FromCERO object.
 
         Checks include:
-            * Valid configuration.
+            * Valid type.
+            * Valid procedures.
             * If ``file`` given, that the user has write permissions in that directory.
 
-        :param dict conf:
-        :param bool raise_exception:
-        :return bool:
+        :param dict conf: The object to check the validity of.
+        :param bool raise_exception: If `True` (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and `False` returned.
+        :return bool: `True` if ``conf`` passes all static checks.
         """
 
         if not issubclass(type(conf), dict):
@@ -865,9 +864,9 @@ class FromCERO(dict):
         """
         Performs runtime checks on ``conf``, given ``cero``.
 
-        :param dict conf:
-        :param bool raise_exception:
-        :return bool:
+        :param dict conf: The object to check the validity of.
+        :param bool raise_exception: If `True` (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and `False` returned.
+        :return bool: `True` if ``conf`` passes all runtime checks.
         """
         for procedure in conf["procedures"]:
             if not procedure.run_checks(cero, raise_exception=raise_exception):

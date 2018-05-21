@@ -699,11 +699,10 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :arg &#39;Union[str, dict]&#39; conf: A dictionary containing the configuration. If a `str` is provided, it is interpreted as the filename, relative to the current working directory, of a configuration file (in YAML format).</span>
-<span class="sd">        :arg dict parent: If provided, the created object will inherit from the parent `dict`.</span>
-
 <span class="sd">        Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the `dict` class).</span>
+
+<span class="sd">        :arg &quot;Union[str,dict]&quot; conf: A dictionary containing the configuration. If a `str` is provided, it is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory).</span>
+<span class="sd">        :arg dict parent: If provided, the created object will inherit from ``parent`` (a `dict`).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_conf</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
@@ -714,10 +713,9 @@
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;self.procedures: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="FromCERO.exec_procedures"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.exec_procedures">[docs]</a>    <span class="k">def</span> <span class="nf">exec_procedures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cero</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param pandas.DataFrame cero: A CERO object on which to apply the procedures. The argument is not mutated/modified.</span>
-<span class="sd">        :return:</span>
+        <span class="sd">&quot;&quot;&quot; Execute all the procedures of the FromCERO object</span>
+<span class="sd">        .</span>
+<span class="sd">        :param pandas.DataFrame cero: A CERO to serve as input for the procedures. The argument is not mutated/modified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">cero</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">empty_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -786,9 +784,9 @@
 <div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as configuration filename. Otherwise conf must be a dictionary.</span>
+<span class="sd">        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory). Otherwise conf must be a dictionary.</span>
 
-<span class="sd">        :param &#39;Union[str, dict]&#39; conf:</span>
+<span class="sd">        :param &#39;Union[str,dict]&#39; conf:</span>
 <span class="sd">        :return dict:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -856,15 +854,16 @@
 <div class="viewcode-block" id="FromCERO.is_valid"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs static checks on ``conf``.</span>
+<span class="sd">        Performs static checks on ``conf`` to verify if ``conf`` can be converted to a FromCERO object.</span>
 
 <span class="sd">        Checks include:</span>
-<span class="sd">            * Valid configuration.</span>
+<span class="sd">            * Valid type.</span>
+<span class="sd">            * Valid procedures.</span>
 <span class="sd">            * If ``file`` given, that the user has write permissions in that directory.</span>
 
-<span class="sd">        :param dict conf:</span>
-<span class="sd">        :param bool raise_exception:</span>
-<span class="sd">        :return bool:</span>
+<span class="sd">        :param dict conf: The object to check the validity of.</span>
+<span class="sd">        :param bool raise_exception: If `True` (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and `False` returned.</span>
+<span class="sd">        :return bool: `True` if ``conf`` passes all static checks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
@@ -898,9 +897,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs runtime checks on ``conf``, given ``cero``.</span>
 
-<span class="sd">        :param dict conf:</span>
-<span class="sd">        :param bool raise_exception:</span>
-<span class="sd">        :return bool:</span>
+<span class="sd">        :param dict conf: The object to check the validity of.</span>
+<span class="sd">        :param bool raise_exception: If `True` (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and `False` returned.</span>
+<span class="sd">        :return bool: `True` if ``conf`` passes all runtime checks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">procedure</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">procedure</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">cero</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>

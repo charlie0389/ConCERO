@@ -12,6 +12,7 @@ from collections import OrderedDict
 import itertools as it
 import re
 
+
 class _Identifier(object):
 
     @staticmethod

@@ -268,42 +268,36 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <dl class="class">
 <dt id="from_cero.FromCERO">
 <em class="property">class </em><code class="descclassname">from_cero.</code><code class="descname">FromCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>parent=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the <cite>dict</cite> class).</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dict</strong><strong>]</strong><strong>' conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em>) – A dictionary containing the configuration. If a <cite>str</cite> is provided, it is interpreted as the filename, relative to the current working directory, of a configuration file (in YAML format).</li>
-<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – If provided, the created object will inherit from the parent <cite>dict</cite>.</li>
+<li><strong>conf</strong> (<em>&quot;Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>]</em><em>&quot;</em>) – A dictionary containing the configuration. If a <cite>str</cite> is provided, it is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory).</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – If provided, the created object will inherit from <code class="docutils literal notranslate"><span class="pre">parent</span></code> (a <cite>dict</cite>).</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the <cite>dict</cite> class).</p>
 <dl class="method">
 <dt id="from_cero.FromCERO.exec_procedures">
 <code class="descname">exec_procedures</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.exec_procedures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.exec_procedures" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cero</strong> (<em>pandas.DataFrame</em>) – A CERO object on which to apply the procedures. The argument is not mutated/modified.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
+<dd><p>Execute all the procedures of the FromCERO object
+.
+:param pandas.DataFrame cero: A CERO to serve as input for the procedures. The argument is not mutated/modified.</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="from_cero.FromCERO.is_valid">
 <em class="property">static </em><code class="descname">is_valid</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.is_valid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs static checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code>.</p>
+<dd><p>Performs static checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code> to verify if <code class="docutils literal notranslate"><span class="pre">conf</span></code> can be converted to a FromCERO object.</p>
 <dl class="docutils">
 <dt>Checks include:</dt>
 <dd><ul class="first last simple">
-<li>Valid configuration.</li>
+<li>Valid type.</li>
+<li>Valid procedures.</li>
 <li>If <code class="docutils literal notranslate"><span class="pre">file</span></code> given, that the user has write permissions in that directory.</li>
 </ul>
 </dd>
@@ -313,12 +307,13 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – </li>
-<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </li>
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The object to check the validity of.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and <cite>False</cite> returned.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last"><cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">conf</span></code> passes all static checks.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -327,12 +322,12 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <dl class="staticmethod">
 <dt id="from_cero.FromCERO.load_config">
 <em class="property">static </em><code class="descname">load_config</code><span class="sig-paren">(</span><em>conf</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.load_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads configuration of FromCERO. If conf is a <cite>str</cite>, this is interpreted as configuration filename. Otherwise conf must be a dictionary.</p>
+<dd><p>Loads configuration of FromCERO. If conf is a <cite>str</cite>, this is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory). Otherwise conf must be a dictionary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dict</strong><strong>]</strong><strong>' conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>]</em><em>'</em>) – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body"></td>
 </tr>
@@ -349,12 +344,13 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – </li>
-<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </li>
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The object to check the validity of.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and <cite>False</cite> returned.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last"><cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">conf</span></code> passes all runtime checks.</p>
+</td>
 </tr>
 </tbody>
 </table>
