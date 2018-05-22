@@ -175,7 +175,7 @@ class _Identifier(object):
         except TypeError as e:
             raise e
 
-        return _Identifier.tupleize_name(idents)
+        return [_Identifier.tupleize_name(id) for id in idents]
 
     @staticmethod
     def remove_id_field(field_no: int, idents: "Union[tuple, List[tuple]]") -> tuple:
@@ -194,12 +194,33 @@ class _Identifier(object):
         return _Identifier.tupleize_name(idents)
 
     @staticmethod
-    def unique_id_fields(idents: list, key: int=None):
+    def unique_id_fields(idents: list, key: "Union[List[int], int]"=None):
+        """
+
+        :param idents: A list of _Identifier objects.
+        :param key: The zero-indexed number corresponding to the ident field (i.e. a tuple index), which limits the ``idents`` `list`. If `None` (the default), all idents (whether tuple or not) are considered.
+        :return: A list of the unique elements of ``idents``, restricted to tuple fields defined by ``key`` (if given).
+        """
 
         if key is not None:
-            idents = [id[key] for id in idents if issubclass(type(id), tuple)]
+            if issubclass(type(key), int):
+                key = [key]
 
-        return list(set(idents))
+            nids = []
+            for id in idents:
+                if issubclass(type(id), tuple):
+                    try:
+                        nids.append(tuple(id[k] for k in key))
+                    except IndexError:
+                        pass
+            idents = nids
+
+        uids = OrderedDict()
+
+        for id in idents:
+            uids[id] = True
+
+        return [_Identifier.tupleize_name(n) for n in list(uids.keys())]
 
     @staticmethod
     def is_valid(ident, raise_exception=True):

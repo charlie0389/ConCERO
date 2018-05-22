@@ -373,34 +373,37 @@ def noop(df):
     return df
 
 @dataframe_op
-def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: str=None, **kwargs):
-
-    # TODO: Expand support to include multiple tuple fields as keys
+def groupby(df: "CERO", *args, key: "Union[int, list[int]]"=None, match: str=None, agg: str=None, **kwargs):
 
     if key is None:
         raise TypeError("'key' must be provided to 'groupby' function as either an int or list of ints.")
-    elif key is not issubclass(type(key), list):
+    elif not issubclass(type(key), list):
         key = [key]
+
+    if not all([issubclass(type(k), int) for k in key]):
+        raise TypeError("'key' must be provided to 'groupby' function as either an int or list of ints.")
 
     defaults = {"axis": 0,
                 "sort": False,
                 "group_keys": False}
     defaults.update(kwargs)
 
+    match = _Identifier.tupleize_name(match)
     m_ids = [match]
     if match is None:
         m_ids = _Identifier.unique_id_fields(df.index.values, key=key)
 
+    conv = lambda x: tuple(x) if issubclass(type(x), str) else x
+    m_ids = [conv(m) for m in m_ids]
 
     rename_dict = {}
     for m in m_ids:
 
         # Create func that identifies rows for grouping
         def f(x):
-            # for k in key:
-            #     if x[k] != m[k]
-            return x[key[0]] == m
+            return all([x[k] == m[idx] for idx, k in enumerate(key)])
 
+        # TODO: Expand support to include multiple tuple fields as keys
         # Groupby and apply aggregation function
         agg_df = df.groupby(by=f, **defaults).agg(agg)
 
@@ -409,7 +412,7 @@ def groupby(df, *args, key: "Union[int, list[int]]"=None, match: str=None, agg: 
         df.iloc[df.index.get_loc(row_loc)] = agg_df.loc[True]
 
         # Rename row
-        rename_dict.update({row_loc: _Identifier.keep_only_fields(key[0], row_loc)})
+        rename_dict.update({row_loc: _Identifier.keep_only_fields(key, row_loc)[0]})
 
     CERO.rename_index_values(df, rename_dict, inplace=True)
     return df

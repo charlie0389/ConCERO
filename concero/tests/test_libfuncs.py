@@ -75,27 +75,51 @@ class TestLibfuncs(DefaultTestCase):
         tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
                                 "sheet": "groupby",
                                 "index_col": [0,1]}]})
+
         cero = tc.create_cero()
         cero = libfuncs.groupby(cero, key=0, match="a", agg="sum")
-
         test_list = ["a", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
         test_vals = [6, 2, 3, 4, 5]
-        # print(cero)
         self.assertTrue(
         all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
         self.assertTrue(all([x==y for (x,y)  in zip(test_list, cero.index.tolist())]))
 
-        tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
-                                "sheet": "groupby",
-                                "index_col": [0, 1]}]})
         cero = tc.create_cero()
         cero = libfuncs.groupby(cero, key=1, match="b", agg="mean")
-
         test_list = ["b", ("a", "c"), ("a", "d"), ("b", "b"), ("c", "b")]
         test_vals = [3.3333333333, 2, 3, 4, 5]
         self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
         self.assertTrue(
             all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+
+        cero = tc.create_cero()
+        cero = libfuncs.groupby(cero, key=0, agg="count")
+        test_list = ["a", ("a", "c"), ("a", "d"), "b", "c"]
+        test_vals = [3, 2, 3, 1, 1]
+        self.assertTrue(
+            all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
+
+        cero = tc.create_cero()
+        cero = libfuncs.groupby(cero, key=0, agg="count")
+        test_list = ["a", ("a", "c"), ("a", "d"), "b", "c"]
+        test_vals = [3, 2, 3, 1, 1]
+        self.assertTrue(
+            all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
+
+        tc = ToCERO({"files": [{"file": TestLibfuncs._dd + "test_groupby_and_aggregate.xlsx",
+                                "sheet": "groupby_2",
+                                "index_col": [0, 1, 2]}]})
+
+        cero = tc.create_cero()
+        cero = libfuncs.groupby(cero, key=[0, 1], agg="count")
+        test_list = [('a', 'b'), ('a', 'c'), ('a', 'd'), ('b', 'b'),
+                     ('c', 'b'), ('a', 'b', '2'), ('a', 'c', '2'), ('a', 'd', '3'), ('a', 'c', '3')]
+        test_vals = [2, 3, 2, 1, 1, 6, 7, 8, 9]
+        self.assertTrue(
+            all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
 
 
 if __name__ == '__main__':

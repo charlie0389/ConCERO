@@ -189,6 +189,38 @@ class Test_Identifier(DefaultTestCase):
         fil_ids = _Identifier.get_identifiers("a,b", universal_set=uset)
         self.assertEqual(fil_ids, [("a", "b")])
 
+    def test_unique_id_fields(self):
+
+        idents = ["a", ("a", "b"), ("a", "b", "c"), ("c", "d"), ("c", "e")]
+
+        uids = _Identifier.unique_id_fields(idents=idents)
+        self.assertEqual(uids, idents)
+
+        uids = _Identifier.unique_id_fields(idents=idents, key=0)
+        self.assertEqual(uids, ["a", "c"])
+
+        uids = _Identifier.unique_id_fields(idents=idents, key=1)
+        self.assertEqual(uids, ["b", "d", "e"])
+
+        uids = _Identifier.unique_id_fields(idents=idents, key=2)
+        self.assertEqual(uids, ["c"])
+
+        uids = _Identifier.unique_id_fields(idents=idents, key=[0, 1])
+        self.assertEqual(uids, [("a", "b"), ("c", "d"), ("c", "e")])
+
+    def test_keep_only_fields(self):
+
+        idents = [("a", "b"), ("a", "b", "c"), ("c", "d"), ("c", "e")]
+
+        ni = _Identifier.keep_only_fields(field_no=0, idents=idents)
+        self.assertEqual(ni, ["a", "a", "c", "c"])
+
+        ni = _Identifier.keep_only_fields(field_no=1, idents=idents)
+        self.assertEqual(ni, ["b", "b", "d", "e"])
+
+        ni = _Identifier.keep_only_fields(field_no=[0,1], idents=idents)
+        self.assertEqual(ni, [("a", "b"), ("a", "b"), ("c", "d"), ("c", "e")])
+
 
 if __name__ == "__main__":
     unittest.main()
