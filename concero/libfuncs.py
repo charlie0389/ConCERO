@@ -403,7 +403,6 @@ def groupby(df: "CERO", *args, key: "Union[int, list[int]]"=None, match: str=Non
         def f(x):
             return all([x[k] == m[idx] for idx, k in enumerate(key)])
 
-        # TODO: Expand support to include multiple tuple fields as keys
         # Groupby and apply aggregation function
         agg_df = df.groupby(by=f, **defaults).agg(agg)
 
