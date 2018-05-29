@@ -19,21 +19,16 @@ class Scenario(dict):
 
     _logger = conf.setup_logger(__name__)
 
-    def __init__(self, sc_def: dict, *args, scenarios_set: 'ScenariosSet' = None,
-                 parent: dict=None,
-                 **kwargs):
+    def __init__(self, sc_def: dict, *args, parent: dict=None, **kwargs):
         """
         :param sc_def: A scenario definition object.
         :param args: Passed to the superclass (dict) as positional arguments at initialisation.
-        :param scenarios_set: A ScenariosSet object, used to verify that ``sc_def`` is a valid \
-        definition.
         :param kwargs: Passed to the superclass (dict) as keyword arguments at initialisation.
         """
 
         defaults = {"search_paths": [],
                     "ref_dir": None,
                     "models": [],
-                    "scenarios_set": None,
                     "input_conf": [],
                     "output_conf": []}
 
@@ -48,9 +43,6 @@ class Scenario(dict):
             raise TypeError("Scenario definition provided in incorrect format - type %s instead of dict." % type(sc_def))
 
         defaults.update(sc_def)
-
-        if scenarios_set is not None:
-            defaults["scenarios_set"] = scenarios_set
 
         sc_def = defaults
         super().__init__(sc_def, *args, **kwargs)
@@ -85,12 +77,6 @@ class Scenario(dict):
             self["output_conf"][idx] = FromCERO(self["output_conf"][idx], parent=par_dict)
 
         self.is_valid()  # Check Scenario is valid
-
-        if self.get("scenarios_set"):
-            scenarios_set = ScenariosSet(scen_defs=self["scenarios_set"])
-
-        if scenarios_set is not None:
-            self.link_scenario_set(scenarios_set)
 
         if "run_no" not in self:
             # run_no defaults to 1 if not provided
@@ -182,19 +168,6 @@ class Scenario(dict):
             ToCERO.check_config(ic, raise_exception=raise_exception, runtime=True)
 
 
-    def link_scenario_set(self, scenarios_set: 'ScenariosSet') -> None:
-        """Link a ScenariosSet object (``scenarios_set``) to this Scenario (if it hasn't already been done).
-        """
-        scenarios_set.is_valid_def(self)  # Check if scenario definition is valid
-        self._linked_scenariosets = getattr(self, "_linked_scenariosets", [])
-        if not any([ss == scenarios_set for ss in self._linked_scenariosets]):
-            self._linked_scenariosets.append(scenarios_set)
-        else:
-            msg = "ScenariosSet already linked to Scenario."
-            print(msg)
-            Scenario._logger.error(msg)
-            raise RuntimeError(msg)
-
     def get_name(self, long_form: bool=True, raise_exception=False) -> str:
         """
         Returns the name of the ``Scenario``, which is dependent on the first linked ``ScenariosSet`` object.
@@ -229,12 +202,10 @@ class Scenario(dict):
         return self.get("_linked_scenariosets")
 
     @staticmethod
-    def load_scenarios(scen_def: str, scenarios_set: 'ScenariosSet' = None, parent=None):
+    def load_scenarios(scen_def: str, parent=None):
         """Load one or more scenarios from a file.
 
         :param scen_def: The file containing one or more scenario definitions.
-        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \
-        definition.
         :return "Union['Scenario',List['Scenario']]": Either a single ``Scenario`` , or a `list` of ``Scenario`` s.
         """
 
@@ -255,16 +226,15 @@ class Scenario(dict):
 
         if isinstance(scen_def, dict):
             # single scenario in file
-            return [Scenario.load_scenario(scen_def, scenarios_set=scenarios_set, parent=defaults)]
+            return [Scenario.load_scenario(scen_def, parent=defaults)]
         elif isinstance(scen_def, list):
             # List of scenarios
-            return [Scenario.load_scenario(scd, scenarios_set=scenarios_set, parent=defaults) for scd in scen_def]
+            return [Scenario.load_scenario(scd, parent=defaults) for scd in scen_def]
 
     @staticmethod
-    def load_scenario(scen_def: str, scenarios_set: 'ScenariosSet' = None, parent=None):
+    def load_scenario(scen_def: str, parent=None):
         """
         :param scen_def: The file containing a single scenario definition, or a scenario definition `dict` .
-        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` definition.
         :return 'Scenario': A single ``Scenario`` object.
         """
 
@@ -285,174 +255,4 @@ class Scenario(dict):
             raise TypeError(
                 "'scen_def' must be either a str to a file containing a scenario definition or a scenario definition dict.")
 
-        return Scenario(scen_def, scenarios_set=scenarios_set, parent=defaults)
-
-
-class ScenariosSet(list):
-
-    def __init__(self, scen_defs: str, *args, **kwargs):
-        """
-        A ``ScenariosSet`` object defines a set of valid ``Scenario``, and is therefore can be used to \
-        name a ``Scenario``, or check validity of a ``Scenario``.
-
-        :param scen_defs: The file containing the definition of valid scenarios.
-        :param args: Passed to the superclass (``list``) on initialisation.
-        :param kwargs: Passed to the superclass (``list``) on initialisation.
-        """
-
-        if isinstance(scen_defs, str):
-            scen_defs = os.path.abspath(scen_defs)
-            # scen_defs = os.path.relpath(os.path.normpath(scen_defs))
-            scen_defs = read_yaml(scen_defs)
-
-        if isinstance(scen_defs, dict):
-            # If dict, assumed to be single-workstream ScenarioSet
-            scen_defs = [scen_defs]
-
-        try:
-            assert(issubclass(type(scen_defs), list))
-        except AssertionError:
-            raise RuntimeError("'scen_defs' must be provided as a filename, or a list of workstreams, or a dict representing a single workstream.")
-
-        scen_defs = [_WorkStream(wkstrm_def) for wkstrm_def in scen_defs]
-
-        super().__init__(scen_defs, *args, **kwargs)
-
-    def is_valid(self):
-        """Checks object is a valid ScenarioSet. NOT implemented."""
-        #TODO: Write this
-        pass
-
-
-    def is_valid_def(self, scenario):
-        """Checks that ``scenario`` is a valid definition for this ``ScenarioSet``. A scenario is a valid definition\
-        if it is an element of the set defined by ``self``."""
-
-        try:
-            assert isinstance(scenario, Scenario)
-
-        except AssertionError:
-            raise TypeError("Invalid scenario definition. Argument 'scenario' is not of scenario.Scenario type.")
-
-        wkstrm_ids = [wkstrm["id"] for wkstrm in self]
-        try:
-            assert all([k in wkstrm_ids for k in scenario["def"].keys()])
-        except AssertionError:
-            raise TypeError("Non-existant workstreams defined in scenario.")
-
-        try:
-            assert all([wkstrm_id in scenario["def"].keys() for wkstrm_id in wkstrm_ids])
-        except AssertionError:
-            raise TypeError("Not all workstreams have been defined.")
-
-        for wkstrm in self:
-            id = wkstrm["id"]
-            wkstrm.is_valid_def(scenario["def"][id])
-
-        return True
-
-    def get_scenario_name(self, scenario: Scenario, long_form=True) -> str:
-        """
-        Given ``scenario``, returns the name of the ``scenario`` in a long or short form.
-        :param scenario: A ``Scenario`` object to retrieve the name of.
-        :param long_form: If ``True`` (default), return the long form name, otherwise return the short form.
-        :return: The name of the ``Scenario``.
-        """
-
-        assert self.is_valid_def(scenario)
-        try:
-            assert ("name" in scenario)
-        except AssertionError:
-            raise TypeError("Scenario must have a name to provide string representation.")
-
-        nm = scenario["name"] + "_"
-
-        for wkstrm in self:
-            id = wkstrm["id"]
-            nm += wkstrm.get_str(scenario["def"][id], long_form=long_form)
-        return nm
-
-    def __eq__(self, other):
-        try:
-            return [self.items()] == [other.items()]
-        except AttributeError:
-            return False
-
-
-class _WorkStream(dict):
-
-    def __init__(self, wkstrm_dict, *args, **kwargs):
-        super().__init__(wkstrm_dict, *args, **kwargs)
-        self.is_valid()
-        self["issues"] = [_Issue(issue) for issue in self["issues"]]
-
-    def is_valid(self):
-        try:
-            assert (type(self.get("issues")) is list)
-            assert (all([
-                "id" in self,
-                "issues" in self,
-            ]))
-        except AssertionError:
-            raise RuntimeError("Invalid workstream definition provided.")
-        return True
-
-    def is_valid_def(self, workstream):
-        issue_ids = [issue["id"] for issue in self["issues"]]
-        try:
-            assert all([k in issue_ids for k in workstream.keys()])
-        except AssertionError:
-            raise TypeError("Issues inappropriate for workstream %s defined." % self["id"])
-
-        try:
-            assert all([issue_id in workstream.keys() for issue_id in issue_ids])
-        except AssertionError:
-            raise TypeError("Not all issues for workstream %s have been defined." % self["id"])
-
-        for issue in self["issues"]:
-            id = issue["id"]
-            issue.is_valid_def(workstream[id])
-
-        return True
-
-    def get_str(self, workstrm_def, long_form=True):
-        nm = self["id"] + "_"
-        for issue in self["issues"]:
-            id = issue["id"]
-            nm += issue.get_str(workstrm_def[id], long_form=long_form)
-        return nm
-
-
-class _Issue(dict):
-
-    def __init__(self, issue_dict, *args, **kwargs):
-        super().__init__(issue_dict, *args, **kwargs)
-        self.is_valid()
-
-    def is_valid(self):
-        try:
-
-            assert (all([
-                "id" in self,
-                "values" in self,
-                type(self["values"]) is list,
-            ]))
-            assert (type(value) in [str, float, int, bool] for value in self.get("values", []))
-        except AssertionError:
-            raise RuntimeError("Invalid issue definition provided.")
-
-    def is_valid_def(self, issue):
-        try:
-            assert (issue in self["values"])
-        except AssertionError:
-            raise TypeError("Inappropriate value for issue %s defined." % self["id"])
-        return True
-
-    def get_str(self, issue_def, long_form=True):
-        nm = self["id"] if long_form else ""
-        if isinstance(issue_def, bool):
-            nm += "B" if issue_def else "O"
-        else:
-            nm += issue_def
-        return nm
-
+        return Scenario(scen_def, parent=defaults)

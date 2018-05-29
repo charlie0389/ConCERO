@@ -8,7 +8,7 @@ Created on Feb 05 10:42:27 2018
 import os
 
 import concero.conf as conf
-from concero.scenario import ScenariosSet, Scenario
+from concero.scenario import Scenario
 
 def run(scenario, **kwargs):
 
@@ -25,14 +25,9 @@ def run(scenario, **kwargs):
     conf.set_logd(ns["log_directory"])
 
     _pd = os.path.dirname(__file__) + os.sep  # parent directory
-    # Load ScenariosSet (used to check a Scenario definition is valid)
-    if ns.get("scenarios_set"):
-        ss = ScenariosSet(scen_defs=ns["scenarios_set"])
-    else:
-        ss = None
 
     # Load Scenario(s)
-    scens = Scenario.load_scenarios(ns["scenario"], scenarios_set=ss)
+    scens = Scenario.load_scenarios(ns["scenario"])
 
     if ns["fake_run"] or ns["check"]:
         for sc in scens:

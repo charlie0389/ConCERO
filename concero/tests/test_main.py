@@ -26,39 +26,30 @@ class TestMain(DefaultTestCase):
 
         scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
 
-        ssf = TestMain._dd + "test_scenario_set.yaml"
-        ss = sn.ScenariosSet(scen_defs=ssf)
-
-        concero.main.run(scen_file, scenarios_set=ss)
+        concero.main.run(scen_file)
 
         # Clean up...
         os.remove('test_scen_outputs.har')
         os.remove('test_model_input.har')
         os.remove('test_model_output.har')
-        os.remove('A1_P_IMRLELSLWEC_PXRLDLLLHLR_GHPETMAMEFB_GOTOSOHOCOG_IPPMMHGHWXCX_001_step_00.xlsx')
+        os.remove('A1_001_step_00.xlsx')
         os.remove("dummy_model_run.py")
 
     def test_fake_run(self):
         scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
 
-        ssf = TestMain._dd + "test_scenario_set.yaml"
-        ss = sn.ScenariosSet(scen_defs=ssf)
-
         concero.main.run(scen_file, fake_run=True)
 
-        concero.main.run(scen_file, scenarios_set=ss, fake_run=True)
+        concero.main.run(scen_file, fake_run=True)
 
         # TODO: Come up with more thorough way of checking the scenario hasn't run
 
     def test_check(self):
         scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
 
-        ssf = TestMain._dd + "test_scenario_set.yaml"
-        ss = sn.ScenariosSet(scen_defs=ssf)
-
         concero.main.run(scen_file, fake_run=True)
 
-        concero.main.run(scen_file, scenarios_set=ss, check=True)
+        concero.main.run(scen_file, check=True)
 
         # TODO: Come up with more thorough way of checking that checks have occured
 

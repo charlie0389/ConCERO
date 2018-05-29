@@ -27,12 +27,9 @@ class TestScenario(DefaultTestCase):
         src = concero.conf.find_file("dummy_model.py")
         shutil.copy2(src, "dummy_model_run.py")
 
-        ssf = TestScenario._dd + "test_scenario_set.yaml"
-        ss = sn.ScenariosSet(scen_defs=ssf)
-
         # Load Scenario(s)
         scen_file = TestScenario._dd + "test_scenarios.yaml"
-        scens = sn.Scenario.load_scenario(scen_file, scenarios_set=ss)
+        scens = sn.Scenario.load_scenario(scen_file)
 
         # Run the scenario
         scens.run()
@@ -44,18 +41,14 @@ class TestScenario(DefaultTestCase):
         caps = har.getHeaderArrayObj("CAPS")
 
         self.assertEqual([s["name"] for s in caps["sets"]], ["IND_TYPE", "REGIONS", "TIME"])
-        # self.assertEqual(caps.SetNames, ["IND_TYPE", "REGIONS", "TIME"])
 
         ct_lst = ["SheepCattle", "DairyCattle", "OtherAnimals"]
         self.assertEqual(caps.getSet("IND_TYPE")["dim_desc"], ct_lst)
-        # self.assertEqual(caps.SetElements["IND_TYPE"], ct_lst)
 
         rg_lst = ["NSW", "VIC"]
         self.assertEqual(caps.getSet("REGIONS")["dim_desc"], rg_lst)
-        # self.assertEqual(caps.SetElements["REGIONS"], rg_lst)
 
         self.assertEqual(caps.getSet("TIME")["dim_desc"], ["Y2017"])
-        # self.assertEqual(caps.SetElements["TIME"], ["Y2017"])
 
         self.assertTrue(np.isclose(5557.53515625, caps["array"][0, 0, 0]))
         self.assertTrue(np.isclose(6572.65625000, caps["array"][0, 1, 0]))
@@ -66,7 +59,7 @@ class TestScenario(DefaultTestCase):
         os.remove('test_scen_outputs.har')
         os.remove('test_model_input.har')
         os.remove('test_model_output.har')
-        os.remove('A1_P_IMRLELSLWEC_PXRLDLLLHLR_GHPETMAMEFB_GOTOSOHOCOG_IPPMMHGHWXCX_001_step_00.xlsx')
+        os.remove('A1_001_step_00.xlsx')
         os.remove("dummy_model_run.py")
 
 
