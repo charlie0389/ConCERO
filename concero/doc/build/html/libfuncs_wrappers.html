@@ -72,7 +72,7 @@
 </div>
 <div class="section" id="class-2-functions-series-operations">
 <h2>Class 2 Functions - Series Operations<a class="headerlink" href="#class-2-functions-series-operations" title="Permalink to this headline">¶</a></h2>
-<p>Class 2 functions operate on a single <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object - note that a single row of a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> is an instance of a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>. The series operations class can be considered a subset of DataFrame operations, and a superset of all recursive operations (discussed below).</p>
+<p>Class 2 functions operate on a single <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object. Note that a single row of a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> is an instance of a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>. The series operations class can be considered a subset of DataFrame operations, and a superset of all recursive operations (discussed below).</p>
 <p>Similar to class 1 functions, class 2 functions must fit the form:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@series_op</span>
 <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

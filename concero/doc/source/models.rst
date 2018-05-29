@@ -73,7 +73,7 @@ The results from AUSTIMES are files that look like
 C154.nexus.csiro.au\c:\VEDA\VEDA_FE\GAMS_WRKANO2\AusT_ET_zTw.VD
 
 Models Technical Reference
-==========================
+--------------------------
 
-.. autoclass:: model
+.. autoclass:: model.Model
     :members:

@@ -881,7 +881,6 @@ class ToCERO(dict):
             cero_series.append(cero)
 
         cero = CERO.combine_ceros(cero_series, overwrite=[fo["overwrite"] for fo in self["files"]])
-        # cero = CERO.combine_ceros(cero_series, overwrite=False)
         return cero
 
     @staticmethod

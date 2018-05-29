@@ -50,7 +50,7 @@
 
 <div class="viewcode-block" id="Scenario"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario">[docs]</a><span class="k">class</span> <span class="nc">Scenario</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sc_def</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -86,7 +86,7 @@
             <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;scenarios_set&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenarios_set</span>
 
         <span class="n">sc_def</span> <span class="o">=</span> <span class="n">defaults</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">sc_def</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sc_def</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">])]</span>
@@ -263,12 +263,12 @@
 
 <div class="viewcode-block" id="Scenario.load_scenarios"><a class="viewcode-back" href="../scenarios.html#scenario.Scenario.load_scenarios">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load_scenarios</span><span class="p">(</span><span class="n">scen_def</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenarios_set</span><span class="p">:</span> <span class="s1">&#39;ScenariosSet&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Load one or more scenarios from a file.</span>
 
 <span class="sd">        :param scen_def: The file containing one or more scenario definitions.</span>
 <span class="sd">        :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \</span>
 <span class="sd">        definition.</span>
-<span class="sd">        :return &quot;Union[&#39;Scenario&#39;, List[&#39;Scenario&#39;]]&quot;: Either a single ``Scenario``, or a ``list`` of ``Scenario``s.</span>
+<span class="sd">        :return &quot;Union[&#39;Scenario&#39;,List[&#39;Scenario&#39;]]&quot;: Either a single ``Scenario`` , or a `list` of ``Scenario`` s.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -349,7 +349,7 @@
 
         <span class="n">scen_defs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_WorkStream</span><span class="p">(</span><span class="n">wkstrm_def</span><span class="p">)</span> <span class="k">for</span> <span class="n">wkstrm_def</span> <span class="ow">in</span> <span class="n">scen_defs</span><span class="p">]</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scen_defs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ScenariosSet.is_valid"><a class="viewcode-back" href="../scenarios.html#scenario.ScenariosSet.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks object is a valid ScenarioSet. NOT implemented.&quot;&quot;&quot;</span>
@@ -415,7 +415,7 @@
 <span class="k">class</span> <span class="nc">_WorkStream</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wkstrm_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">wkstrm_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wkstrm_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Issue</span><span class="p">(</span><span class="n">issue</span><span class="p">)</span> <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">]]</span>
 
@@ -459,7 +459,7 @@
 <span class="k">class</span> <span class="nc">_Issue</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issue_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">issue_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">issue_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

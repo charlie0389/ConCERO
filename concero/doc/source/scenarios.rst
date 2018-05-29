@@ -30,8 +30,8 @@ And may have the options:
 
 .. _scenario_example:
 
-Scenario Example:
-^^^^^^^^^^^^^^^^^
+Scenario Example
+^^^^^^^^^^^^^^^^
 
 An example scenario definition file, with a single scenario definition object, is:
 

@@ -110,9 +110,68 @@ Scen_transport_ci_sc.xls</p>
 <p>C154.nexus.csiro.auc:VEDAVEDA_FEGAMS_WRKANO2AusT_ET_zTw.VD</p>
 </div>
 </div>
-</div>
 <div class="section" id="models-technical-reference">
-<h1>Models Technical Reference<a class="headerlink" href="#models-technical-reference" title="Permalink to this headline">¶</a></h1>
+<h2>Models Technical Reference<a class="headerlink" href="#models-technical-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="model.Model">
+<em class="property">class </em><code class="descclassname">model.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>model: dict</em>, <em>*args</em>, <em>parent: Union[model.Model</em>, <em>NoneType] = None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – A <cite>dict</cite> containing <code class="docutils literal notranslate"><span class="pre">Model</span></code> options.</li>
+<li><strong>args</strong> – Passed to superclass (<cite>dict</cite>) at initialisation.</li>
+<li><strong>parent</strong> (<em>&quot;Model&quot;</em>) – If provided, inherits all key-value pairs from <code class="docutils literal notranslate"><span class="pre">parent</span></code>.</li>
+<li><strong>kwargs</strong> – Passed to superclass (<cite>dict</cite>) at initialisation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.Model.is_valid">
+<code class="descname">is_valid</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the validity of <code class="docutils literal notranslate"><span class="pre">self</span></code> as a <code class="docutils literal notranslate"><span class="pre">Model</span></code> object. Method does not ensure runtime issues will not occur.
+:param bool raise_exception:
+:return bool: Returns <cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">self</span></code> is a valid <code class="docutils literal notranslate"><span class="pre">Model</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span> &#x2192; concero.cero.CERO<a class="reference internal" href="_modules/model.html#Model.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.run" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cero</strong> (<em>pandas.DataFrame</em>) – A CERO that contains all necessary data for conversion to input files (for         model execution).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return pandas.DataFrame:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">A CERO of relevant output data (‘relevant’ is defined by <code class="docutils literal notranslate"><span class="pre">output_conf</span></code>).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.run_checks">
+<code class="descname">run_checks</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.run_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.run_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs runtime checks on <code class="docutils literal notranslate"><span class="pre">self</span></code> to ensure it is a valid Model object. Failure of runtime checks indicates that the model is not ready to run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If True, an exception is raised on check failure (as opposed to returning <cite>False</cite>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -130,9 +189,9 @@ Scen_transport_ci_sc.xls</p>
 <li><a class="reference internal" href="#valid-commands">Valid commands</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#models-technical-reference">Models Technical Reference</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#models-technical-reference">Models Technical Reference</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>

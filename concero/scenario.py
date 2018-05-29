@@ -230,12 +230,12 @@ class Scenario(dict):
 
     @staticmethod
     def load_scenarios(scen_def: str, scenarios_set: 'ScenariosSet' = None, parent=None):
-        """
+        """Load one or more scenarios from a file.
 
         :param scen_def: The file containing one or more scenario definitions.
         :param scenarios_set: Either a ``ScenariosSet`` object or a reference to a file containing a ``ScenariosSet`` \
         definition.
-        :return "Union['Scenario', List['Scenario']]": Either a single ``Scenario``, or a ``list`` of ``Scenario``s.
+        :return "Union['Scenario',List['Scenario']]": Either a single ``Scenario`` , or a `list` of ``Scenario`` s.
         """
 
         defaults = {"search_paths": []}

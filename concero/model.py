@@ -56,7 +56,14 @@ class Model(dict):
 
     _logger = conf.setup_logger(__name__)
 
-    def __init__(self, model: dict, *args, parent: dict=None, **kwargs):
+    def __init__(self, model: dict, *args, parent: "Model"=None, **kwargs):
+        """
+
+        :param model: A `dict` containing ``Model`` options.
+        :param args: Passed to superclass (`dict`) at initialisation.
+        :param "Model" parent: If provided, inherits all key-value pairs from ``parent``.
+        :param kwargs: Passed to superclass (`dict`) at initialisation.
+        """
 
         defaults = {"input_conf": [],
                     "output_conf": [],
@@ -94,7 +101,7 @@ class Model(dict):
         """
         Checks the validity of ``self`` as a ``Model`` object. Method does not ensure runtime issues will not occur.
         :param bool raise_exception:
-        :return bool:
+        :return bool: Returns `True` if ``self`` is a valid ``Model``.
         """
         req_keys = ["name", "exec_cmd", "input_conf", "output_conf"]
 

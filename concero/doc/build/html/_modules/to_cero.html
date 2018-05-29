@@ -369,7 +369,7 @@
 <div class="viewcode-block" id="ToCERO"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO">[docs]</a><span class="k">class</span> <span class="nc">ToCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
     <span class="c1"># supported_file_types = [&quot;har&quot;, &quot;csv&quot;, &quot;xlsx&quot;, &quot;shk&quot;, &quot;gdx&quot;]</span>
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">_FileObj</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
@@ -384,7 +384,7 @@
 <span class="sd">            &quot;&quot;&quot;</span>
 
             <span class="n">conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
 
         <span class="nd">@staticmethod</span>
         <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -396,8 +396,8 @@
             <span class="c1"># Defaults</span>
             <span class="n">_conf</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
                         <span class="s2">&quot;index_col&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
-                        <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span><span class="s2">r&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="s2">r&quot;%Y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span><span class="sa">r</span><span class="s2">&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
                         <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
                     <span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
@@ -479,13 +479,13 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_file</span><span class="p">()</span> <span class="c1"># _import_file documents the state of df.</span>
             <span class="k">except</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">biffh</span><span class="o">.</span><span class="n">XLRDError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39; - invalid sheet name.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39; - invalid sheet name.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
                 <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. Failed to import file &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
                 <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
             <span class="c1"># Throw away unnecessary rows</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;series&quot;</span><span class="p">):</span>
@@ -517,7 +517,7 @@
                     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Error attempting to perform string matching on datetime values for file &#39;</span><span class="si">%s</span><span class="s2">&#39;. A &quot;</span> <span class="o">+</span>\
                           <span class="s2">&quot;likely cause is too few datetimes for the size of the data array.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
                     <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_fmt&quot;</span><span class="p">])</span>  <span class="c1"># Interpret as datetime</span>
 
             <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">ts</span>
@@ -595,7 +595,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="s2">&quot;Invalid dataframe type detected. One possible reason is invalid columns - &quot;</span> <span class="o">+</span>
+                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="s2">&quot;Invalid dataframe type detected. One possible reason is invalid columns - &quot;</span> <span class="o">+</span>
                                   <span class="s2">&quot;for example, columns that do not refer to a year when other columns do.&quot;</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">df</span>
@@ -677,8 +677,8 @@
                 <span class="c1"># - usecols is a string which has a column range in it, where one of the indices has more than</span>
                 <span class="c1">#   one letter - e.g. usecols=&quot;B,C,E:AW&quot;.</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;^Passed header&quot;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. This is likely because a range has been specified with a &#39;-&#39; instead of a &#39;:&#39;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^Passed header&quot;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. This is likely because a range has been specified with a &#39;-&#39; instead of a &#39;:&#39;&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">e</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nrows&quot;</span><span class="p">):</span>
@@ -864,7 +864,7 @@
                     <span class="c1"># print(df.index.values)</span>
                     <span class="c1"># print(names)</span>
                     <span class="c1"># print(name in df.index.values)</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;. There are several likely reasons: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;. There are several likely reasons: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
                                          <span class="s2">&quot;1. File orientation is in columns and this has not been specified.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                                          <span class="s2">&quot;2. Series names do not match those given in the file. Remember to &quot;</span> <span class="o">+</span>
                                          <span class="s2">&quot;comma-separate the values if multiple columns are used as the index.</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -896,7 +896,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_conf</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Loaded ToCERO configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span>
         <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -927,8 +927,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_conf</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span> <span class="s2">r&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
-                 <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="s2">r&quot;%Y&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;time_regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;.*(\d</span><span class="si">{4}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;time_fmt&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
                  <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
                  <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[]}</span>  <span class="c1"># Defaults</span>
 

@@ -9,11 +9,7 @@ Created on Thu Dec 21 10:39:13 2017
 import os
 import yaml
 
-import concero.conf
-
 def read_yaml(filename):
-    # filename = concero.conf.find_file(filename)
-    # filename = os.path.normpath(filename)
     with open(filename, 'r') as inFile:
         conf = yaml.load(inFile)
     return conf

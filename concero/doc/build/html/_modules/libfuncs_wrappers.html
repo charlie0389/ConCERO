@@ -90,7 +90,7 @@
 <span class="sd">Class 2 Functions - Series Operations</span>
 <span class="sd">-------------------------------------</span>
 
-<span class="sd">Class 2 functions operate on a single ``pandas.Series`` object - note that a single row of a ``pandas.DataFrame`` is \</span>
+<span class="sd">Class 2 functions operate on a single ``pandas.Series`` object. Note that a single row of a ``pandas.DataFrame`` is \</span>
 <span class="sd">an instance of a ``pandas.Series``. The series operations class can be considered a subset of DataFrame operations, \</span>
 <span class="sd">and a superset of all recursive operations (discussed below).</span>
 
@@ -220,7 +220,7 @@
 <span class="kn">from</span> <span class="nn">concero._identifier</span> <span class="k">import</span> <span class="n">_Identifier</span>
 <span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
 
-<span class="n">log</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="log_func"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.log_func">[docs]</a><span class="k">def</span> <span class="nf">log_func</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Logging decorator - for debugging purposes. To apply to function ``func``:</span>
@@ -234,7 +234,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Returned: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">result</span><span class="p">,))</span>
         <span class="k">return</span> <span class="n">result</span>
@@ -268,9 +268,9 @@
 <span class="sd">        provided (corresponding to the row number of ``df``). An \</span>
 <span class="sd">        error is raised if both ``locs`` and ``ilocs`` is specified.</span>
 <span class="sd">        :param start_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \</span>
-<span class="sd">        ``start_year`` restricts the CERO to years after *and including* ``start_year``.</span>
+<span class="sd">        ``start_year`` restricts the CERO to years after and including ``start_year``.</span>
 <span class="sd">        :param end_year: Note that ``df`` is a CERO, and CEROs have a ``pandas.DatetimeIndex`` on columns. \</span>
-<span class="sd">        ``end_year`` restricts the CERO to years before, *but excluding* ``end_year``.</span>
+<span class="sd">        ``end_year`` restricts the CERO to years up to and including ``end_year``.</span>
 <span class="sd">        :param kwargs: Keyword arguments to be passed to the encapsulated function.</span>
 <span class="sd">        :return: The return value of the encapsulated function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -305,7 +305,9 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">df_cp</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ret</span>
-        <span class="c1"># TODO: If series, convert to dataframe</span>
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ret</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="c1"># If series, convert to dataframe</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">ret</span><span class="p">])</span>
 
         <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="c1"># Performs checks to ensure ret is a valid CERO</span>
         <span class="k">return</span> <span class="n">ret</span>
@@ -390,13 +392,8 @@
 <span class="sd">        :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.</span>
 <span class="sd">        :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.</span>
 <span class="sd">        :param list post: ``post`` is post-pended to ``array`` before the recursive operation is applied.</span>
-<span class="sd">        :arg (bool) inplace: If ``True``, the operation will be applied on the array \</span>
-<span class="sd">        inplace, such that the result from a previous iteration is used in subsequent \</span>
-<span class="sd">        iterations. If ``False``, the operation proceeds ignorant of the results of \</span>
-<span class="sd">        previous iterations. ``True`` by default.</span>
-<span class="sd">        :returns (pandas.Series): Returns the result of the recursively-\</span>
-<span class="sd">        applied function. Will copy ``name`` and ``index`` \</span>
-<span class="sd">        properties of the provided ``pandas.Series`` object to the returned object.&#39;&#39;&#39;</span>
+<span class="sd">        :arg (bool) inplace: If `True` (the default), the operation will be applied on the array inplace, such that the result from a previous iteration is used in subsequent iterations. If `False`, the operation proceeds ignorant of the results of previous iterations.</span>
+<span class="sd">        :returns (pandas.Series): Returns the result of the recursively-applied function. Will copy ``name`` and ``index`` properties of the provided ``pandas.Series`` object to the returned object.&#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">init</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">auto_init</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">init_cols</span><span class="p">)]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only one of the keyword arguments &#39;init&#39;, &#39;auto_init&#39; and &#39;init_cols&#39; must be provided.&quot;</span>
@@ -468,7 +465,7 @@
                 <span class="c1">#            *args,</span>
                 <span class="c1">#            **kwargs)</span>
             <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. A likely cause is that initial conditions (or columns) have not been specified.&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. A likely cause is that initial conditions (or columns) have not been specified.&quot;</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
