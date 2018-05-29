@@ -16,7 +16,7 @@ def package_files(directory, append_to=None):
 test_files = package_files('concero/tests/data')
 doc_files = package_files('concero/doc/build/html', append_to=test_files)
 doc_files = package_files('concero/doc/source', append_to=doc_files)
-doc_files = package_files('concero/aux_scripts', append_to=doc_files)
+doc_files = package_files('concero/aux', append_to=doc_files)
 doc_files.append('doc/Makefile')
 
 setup(name='concero',

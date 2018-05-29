@@ -1,0 +1,4 @@
+test_file.txt:
+   - /mnt/OSM16/iam/integration/ConCERO/test_file.txt
+   - /mnt/OSM16/iam/integration/ConCERO/a_new_dir/test_file.txt
+   - /mnt/OSM16/iam/integration/ConCERO/b_new_dir
