@@ -24,8 +24,6 @@ def run(scenario, **kwargs):
     conf.set_log_level(ns["log_level"])
     conf.set_logd(ns["log_directory"])
 
-    _pd = os.path.dirname(__file__) + os.sep  # parent directory
-
     # Load Scenario(s)
     scens = Scenario.load_scenarios(ns["scenario"])
 
