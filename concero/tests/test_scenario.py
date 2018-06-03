@@ -62,6 +62,32 @@ class TestScenario(DefaultTestCase):
         os.remove('A1_001_step_00.xlsx')
         os.remove("dummy_model_run.py")
 
+    def test_scenario_without_conf(self):
+
+        src = concero.conf.find_file("scenario_without_conf.py")
+        shutil.copy2(src, "scenario_without_conf.py")
+
+        # Load Scenario(s)
+        scens = {"name": "test_scenario_without_conf",
+                 "run_no": 1,
+                 "export_mod_xlsx": False,
+                 "export_int_xlsx": False,
+                 "models": [{"name": "test_model",
+                             "exec_cmd": "python scenario_without_conf.py",
+                             "export_mod_xlsx": False}]}
+        scens = sn.Scenario.load_scenario(scens)
+
+        # Run the scenario
+        scens.run()
+
+        try:
+            open("scenario_without_conf.txt")
+        except FileNotFoundError:
+            self.fail("File that should of been generated, hasn't.")
+
+        os.remove("scenario_without_conf.txt")
+        os.remove("scenario_without_conf.py")
+
 
 if __name__ == '__main__':
     unittest.main()

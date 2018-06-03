@@ -90,8 +90,9 @@ class Scenario(dict):
         self.cero = CERO.create_empty()
 
         ceros = [in_conf.create_cero() for in_conf in self["input_conf"]]
-        self.cero = CERO.combine_ceros(ceros)
-        print("Successfully loaded scenario inputs as CERO.")
+        if ceros:
+            self.cero = CERO.combine_ceros(ceros)
+            print("Successfully loaded scenario inputs as CERO.")
 
         FromCERO.xlsx_out(self.cero, (self.get_name() + "_%03d_step_%02d.xlsx" % (self["run_no"], 0)))
 
