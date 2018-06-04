@@ -256,7 +256,7 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc = FromCERO._Procedure({"name": "test_output_cero",
                                     "file": "test_output_cero5.csv",
                                     "inputs": ["A", "B", "C"],
-                                    "operations": [{"func": "merge_new"}],
+                                    "operations": [{"func": "merge"}],
                                     "ref_dir": "."})
 
     def test_stitch_time(self):
