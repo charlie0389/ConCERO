@@ -121,6 +121,16 @@ class TestLibfuncs(DefaultTestCase):
             all([np.isclose(x, y) for (x, y) in zip(test_vals, cero[pd.datetime.strptime("2018", "%Y")].tolist())]))
         self.assertTrue(all([x == y for (x, y) in zip(test_list, cero.index.tolist())]))
 
+    def test_mult(self):
+        df = pd.DataFrame(data=[pd.Series(data=[1, 2, 3], index=["a", "b", "c"])],
+                          index=["A"],
+                          dtype=pd.np.float32)
+        df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+
+        res = libfuncs.mult(df, factor=2)
+        test_df = df*2
+
+        self.assertTrue(res.equals(test_df))
 
 if __name__ == '__main__':
     unittest.main()

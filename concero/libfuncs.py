@@ -422,6 +422,10 @@ def interpolate(series, **kwargs):
     defaults.update(kwargs)
     return series.interpolate(**defaults)
 
+@dataframe_op
+def mult(df, factor: float=1.0):
+    return df*factor
+
 @recursive_op
 def pc_change(x, y):
     return x*(1 + y/100)
