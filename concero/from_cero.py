@@ -521,7 +521,6 @@ class FromCERO(dict):
                     ret = getattr(libfuncs, "noop")(self.inputs, *op_args, locs=arrays, **op)
 
                 if isinstance(rename, str):
-                    # rename = [rename]
                     rename = {ret.index.tolist()[0]: rename} # Rename the first index by default
 
                 if issubclass(type(rename), list):

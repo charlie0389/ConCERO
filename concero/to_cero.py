@@ -388,7 +388,7 @@ class ToCERO(dict):
                 _conf["search_paths"].append(os.path.abspath("."))
 
             # Identify file type by extension if not given - the type determines which import function to use
-            _conf["type"] = _conf.get("type", os.path.splitext(_conf["file"])[1][1:])
+            _conf["type"] = _conf.get("type", os.path.splitext(_conf["file"])[1][1:]).lower()
 
             # Series limits the data import to only those data series specified
             if _conf.get("series"):
@@ -546,7 +546,7 @@ class ToCERO(dict):
                                  "or (b), not supported. Supported types are %s.") % (self["file"],
                                                                                       ToCERO._FileObj.supported_file_types))
 
-            elif self["type"] in ['xlsx', 'csv']:
+            elif self["type"] in ['xlsx', 'xls', 'csv']:
                 df = self._import_csv_or_xlsx()
 
             elif self["type"] == 'gdx':
@@ -592,7 +592,7 @@ class ToCERO(dict):
 
             if self["type"] == "csv":
                 pandas_kwargs = read_csv_kwargs
-            elif self["type"] == "xlsx":
+            elif self["type"] in ["xlsx", "xls"]:
                 pandas_kwargs = read_excel_kwargs
 
             for opt in list(pd_opts.keys()):
@@ -613,7 +613,7 @@ class ToCERO(dict):
                     else:
                         raise TypeError("'skip_cols' is a valid option for files of 'csv' type only.")
 
-            if self["type"] == 'xlsx':
+            if self["type"] in ['xlsx', 'xls']:
                 # Check excel-specific requirements
                 if self.get("sheet", None) is None:
                     raise TypeError(
@@ -648,7 +648,7 @@ class ToCERO(dict):
                     raise ValueError(e.__str__() + ". This is likely because a range has been specified with a '-' instead of a ':'")
                 raise e
 
-            if self["type"] == 'xlsx' and self.get("nrows"):
+            if self["type"] in ['xlsx', "xls"] and self.get("nrows"):
                 df = df.iloc[:self["nrows"], :]
 
             if self.get("orientation", "") == "cols":
@@ -916,11 +916,11 @@ class ToCERO(dict):
             except UnicodeDecodeError:
                 # Try auto-import (i.e. assumes that file is of default format) - not supported for all import formats
                 # Works by feeding in appropriate kwargs
-                conf_file_ext = os.path.splitext(conf)[1][1:]
+                conf_file_ext = os.path.splitext(conf)[1][1:].lower()
 
                 if conf_file_ext in ["csv"]:
                     _conf["files"].append({"file": conf})
-                elif conf_file_ext in ["xlsx"]:
+                elif conf_file_ext in ["xlsx", "xls"]:
                     _conf["files"].append({"file": conf, "sheet": "CERO"})
 
         conf = dict(conf)
