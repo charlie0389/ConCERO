@@ -335,12 +335,11 @@ from concero.cero import CERO
 
 class ToCERO(dict):
 
-    # supported_file_types = ["har", "csv", "xlsx", "shk", "gdx"]
     _logger = concero.conf.setup_logger(__name__)
 
     class _FileObj(dict):
 
-        supported_file_types = ["har", "csv", "xlsx", "shk", "gdx"]
+        supported_file_types = ["har", "csv", "xlsx", "xls", "shk", "gdx"]
 
         def __init__(self, *args, parent: dict=None,
                      **kwargs):
