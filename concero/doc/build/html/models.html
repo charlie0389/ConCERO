@@ -41,6 +41,11 @@
 <div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the model (for referencing purposes). The value of <code class="docutils literal notranslate"><span class="pre">name</span></code> does not alter scenario execution.</li>
 <li><code class="docutils literal notranslate"><span class="pre">exec_cmd:</span> <span class="pre">(command</span> <span class="pre">object|list[command</span> <span class="pre">objects])</span></code> - a single <em>command object</em>, or a <em>list</em> of <em>command objects</em>. Command objects are discussed below here - <a class="reference internal" href="#command-objects"><span class="std std-ref">Command Objects</span></a>. A good placeholder command (to test if the data conversion process works for example) is <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> which simply outputs the text <code class="docutils literal notranslate"><span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> to the terminal.</li>
+</ul>
+</div></blockquote>
+<p>And <em>may</em> have the following options:</p>
+<blockquote>
+<div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - the input configuration file that specifies the export of data <em>from</em> the scenario-level CERO <em>into</em> appropriate input files for the model.</li>
 <li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code>- the output configuration file that specifies the import of data <em>into</em> the scenario-level CERO <em>from</em> the appropriate output files for the model.</li>
 </ul>

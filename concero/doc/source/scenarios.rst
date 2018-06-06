@@ -16,14 +16,12 @@ Scenario Definition Objects
 A scenario definition object must have the options:
 
     * ``name: (str)`` - the name of the scenario. For example, ``'A1'`` or ``'ExistingTrends'``. The name of the scenario is not constrained by ``scenarios_set``.
-    * ``def: (dict[str -> dict[str -> (str|bool)]])`` - the scenario definition. A definition consists of *workstream* identification characters, mapped to *issue* identification characters, which themselves are character values indicating the *stance* on an issue. See :ref:`automating_execution` for some contextual information.
     * ``models: list[model objects]`` - the structure of model objects are described here - :ref:`model_objects`.
-    * ``input_conf: (str)`` - an input configuration file that defines all of the scenario inputs. See :ref:`to_cero` for more information.
-    * ``output_conf: (str)`` - an output configuration file that defines outputs from the scenario. See :ref:`from_cero` for more information.
 
 And may have the options:
 
-    * ``scenarios_set: (str)`` - The name of a file that contains a ``ScenariosSet`` definition. A ``ScenariosSet`` is used to check the definition validity of the scenario definition object.
+    * ``input_conf: (str)`` - an input configuration file that defines all of the scenario inputs. See :ref:`to_cero` for more information.
+    * ``output_conf: (str)`` - an output configuration file that defines outputs from the scenario. See :ref:`from_cero` for more information.
     * ``run_no: (int)`` - An integer numbering the execution run of the scenario. By default is 1. This integer will appear in the filenames of any files output as intermediate steps.
     * ``export_mod_xlsx: (bool)`` - Exports the returned output from each of the models as an ``xlsx`` file, which allows the user to easily analyse whether results are sensible. The output file will have a name of the format ``<scenario_name>_<run_no>_<model["name"]>.xlsx``. The default is ``True``.
     * ``export_int_xlsx: (bool)`` - Exports the returned output from each of the intermediate steps in the scenario execution as an ``xlsx`` file, which allows the user to easily analyse whether results are sensible. Conceptually, the output is the CERO before the previous model execution, updated with the output of the previous model execution. The output file will have a name of the format ``<scenario_name>_<run_no>_step_<execution_step>.xlsx``, where ``execution_step`` is the (1-indexed) number of model executions. The default is ``True``.
@@ -39,38 +37,6 @@ An example scenario definition file, with a single scenario definition object, i
 
     name: A1
     run_no: 1
-    def:
-      P:
-        I: M
-        R: L
-        E: L
-        S: L
-        W: E
-      C:
-        P: X
-        R: L
-        D: L
-        L: L
-        H: L
-      R:
-        G: H
-        P: E
-        T: M
-        A: M
-        E: F
-      B:
-        G: False
-        T: False
-        S: False
-        H: False
-        C: False
-      G:
-        I: P
-        P: M
-        M: H
-        G: H
-        W: X
-        C: X
     input_conf: data/test_scen_inputs.yaml
     export_mod_xlsx: False
     export_int_xlsx: False
@@ -88,10 +54,4 @@ Scenario Technical Reference
 ----------------------------
 
 .. autoclass:: scenario.Scenario
-    :members:
-
-ScenariosSet Technical Reference
---------------------------------
-
-.. autoclass:: scenario.ScenariosSet
     :members:

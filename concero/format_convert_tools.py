@@ -6,7 +6,6 @@ Created on Thu Dec 21 10:39:13 2017
 @author: Lyle Collins
 @email: Lyle.Collins@csiro.au
 """
-import os
 import yaml
 
 def read_yaml(filename):

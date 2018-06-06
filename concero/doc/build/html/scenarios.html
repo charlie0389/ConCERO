@@ -45,16 +45,14 @@
 <blockquote>
 <div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the scenario. For example, <code class="docutils literal notranslate"><span class="pre">'A1'</span></code> or <code class="docutils literal notranslate"><span class="pre">'ExistingTrends'</span></code>. The name of the scenario is not constrained by <code class="docutils literal notranslate"><span class="pre">scenarios_set</span></code>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">def:</span> <span class="pre">(dict[str</span> <span class="pre">-&gt;</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">(str|bool)]])</span></code> - the scenario definition. A definition consists of <em>workstream</em> identification characters, mapped to <em>issue</em> identification characters, which themselves are character values indicating the <em>stance</em> on an issue. See <a class="reference internal" href="design_philosophy.html#automating-execution"><span class="std std-ref">Automating the Execution of Models</span></a> for some contextual information.</li>
 <li><code class="docutils literal notranslate"><span class="pre">models:</span> <span class="pre">list[model</span> <span class="pre">objects]</span></code> - the structure of model objects are described here - <a class="reference internal" href="models.html#model-objects"><span class="std std-ref">Model Objects</span></a>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - an input configuration file that defines all of the scenario inputs. See <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
-<li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code> - an output configuration file that defines outputs from the scenario. See <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
 </ul>
 </div></blockquote>
 <p>And may have the options:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">scenarios_set:</span> <span class="pre">(str)</span></code> - The name of a file that contains a <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> definition. A <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> is used to check the definition validity of the scenario definition object.</li>
+<li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - an input configuration file that defines all of the scenario inputs. See <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code> - an output configuration file that defines outputs from the scenario. See <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
 <li><code class="docutils literal notranslate"><span class="pre">run_no:</span> <span class="pre">(int)</span></code> - An integer numbering the execution run of the scenario. By default is 1. This integer will appear in the filenames of any files output as intermediate steps.</li>
 <li><code class="docutils literal notranslate"><span class="pre">export_mod_xlsx:</span> <span class="pre">(bool)</span></code> - Exports the returned output from each of the models as an <code class="docutils literal notranslate"><span class="pre">xlsx</span></code> file, which allows the user to easily analyse whether results are sensible. The output file will have a name of the format <code class="docutils literal notranslate"><span class="pre">&lt;scenario_name&gt;_&lt;run_no&gt;_&lt;model[&quot;name&quot;]&gt;.xlsx</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">export_int_xlsx:</span> <span class="pre">(bool)</span></code> - Exports the returned output from each of the intermediate steps in the scenario execution as an <code class="docutils literal notranslate"><span class="pre">xlsx</span></code> file, which allows the user to easily analyse whether results are sensible. Conceptually, the output is the CERO before the previous model execution, updated with the output of the previous model execution. The output file will have a name of the format <code class="docutils literal notranslate"><span class="pre">&lt;scenario_name&gt;_&lt;run_no&gt;_step_&lt;execution_step&gt;.xlsx</span></code>, where <code class="docutils literal notranslate"><span class="pre">execution_step</span></code> is the (1-indexed) number of model executions. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
@@ -62,42 +60,10 @@
 </div></blockquote>
 </div>
 <div class="section" id="scenario-example">
-<span id="id1"></span><h3>Scenario Example:<a class="headerlink" href="#scenario-example" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3>Scenario Example<a class="headerlink" href="#scenario-example" title="Permalink to this headline">¶</a></h3>
 <p>An example scenario definition file, with a single scenario definition object, is:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">A1</span>
 <span class="l l-Scalar l-Scalar-Plain">run_no</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
-<span class="l l-Scalar l-Scalar-Plain">def</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">P</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">M</span>
-    <span class="l l-Scalar l-Scalar-Plain">R</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">E</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">S</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">W</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">E</span>
-  <span class="l l-Scalar l-Scalar-Plain">C</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">P</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">X</span>
-    <span class="l l-Scalar l-Scalar-Plain">R</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">D</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">L</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-    <span class="l l-Scalar l-Scalar-Plain">H</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">L</span>
-  <span class="l l-Scalar l-Scalar-Plain">R</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">G</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">H</span>
-    <span class="l l-Scalar l-Scalar-Plain">P</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">E</span>
-    <span class="l l-Scalar l-Scalar-Plain">T</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">M</span>
-    <span class="l l-Scalar l-Scalar-Plain">A</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">M</span>
-    <span class="l l-Scalar l-Scalar-Plain">E</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">F</span>
-  <span class="l l-Scalar l-Scalar-Plain">B</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">G</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-    <span class="l l-Scalar l-Scalar-Plain">T</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-    <span class="l l-Scalar l-Scalar-Plain">S</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-    <span class="l l-Scalar l-Scalar-Plain">H</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-    <span class="l l-Scalar l-Scalar-Plain">C</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-  <span class="l l-Scalar l-Scalar-Plain">G</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">P</span>
-    <span class="l l-Scalar l-Scalar-Plain">P</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">M</span>
-    <span class="l l-Scalar l-Scalar-Plain">M</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">H</span>
-    <span class="l l-Scalar l-Scalar-Plain">G</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">H</span>
-    <span class="l l-Scalar l-Scalar-Plain">W</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">X</span>
-    <span class="l l-Scalar l-Scalar-Plain">C</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">X</span>
 <span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data/test_scen_inputs.yaml</span>
 <span class="l l-Scalar l-Scalar-Plain">export_mod_xlsx</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 <span class="l l-Scalar l-Scalar-Plain">export_int_xlsx</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
@@ -117,7 +83,7 @@
 <h2>Scenario Technical Reference<a class="headerlink" href="#scenario-technical-reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="scenario.Scenario">
-<em class="property">class </em><code class="descclassname">scenario.</code><code class="descname">Scenario</code><span class="sig-paren">(</span><em>sc_def: dict</em>, <em>*args</em>, <em>scenarios_set: Union[scenario.ScenariosSet</em>, <em>NoneType] = None</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">scenario.</code><code class="descname">Scenario</code><span class="sig-paren">(</span><em>sc_def: dict</em>, <em>*args</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -125,7 +91,6 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>sc_def</strong> – A scenario definition object.</li>
 <li><strong>args</strong> – Passed to the superclass (dict) as positional arguments at initialisation.</li>
-<li><strong>scenarios_set</strong> – A ScenariosSet object, used to verify that <code class="docutils literal notranslate"><span class="pre">sc_def</span></code> is a valid         definition.</li>
 <li><strong>kwargs</strong> – Passed to the superclass (dict) as keyword arguments at initialisation.</li>
 </ul>
 </td>
@@ -160,28 +125,17 @@
 <dd><p>Performs static checks on <code class="docutils literal notranslate"><span class="pre">self</span></code> to ensure it is a valid Scenario object.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="scenario.Scenario.link_scenario_set">
-<code class="descname">link_scenario_set</code><span class="sig-paren">(</span><em>scenarios_set: scenario.ScenariosSet</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/scenario.html#Scenario.link_scenario_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.link_scenario_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link a ScenariosSet object (<code class="docutils literal notranslate"><span class="pre">scenarios_set</span></code>) to this Scenario (if it hasn’t already been done).</p>
-</dd></dl>
-
 <dl class="staticmethod">
 <dt id="scenario.Scenario.load_scenario">
-<em class="property">static </em><code class="descname">load_scenario</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>scenarios_set: Union[scenario.ScenariosSet</em>, <em>NoneType] = None</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenario" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">load_scenario</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenario" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>scen_def</strong> – The file containing a single scenario definition, or a scenario definition <cite>dict</cite> .</li>
-<li><strong>scenarios_set</strong> – Either a <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> object or a reference to a file containing a <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> definition.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scen_def</strong> – The file containing a single scenario definition, or a scenario definition <cite>dict</cite> .</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Return ‘Scenario’:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">A single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object.</p>
-</td>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">A single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object.</td>
 </tr>
 </tbody>
 </table>
@@ -189,21 +143,16 @@
 
 <dl class="staticmethod">
 <dt id="scenario.Scenario.load_scenarios">
-<em class="property">static </em><code class="descname">load_scenarios</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>scenarios_set: Union[scenario.ScenariosSet</em>, <em>NoneType] = None</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenarios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenarios" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">load_scenarios</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenarios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenarios" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load one or more scenarios from a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>scen_def</strong> – The file containing one or more scenario definitions.</li>
-<li><strong>scenarios_set</strong> – Either a <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> object or a reference to a file containing a <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code>         definition.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scen_def</strong> – The file containing one or more scenario definitions.</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Return “Union[‘Scenario’,List[‘Scenario’]]”:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">Either a single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> , or a <cite>list</cite> of <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> s.</p>
-</td>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">Either a single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> , or a <cite>list</cite> of <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> s.</td>
 </tr>
 </tbody>
 </table>
@@ -234,49 +183,6 @@
 </dd></dl>
 
 </div>
-<div class="section" id="scenariosset-technical-reference">
-<h2>ScenariosSet Technical Reference<a class="headerlink" href="#scenariosset-technical-reference" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="scenario.ScenariosSet">
-<em class="property">class </em><code class="descclassname">scenario.</code><code class="descname">ScenariosSet</code><span class="sig-paren">(</span><em>scen_defs: str</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#ScenariosSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.ScenariosSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>A <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> object defines a set of valid <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>, and is therefore can be used to         name a <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>, or check validity of a <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>scen_defs</strong> – The file containing the definition of valid scenarios.</li>
-<li><strong>args</strong> – Passed to the superclass (<code class="docutils literal notranslate"><span class="pre">list</span></code>) on initialisation.</li>
-<li><strong>kwargs</strong> – Passed to the superclass (<code class="docutils literal notranslate"><span class="pre">list</span></code>) on initialisation.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="scenario.ScenariosSet.get_scenario_name">
-<code class="descname">get_scenario_name</code><span class="sig-paren">(</span><em>scenario: scenario.Scenario</em>, <em>long_form=True</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/scenario.html#ScenariosSet.get_scenario_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.ScenariosSet.get_scenario_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given <code class="docutils literal notranslate"><span class="pre">scenario</span></code>, returns the name of the <code class="docutils literal notranslate"><span class="pre">scenario</span></code> in a long or short form.
-:param scenario: A <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object to retrieve the name of.
-:param long_form: If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), return the long form name, otherwise return the short form.
-:return: The name of the <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="scenario.ScenariosSet.is_valid">
-<code class="descname">is_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#ScenariosSet.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.ScenariosSet.is_valid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks object is a valid ScenarioSet. NOT implemented.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="scenario.ScenariosSet.is_valid_def">
-<code class="descname">is_valid_def</code><span class="sig-paren">(</span><em>scenario</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#ScenariosSet.is_valid_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.ScenariosSet.is_valid_def" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that <code class="docutils literal notranslate"><span class="pre">scenario</span></code> is a valid definition for this <code class="docutils literal notranslate"><span class="pre">ScenarioSet</span></code>. A scenario is a valid definition        if it is an element of the set defined by <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 </div>
 
 
@@ -290,11 +196,10 @@
 <li><a class="reference internal" href="#">Scenarios</a><ul>
 <li><a class="reference internal" href="#scenario-definition-files">Scenario Definition Files</a><ul>
 <li><a class="reference internal" href="#scenario-definition-objects">Scenario Definition Objects</a></li>
-<li><a class="reference internal" href="#scenario-example">Scenario Example:</a></li>
+<li><a class="reference internal" href="#scenario-example">Scenario Example</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#scenario-technical-reference">Scenario Technical Reference</a></li>
-<li><a class="reference internal" href="#scenariosset-technical-reference">ScenariosSet Technical Reference</a></li>
 </ul>
 </li>
 </ul>

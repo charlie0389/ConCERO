@@ -101,20 +101,6 @@ import shutil
 
 import pandas as pd
 import numpy as np
-import matplotlib
-# if matplotlib.get_backend() == "Qt4Agg":
-#     # Qt4Agg backend raises warnings, so switch to Qt5Agg if possible...
-#     # see: https://software.intel.com/en-us/forums/intel-distribution-for-python/topic/691231
-#     # Solution (in above link) regarding warn=False does not stop warnings...
-#
-#     print("Switching matplotlib backend to Qt5Agg.")
-#     matplotlib.use("Qt5Agg")
-#
-#     try:
-#         import matplotlib.pyplot
-#     except ImportError:
-#         matplotlib.use("Qt4Agg", warn=False, force=True)
-#         import matplotlib.pyplot
 import seaborn
 
 import concero.conf as conf

@@ -4,9 +4,7 @@ Created on Feb 05 09:44:50 2018
 .. sectionauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
-
 import os
-import copy
 
 import concero.conf as conf
 from concero.format_convert_tools import read_yaml

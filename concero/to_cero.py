@@ -75,7 +75,7 @@ example of a YAML file including all points discussed so far is:
 
 .. code-block:: yaml
 
-    input_files:
+    files:
         - file: a_file.csv
         - file: b_file
           type: 'csv'
@@ -90,7 +90,7 @@ A minimal configuration form that demonstrates inheritance (and assuming ``c_fil
 .. code-block:: yaml
 
     type: 'csv'
-    input_files:
+    files:
         - file: a_file.csv
         - file: b_file
         - file: c_file
@@ -211,7 +211,7 @@ look like:
 
 .. code-block:: yaml
 
-    input_files:
+    files:
       - file: har_file.har
         head_arrs:
           - HEA1
