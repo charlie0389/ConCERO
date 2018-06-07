@@ -9,7 +9,7 @@ Model Objects
 A model object must be of dictionary form and *must* have the following options:
 
     * ``name: (str)`` - the name of the model (for referencing purposes). The value of ``name`` does not alter scenario execution.
-    * ``exec_cmd: (command object|list[command objects])`` - a single *command object*, or a *list* of *command objects*. Command objects are discussed below here - :ref:`command_objects`. A good placeholder command (to test if the data conversion process works for example) is ``echo "Model running..."`` which simply outputs the text ``"Model running..."`` to the terminal.
+    * ``cmds: (command object|list[command objects])`` - a single *command object*, or a *list* of *command objects*. Command objects are discussed below here - :ref:`command_objects`. A good placeholder command (to test if the data conversion process works for example) is ``echo "Model running..."`` which simply outputs the text ``"Model running..."`` to the terminal.
 
 And *may* have the following options:
 

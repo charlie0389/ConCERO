@@ -73,7 +73,7 @@ class TestScenario(DefaultTestCase):
                  "export_mod_xlsx": False,
                  "export_int_xlsx": False,
                  "models": [{"name": "test_model",
-                             "exec_cmd": "python scenario_without_conf.py",
+                             "cmds": "python scenario_without_conf.py",
                              "export_mod_xlsx": False}]}
         scens = sn.Scenario.load_scenario(scens)
 

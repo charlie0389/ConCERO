@@ -5,7 +5,7 @@ export_mod_xlsx: False
 export_int_xlsx: False
 models:
   - name: VURM
-    exec_cmd: python dummy_model_run.py
+    cmds: python dummy_model_run.py
     input_conf: test_model_input.yaml
     output_conf: test_model_output.yaml
     export_mod_xlsx: False

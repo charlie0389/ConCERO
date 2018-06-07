@@ -103,7 +103,7 @@ class Model(dict):
         :param bool raise_exception:
         :return bool: Returns `True` if ``self`` is a valid ``Model``.
         """
-        req_keys = ["name", "exec_cmd", "input_conf", "output_conf"]
+        req_keys = ["name", "cmds", "input_conf", "output_conf"]
 
         if not all([k in self for k in req_keys]):
 
@@ -159,8 +159,8 @@ class Model(dict):
         print("Completed converting CERO to model input files (%s). Now processing commands..." % self["name"])
 
         # Command string processing
-        if isinstance(self["exec_cmd"], str):
-            self["exec_cmd"] = [self["exec_cmd"]]
+        if isinstance(self["cmds"], str):
+            self["cmds"] = [self["cmds"]]
 
         old_dir = os.getcwd()
         run_dir = os.path.abspath(self.get("run_dir", old_dir))
@@ -174,7 +174,7 @@ class Model(dict):
 
         with _modified_environ(**self.get("env_vars", {})):
 
-            for cmdobj in self["exec_cmd"]:
+            for cmdobj in self["cmds"]:
 
                 cmd = {"type": "shell", "shell": True} # Default command
 

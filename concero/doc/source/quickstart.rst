@@ -73,7 +73,7 @@ Anything that can be run from the command line can be run by ConCERO. Let's assu
             name: example_scenario
             models:
                 - name: a_model
-                  exec_cmd: python model.py
+                  cmds: python model.py
 
        This scenario (an execution sequence of one or more models) has been named "example_scenario" (required).
 
@@ -105,7 +105,7 @@ Let's assume that ``model_output.yaml`` defines the import of ``interesting_data
         models:
             - name: a_model
               input_conf: data_export.yaml
-              exec_cmd: python model.py
+              cmds: python model.py
               output_conf: model_output.yaml
         output_conf: scenario_output.yaml
 

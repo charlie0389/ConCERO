@@ -42,7 +42,7 @@ An example scenario definition file, with a single scenario definition object, i
     export_int_xlsx: False
     models:
       - name: example_model
-        exec_cmd: python dummy_model.py
+        cmds: python dummy_model.py
         input_conf: data/test_model_input.yaml
         output_conf: data/test_model_output.yaml
         export_xlsx: False
