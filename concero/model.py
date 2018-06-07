@@ -197,12 +197,12 @@ class Model(dict):
                 if cmd_run_dir:
                     cmd_run_dir = os.path.abspath(cmd_run_dir)
 
-                cmd_type = cmd.pop("type", "shell")
+                cmd_type = cmd.pop("type")
 
                 # Execute commands
                 msg = "In directory '%s', executing command '%s'." % (cmd_run_dir, cmd)
                 Model._logger.info(msg)
-                with _modified_environ(wd=cmd_run_dir, **cmd.get("env_vars", {})):
+                with _modified_environ(wd=cmd_run_dir, **cmd.pop("env_vars", {})):
 
                     # Depending on cmd_type, execute command in different ways...
                     if cmd_type in ["shell"]:
