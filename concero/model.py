@@ -16,7 +16,7 @@ from concero.to_cero import ToCERO
 from concero.cero import CERO
 
 @contextlib.contextmanager
-def _modified_environ(*remove, **update):
+def _modified_environ(*remove, wd=None, **update):
     """
     Temporarily updates the ``os.environ`` dictionary in-place.
 
@@ -24,6 +24,7 @@ def _modified_environ(*remove, **update):
     is sure to work in all situations.
 
     :param remove: Environment variables to remove.
+    :param wd: Directory to change to (before any changes to environment variables are made). By default, current working directory.
     :param update: Dictionary of environment variables and values to add/update.
 
     Code for this function from: ``https://stackoverflow.com/questions/2059482/python-temporarily-modify-the-current-processs-environment``
@@ -43,6 +44,16 @@ def _modified_environ(*remove, **update):
     # Environment variables and values to remove on exit.
     remove_after = frozenset(k for k in update if k not in env)
 
+    old_dir = os.getcwd()
+
+    if wd:
+        try:
+            os.chdir(wd)
+        except FileNotFoundError:
+            # Attempt to create directory if it doesn't exist
+            os.mkdir(wd)
+            os.chdir(wd)
+
     try:
         env.update(update)
         [env.pop(k, None) for k in remove]
@@ -50,6 +61,7 @@ def _modified_environ(*remove, **update):
     finally:
         env.update(update_after)
         [env.pop(k) for k in remove_after]
+        os.chdir(old_dir)
 
 
 class Model(dict):
@@ -67,7 +79,8 @@ class Model(dict):
 
         defaults = {"input_conf": [],
                     "output_conf": [],
-                    "search_paths": []}
+                    "search_paths": [],
+                    "wd": None}
         defaults.update(model)
 
         if parent is None:
@@ -162,17 +175,7 @@ class Model(dict):
         if isinstance(self["cmds"], str):
             self["cmds"] = [self["cmds"]]
 
-        old_dir = os.getcwd()
-        run_dir = os.path.abspath(self.get("run_dir", old_dir))
-
-        try:
-            os.chdir(run_dir)
-        except FileNotFoundError:
-            # Create directory if necessary
-            os.mkdir(run_dir)
-            os.chdir(run_dir)
-
-        with _modified_environ(**self.get("env_vars", {})):
+        with _modified_environ(wd=self["wd"], **self.get("env_vars", {})):
 
             for cmdobj in self["cmds"]:
 
@@ -190,26 +193,20 @@ class Model(dict):
                     raise TypeError("Invalid command object in configuration file.")
 
                 # Change to command-specific directory
-                cmd_run_dir = os.path.abspath(cmd.pop("run_dir", run_dir))
-                try:
-                    os.chdir(cmd_run_dir)
-                except FileNotFoundError:
-                    # Create directory if necessary
-                    os.mkdir(cmd_run_dir)
-                    os.chdir(cmd_run_dir)
+                cmd_run_dir = cmd.pop("wd", self["wd"])
+                if cmd_run_dir:
+                    cmd_run_dir = os.path.abspath(cmd_run_dir)
 
                 cmd_type = cmd.pop("type", "shell")
 
                 # Execute commands
                 msg = "In directory '%s', executing command '%s'." % (cmd_run_dir, cmd)
                 Model._logger.info(msg)
-                with _modified_environ(**cmd.get("env_vars", {})):
+                with _modified_environ(wd=cmd_run_dir, **cmd.get("env_vars", {})):
 
                     # Depending on cmd_type, execute command in different ways...
                     if cmd_type in ["shell"]:
                         args = cmd.pop("args")
-                        if "cwd" in cmd:
-                            cmd["cwd"] = os.path.normpath(cmd["cwd"])
                         Model._logger.info("Executing shell command: %s, with keyword args: %s." % (args, cmd))
                         try:
                             cmd["output"] = subprocess.check_output(args=args,
@@ -233,9 +230,6 @@ class Model(dict):
                         cmd["output"] = func(*cmd["args"], **cmd["kwargs"])
                     else:
                         raise ValueError("Unsupported command type specified.")
-
-                os.chdir(run_dir)
-        os.chdir(old_dir)
 
         if not self["output_conf"]:
             return CERO.create_empty()
