@@ -554,7 +554,6 @@
                     <span class="n">ret</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">libfuncs</span><span class="p">,</span> <span class="s2">&quot;noop&quot;</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">op_args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">op</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rename</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="c1"># rename = [rename]</span>
                     <span class="n">rename</span> <span class="o">=</span> <span class="p">{</span><span class="n">ret</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">rename</span><span class="p">}</span> <span class="c1"># Rename the first index by default</span>
 
                 <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">rename</span><span class="p">),</span> <span class="nb">list</span><span class="p">):</span>

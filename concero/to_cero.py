@@ -50,8 +50,7 @@ Note that each item of the ``"files"`` list can be either a `str` or a `dict`. I
 
     file: name_of_file
 
-Where ``name_of_file`` is a file path *relative to the configuration file*. The option \
-``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).
+Where ``name_of_file`` is a file path *relative to the configuration file*. The option ``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).
 
 Without further specification, if the file *type* is comma-separated-values (``CSV``) *and* if the data is of the default format, ConCERO can import the entire file. The 'default format' is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:
 
@@ -60,25 +59,16 @@ Without further specification, if the file *type* is comma-separated-values (``C
     3. by determining the extension of the value of ``file`` in the *file object*, and if not determined then
     4. an error is raised.
 
-Providing the ``type`` option allows the user to potentially extend the program to import files that the \
-program author was not aware existed, if the file is of a similar format to one of the known and supported formats. \
-For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), \
-``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, \
-``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on \
-whether the underlying library allows importing that file type.
+Providing the ``type`` option allows the user to potentially extend the program to import files that the program author was not aware existed, if the file is of a similar format to one of the known and supported formats. For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), ``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, ``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on whether the underlying library allows importing that file type.
 
-With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO \
-object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant \
-information in the case that some properties apply to all the input files. Given that every key-value pair \
-has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an \
-example of a YAML file including all points discussed so far is:
+With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant information in the case that some properties apply to all the input files. Given that every key-value pair has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an example of a YAML file including all points discussed so far is:
 
 .. code-block:: yaml
 
     files:
         - file: a_file.csv
         - file: b_file
-          type: 'csv'
+          type: csv
 
 In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported (assuming they are both of default format). \
 The file extension can be discerned with respect to ``a_file.csv``, and \

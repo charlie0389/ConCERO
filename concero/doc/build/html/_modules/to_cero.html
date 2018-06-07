@@ -83,8 +83,7 @@
 
 <span class="sd">    file: name_of_file</span>
 
-<span class="sd">Where ``name_of_file`` is a file path *relative to the configuration file*. The option \</span>
-<span class="sd">``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</span>
+<span class="sd">Where ``name_of_file`` is a file path *relative to the configuration file*. The option ``search_paths: List[str]`` provided as on option to the file object (or the encompassing ToCERO object) overrides this behaviour (where paths earlier in the list are searched before paths later in the list).</span>
 
 <span class="sd">Without further specification, if the file *type* is comma-separated-values (``CSV``) *and* if the data is of the default format, ConCERO can import the entire file. The &#39;default format&#39; is discussed on this page :ref:`import_guidelines`. ConCERO determines the file type:</span>
 
@@ -93,25 +92,16 @@
 <span class="sd">    3. by determining the extension of the value of ``file`` in the *file object*, and if not determined then</span>
 <span class="sd">    4. an error is raised.</span>
 
-<span class="sd">Providing the ``type`` option allows the user to potentially extend the program to import files that the \</span>
-<span class="sd">program author was not aware existed, if the file is of a similar format to one of the known and supported formats. \</span>
-<span class="sd">For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), \</span>
-<span class="sd">``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, \</span>
-<span class="sd">``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on \</span>
-<span class="sd">whether the underlying library allows importing that file type.</span>
+<span class="sd">Providing the ``type`` option allows the user to potentially extend the program to import files that the program author was not aware existed, if the file is of a similar format to one of the known and supported formats. For example, if the program author was not aware ``shk`` files existed (and thus did not provide support for them), ``shk`` files could be imported by specifying ``type: har`` (given their similarity to ``har`` files). As it is, ``shk`` files *are* supported, so this is not necessary. Naturally, whether the import succeeds will be dependent on whether the underlying library allows importing that file type.</span>
 
-<span class="sd">With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO \</span>
-<span class="sd">object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant \</span>
-<span class="sd">information in the case that some properties apply to all the input files. Given that every key-value pair \</span>
-<span class="sd">has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an \</span>
-<span class="sd">example of a YAML file including all points discussed so far is:</span>
+<span class="sd">With respect to step 2 (of determining the file type), it can be said that the file object *inherits* from the ToCERO object. Many key-value pairs can be inherited from the ToCERO object, which reduces duplicating redundant information in the case that some properties apply to all the input files. Given that every key-value pair has some effect on configuration, the term *option* is used to refer to a key-value pair collectively. So an example of a YAML file including all points discussed so far is:</span>
 
 <span class="sd">.. code-block:: yaml</span>
 
 <span class="sd">    files:</span>
 <span class="sd">        - file: a_file.csv</span>
 <span class="sd">        - file: b_file</span>
-<span class="sd">          type: &#39;csv&#39;</span>
+<span class="sd">          type: csv</span>
 
 <span class="sd">In the example above, ``a_file.csv`` and ``b_file`` would be successfully imported (assuming they are both of default format). \</span>
 <span class="sd">The file extension can be discerned with respect to ``a_file.csv``, and \</span>
@@ -368,12 +358,11 @@
 
 <div class="viewcode-block" id="ToCERO"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO">[docs]</a><span class="k">class</span> <span class="nc">ToCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
-    <span class="c1"># supported_file_types = [&quot;har&quot;, &quot;csv&quot;, &quot;xlsx&quot;, &quot;shk&quot;, &quot;gdx&quot;]</span>
     <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">_FileObj</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
-        <span class="n">supported_file_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;har&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;shk&quot;</span><span class="p">,</span> <span class="s2">&quot;gdx&quot;</span><span class="p">]</span>
+        <span class="n">supported_file_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;har&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;xls&quot;</span><span class="p">,</span> <span class="s2">&quot;shk&quot;</span><span class="p">,</span> <span class="s2">&quot;gdx&quot;</span><span class="p">]</span>
 
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -421,7 +410,7 @@
                 <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
 
             <span class="c1"># Identify file type by extension if not given - the type determines which import function to use</span>
-            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
             <span class="c1"># Series limits the data import to only those data series specified</span>
             <span class="k">if</span> <span class="n">_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;series&quot;</span><span class="p">):</span>
@@ -579,7 +568,7 @@
                                  <span class="s2">&quot;or (b), not supported. Supported types are </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span>
                                                                                       <span class="n">ToCERO</span><span class="o">.</span><span class="n">_FileObj</span><span class="o">.</span><span class="n">supported_file_types</span><span class="p">))</span>
 
-            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;csv&#39;</span><span class="p">]:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;xls&#39;</span><span class="p">,</span> <span class="s1">&#39;csv&#39;</span><span class="p">]:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_csv_or_xlsx</span><span class="p">()</span>
 
             <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;gdx&#39;</span><span class="p">:</span>
@@ -625,7 +614,7 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
                 <span class="n">pandas_kwargs</span> <span class="o">=</span> <span class="n">read_csv_kwargs</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;xls&quot;</span><span class="p">]:</span>
                 <span class="n">pandas_kwargs</span> <span class="o">=</span> <span class="n">read_excel_kwargs</span>
 
             <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd_opts</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -646,7 +635,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;skip_cols&#39; is a valid option for files of &#39;csv&#39; type only.&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;xls&#39;</span><span class="p">]:</span>
                 <span class="c1"># Check excel-specific requirements</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sheet&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -681,7 +670,7 @@
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;. This is likely because a range has been specified with a &#39;-&#39; instead of a &#39;:&#39;&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">e</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nrows&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s2">&quot;xls&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nrows&quot;</span><span class="p">):</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;nrows&quot;</span><span class="p">],</span> <span class="p">:]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orientation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;cols&quot;</span><span class="p">:</span>
@@ -949,11 +938,11 @@
             <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
                 <span class="c1"># Try auto-import (i.e. assumes that file is of default format) - not supported for all import formats</span>
                 <span class="c1"># Works by feeding in appropriate kwargs</span>
-                <span class="n">conf_file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">conf</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">conf_file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">conf</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">conf_file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">]:</span>
                     <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="p">})</span>
-                <span class="k">elif</span> <span class="n">conf_file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xlsx&quot;</span><span class="p">]:</span>
+                <span class="k">elif</span> <span class="n">conf_file_ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;xls&quot;</span><span class="p">]:</span>
                     <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;sheet&quot;</span><span class="p">:</span> <span class="s2">&quot;CERO&quot;</span><span class="p">})</span>
 
         <span class="n">conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
