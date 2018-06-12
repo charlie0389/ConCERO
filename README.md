@@ -26,7 +26,9 @@ Note that this example assumes the CSV is in the default format - one header row
     ```
     The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
 
-3. Run the python interpreter (version 3.4 or above): `python`.
+3. Run the python interpreter (version 3.4 or above):
+
+    ````python```
 
 4. Then run the commands:
 
@@ -43,7 +45,7 @@ More examples can be found on the *Quickstart: Common ConCERO-Related Commands* 
 
 # Bug Reporting
 
-Please submit bug reports to the issue tracker (with this Github project).
+Please submit bug reports to "Issues" - the issue tracker (with this Github project).
 
 # Dependencies/Attributions:
 
