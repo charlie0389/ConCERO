@@ -65,7 +65,7 @@ Installing/using the GAMS API is much easier (and probably more reliable) if the
 Installing harpy (necessary for har or shk files)
 -------------------------------------------------
 
-Installing harpy is a simple process. It is necessary to install a fork of the harpy project that breaks backwards compatibility. The fork can be found (on the master branch) at `github <https://github.com/charlie0389/HARPY>`_. Future development will attempt to integrate this with the mainstream harpy project, or removing the dependency on harpy altogether. To install harpy, download the zip archive ('Clone or Download' -> 'Download ZIP'), extract into a directory, change into that directory, and run the command:
+Installing harpy is a simple process. The source code can be found at `github <https://github.com/GEMPACKsoftware/HARPY>`_. To install harpy, download the zip archive ('Clone or Download' -> 'Download ZIP'), extract into a directory, change into that directory, and run the command:
 
     ``python setup.py install``
 
