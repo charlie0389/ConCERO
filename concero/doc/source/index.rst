@@ -60,7 +60,7 @@ Contents:
     models
     import_guidelines
     coding_guidelines
-
+    modfuncs
 
 Indices and tables
 ==================
