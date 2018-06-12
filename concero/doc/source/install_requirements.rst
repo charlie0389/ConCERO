@@ -73,13 +73,13 @@ If you have both python 2 and python 3 on your system, the install command may i
 
     ``python3 setup.py install``
 
-Installing Matplotlib
----------------------
+Installing Matplotlib (necessary to plot using Python/ConCERO)
+--------------------------------------------------------------
 
 Matplotlib is necessary if you wish to use ConCERO's plotting integration. Instructions can be found at `<https://matplotlib.org/users/installing.html#install-requirements>`_.
 
-Installing PyQt4 (Windows Only)
--------------------------------
+Installing PyQt4 (Windows Only - may be necessary to plot using Python/ConCERO)
+-------------------------------------------------------------------------------
 
 It *may* be necessary to install PyQt4 on Windows through a manual process:
 
@@ -106,9 +106,9 @@ depending which command corresponds to the python 3 interpreter. To check that t
 
     ``python3 -m concero.tests.test_concero``
 
-Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options, with the command:
+Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options (by reading the documentation) or with the command:
 
-    ``python3 -m concero.main -h``
+    ``concero --help``
 
 .. [1] To check whether this library (``lib``) is installed (correctly), the simplest way is to open python on the command line. For example - ``python``. Then, in the python interpreter, execute ``import lib``, where ``lib`` is the relevant library. If no errors are raised, then the program is installed correctly.
 
