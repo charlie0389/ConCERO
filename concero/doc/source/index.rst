@@ -40,8 +40,9 @@ If using ``gdx`` files, the author of ``gdxpds`` (an underlying library) request
 
 The latest version of ``gdxpds`` (and citation format) can be found on `GitHub <https://github.com/NREL/gdx-pandas/tree/master/gdxpds>`_.
 
-.. And if using ``har`` files, the author of ``harpy`` - an underlying library - requests a citation:
-.. <>
+And if using ``har`` files, the authors of ``harpy`` - an underlying library - request a citation:
+
+.. [3] F. Schiffmann and L. D. Collins, *"Harpy v0.3: A Python API to interact with header array (HAR) files,"* Melbourne, Australia, 2018, `<https://github.com/GEMPACKsoftware/HARPY>`_.
 
 **Note regarding the use of '/' and '\\' in file names (applicable if running ConCERO on different operating systems)**: Note that different operating systems prefer a different style to define file locations. The Windows operating system uses the backslash (\\), whereas Linux/Mac based systems use the forward slash (/). **When specifying filenames for the purpose of using ConCERO, forward slashes (/) are preferred**. The reason being that '\\' is also the escape character in Python (for example, ``\n`` indicates a new line, not a backslash followed by 'n'). However, for filenames in YAML files, \\ is correctly interpreted as a directory separator on *Windows-based systems only*. This should not be considered a sufficient reason to use \\ in filenames, because it detracts from the operating-system independent nature of ConCERO, and it is reasonably likely that other operating systems will be used, especially in the context of supercomputers (for which Linux has >90% market share). In summary, / is preferred because ConCERO correctly interprets it on all operating systems, whereas \\ is correctly interpreted on Windows-based systems only.
 
@@ -76,9 +77,3 @@ Indices and tables
 
 .. sectionauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
-
-.. In ConCERO, 1175 lines of code:
-.. ``cloc --exclude_dir=tests,doc,HAR2CERO,CERO2HAR,_CERO2VURM .``
-
-.. In model, 3598 lines of code:
-.. ``cloc .``

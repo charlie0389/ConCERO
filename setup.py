@@ -21,7 +21,7 @@ doc_files.append('doc/Makefile')
 
 setup(name='concero',
     version='0.1',
-    description='Automates the running of models and data conversion for the ANO2 project.',
+    description='Automates the running of models and data format conversion for csv, xlsx and har files.',
     author='Lyle Collins',
     author_email='Lyle.Collins@csiro.au',
     url=r'https://svnserv.csiro.au/svn/OSM_CBR_LW_NATOUTLOOK2_work/ISAM/trunk/iam/integration/',
