@@ -1,0 +1,425 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cero &#8212; ConCERO 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cero</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1">#      ConCERO - a program to automate data format conversion and the execution of economic modelling software.</span>
+<span class="c1">#      Copyright (C) 2018  CSIRO Energy Business Unit</span>
+<span class="c1">#</span>
+<span class="c1">#     This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#     it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#     the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#     (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#     This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#     but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#     GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#     You should have received a copy of the GNU General Public License</span>
+<span class="c1">#     along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. cero:</span>
+
+<span class="sd">A core concept in the operation of ConCERO is that of a &#39;Collins Economic Results Object&#39; - a CERO - which \</span>
+<span class="sd">serves as a standard format for data-interchange between economic modelling programs. Conceptually, the CERO \</span>
+<span class="sd">is a set of instances of a &#39;fundamental data type&#39;, a discussion of which can be found in the :ref:`Design_Philosophy` \</span>
+<span class="sd">documentation.</span>
+
+<span class="sd">Software-wise, the CERO is a ``pandas.DataFrame`` with some additional constraints. Those constraints are:</span>
+
+<span class="sd">    * ``cero.index`` must be an instance of the ``pandas.Index`` class, and</span>
+<span class="sd">    * ``cero.columns`` must be an instance of the ``pandas.DatetimeIndex`` class, and</span>
+<span class="sd">    * both ``cero.index`` and ``cero.columns`` values must be unique and</span>
+<span class="sd">    * all index values must be valid *identifiers* (see below) and</span>
+<span class="sd">    * ``cero`` data/array values must all be of 32-bit floating-point type (specifically, be instances of a \</span>
+<span class="sd">    subclass of the ``numpy.float32`` class),</span>
+
+<span class="sd">where ``cero`` is a CERO. The values of ``cero.index`` are referred as *identifiers*.</span>
+
+<span class="sd">.. _cero_ids:</span>
+
+<span class="sd">CERO Identifiers</span>
+<span class="sd">----------------</span>
+
+<span class="sd">As mentioned previously, values of the index of a CERO are referred to as *identifiers*. Identifiers are \</span>
+<span class="sd">subject to a couple of restrictions. They are:</span>
+
+<span class="sd">    * The identifier must be unique - that is, no other value of ``cero.index`` can be exactly the same.</span>
+<span class="sd">    * The identifier must be either:</span>
+<span class="sd">        * a string (``str``) *with no commas*, or</span>
+<span class="sd">        * a tuple of strings, where each string does not have any commas.</span>
+
+<span class="sd">The comma constraint is a result of how ConCERO interprets commas when reading YAML files - ConCERO \</span>
+<span class="sd">interprets commas as a string-splitting character. Thus, \</span>
+<span class="sd">if a configuration file contains the string:</span>
+
+<span class="sd">    ``&quot;hello,world&quot;``</span>
+
+<span class="sd">in the context of CERO *identifiers*, then this will be interpreted as the python tuple:</span>
+
+<span class="sd">    ``(&#39;hello&#39;,&#39;world&#39;)``</span>
+
+<span class="sd">Note also that any white spaced is stripped when the string is split, so the string:</span>
+
+<span class="sd">    ``&quot;hello, world&quot;``</span>
+
+<span class="sd">also becomes:</span>
+
+<span class="sd">    ``(&#39;hello&#39;,&#39;world&#39;)``</span>
+
+<span class="sd">and this:</span>
+
+<span class="sd">    ``&quot; L_OUTPUT, Electricity, AUS&quot;``</span>
+
+<span class="sd">becomes:</span>
+
+<span class="sd">    ``(&quot;L_OUTPUT&quot;,&quot;Electricity&quot;,&quot;AUS&quot;)``</span>
+
+<span class="sd">The advantage of the tuple form of identifier is that it preserves ordered relationships, even though that \</span>
+<span class="sd">ordered relationship has no meaning within the CERO itself. This is necessary to store data that is more \</span>
+<span class="sd">than 2-dimensional in nature in 2-dimensions. It also allows for the implementation of ``sets`` (see :ref:`sets`),\</span>
+<span class="sd">which provide the user with significant flexibility and power with respect to selecting identifiers of interest. \</span>
+<span class="sd">In summary, ``sets`` allow the user to select large amounts of identifiers by just listing sets, \</span>
+<span class="sd">as opposed to all the identifiers.</span>
+
+
+<span class="sd">.. * VURM</span>
+<span class="sd">.. * AusTIMES</span>
+<span class="sd">.. * LUTO</span>
+<span class="sd">.. * GALLM-E</span>
+<span class="sd">.. * GALLM-T</span>
+<span class="sd">.. * GTAP-E</span>
+
+<span class="sd">.. The CERO provides methods for use with a pandas dataframe. Subclassing \</span>
+<span class="sd">.. ``pandas.DataFrame`` is not a trivial exercise.</span>
+
+<span class="sd">Created on Wed Dec 20 10:20:32 2017</span>
+
+<span class="sd">@author: Lyle Collins</span>
+<span class="sd">@email: Lyle.Collins@csiro.au</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">concero._identifier</span> <span class="k">import</span> <span class="n">_Identifier</span>
+
+<div class="viewcode-block" id="CERO"><a class="viewcode-back" href="../reference.html#cero.CERO">[docs]</a><span class="k">class</span> <span class="nc">CERO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_msg_inv_type</span> <span class="o">=</span> <span class="s2">&quot;Object not of CERO type (pandas.DataFrame).&quot;</span>
+    <span class="n">_msg_bad_idx</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Object&#39;s index is not of pandas.Index type.&quot;</span>
+    <span class="n">_msg_bad_col</span> <span class="o">=</span> <span class="s2">&quot;Object.columns is not of pandas.DatetimeIndex type.&quot;</span>
+    <span class="n">_msg_idx_nunique</span> <span class="o">=</span> <span class="s2">&quot;Index values are not unique.&quot;</span>
+    <span class="n">_msg_col_nunique</span> <span class="o">=</span> <span class="s2">&quot;Column values are not unique.&quot;</span>
+    <span class="n">_msg_val_type</span> <span class="o">=</span> <span class="s2">&quot;Values are not of numpy.float32 type.&quot;</span>
+    <span class="n">_msg_empty_cero</span> <span class="o">=</span> <span class="s2">&quot;Object is empty - not a valid CERO.&quot;</span>
+    <span class="n">_msg_invalid_ids</span> <span class="o">=</span> <span class="s2">&quot;Values in object&#39;s index are not valid identifiers.&quot;</span>
+
+<div class="viewcode-block" id="CERO.InvalidCERO"><a class="viewcode-back" href="../reference.html#cero.CERO.InvalidCERO">[docs]</a>    <span class="k">class</span> <span class="nc">InvalidCERO</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CERO.CEROIndexConflict"><a class="viewcode-back" href="../reference.html#cero.CERO.CEROIndexConflict">[docs]</a>    <span class="k">class</span> <span class="nc">CEROIndexConflict</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CERO.EmptyCERO"><a class="viewcode-back" href="../reference.html#cero.CERO.EmptyCERO">[docs]</a>    <span class="k">class</span> <span class="nc">EmptyCERO</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CERO.create_empty"><a class="viewcode-back" href="../reference.html#cero.CERO.create_empty">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_empty</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Returns empty CERO.&quot;&quot;&quot;</span>
+
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="n">cero</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;AS&quot;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2018&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+<div class="viewcode-block" id="CERO.is_cero"><a class="viewcode-back" href="../reference.html#cero.CERO.is_cero">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_cero</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">empty_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param obj: The object that may or may not be a CERO.</span>
+<span class="sd">        :param raise_exception: If `True` will raise an exception on the event that obj is not a CERO.</span>
+<span class="sd">        :param empty_ok: If `True`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `False` by default.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_inv_type</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_bad_idx</span> <span class="o">+</span>
+                                       <span class="p">(</span><span class="s2">&quot; Instead it is of type &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_bad_col</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_unique</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_idx_nunique</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; Duplicated values are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_duplicates</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">is_unique</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_col_nunique</span> <span class="o">+</span>
+                                       <span class="p">(</span><span class="s2">&quot; Duplicated values are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_duplicates</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dtypes</span><span class="p">])</span>
+            <span class="c1"># Note that this &#39;float32 requirement&#39; is because df.to_pickle() automatically downsizes \</span>
+            <span class="c1"># float64 to float32, and there is no option to change this behaviour.</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_val_type</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">invalid_idents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="ow">not</span> <span class="n">invalid_idents</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_invalid_ids</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; Invalid index values are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">invalid_idents</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">empty_ok</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">EmptyCERO</span><span class="p">(</span><span class="n">CERO</span><span class="o">.</span><span class="n">_msg_empty_cero</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CERO.create_cero_index"><a class="viewcode-back" href="../reference.html#cero.CERO.create_cero_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_cero_index</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="s1">&#39;List[str, tuple]&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates pandas.Index object that adheres to CERO constraints.&quot;&quot;&quot;</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CERO.read_xlsx"><a class="viewcode-back" href="../reference.html#cero.CERO.read_xlsx">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_xlsx</span><span class="p">(</span><span class="n">xlsx_file</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads CEROs that have been exported to xlsx files.</span>
+
+<span class="sd">        :arg (str) file: Name of xlsx file that CERO resides in.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xlsx_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">xlsx_file</span><span class="p">)</span>
+
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">xlsx_file</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Read header</span>
+
+        <span class="c1"># Identify where index columns end</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">ch</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="n">index_col</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ss</span><span class="p">))</span>
+
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">xlsx_file</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">)</span>
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">cero</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_cero_index</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>  <span class="c1"># Check that it is a valid CERO object</span>
+
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+<div class="viewcode-block" id="CERO.read_csv"><a class="viewcode-back" href="../reference.html#cero.CERO.read_csv">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads CEROs that have been exported to csv file. It is assumed that &#39;;&#39; are used to seperate the fields (if more than one) of the identifier.</span>
+
+<span class="sd">        :param str csv_file: Path to the file containing the CERO.</span>
+<span class="sd">        :return pandas.DataFrame: The imported CERO.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Read header</span>
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">cero</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_cero_index</span><span class="p">(</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">get_all_idents</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">))</span>
+        <span class="n">cero</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>  <span class="c1"># Check that it is a valid CERO object</span>
+
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+<div class="viewcode-block" id="CERO.combine_ceros"><a class="viewcode-back" href="../reference.html#cero.CERO.combine_ceros">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_cero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Combine multiple CEROs (provided as a ``list``) into a common CERO. If ``overwrite`` is True, a CERO \</span>
+<span class="sd">        that is later in ``ceros`` (i.e. has a higher index) will overwrite the merger of all preceding CEROs. If \</span>
+<span class="sd">        ``overwrite`` is False and duplicate indices are detected, an ``CERO.CEROIndexConflict`` exception \</span>
+<span class="sd">        will be raised.</span>
+
+<span class="sd">        If ``verify_cero`` is ``True``, then a check is performed before and after combination to ensure that \</span>
+<span class="sd">        only CEROs are combined with other CEROs, to form a CERO. By disabling this, ``combine_ceros`` can be \</span>
+<span class="sd">        applied to ``pandas.DataFrames`` as well.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ceros</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;ceros&#39; must be provided as a list of CEROs, not &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ceros</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">verify_cero</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cero</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ceros</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">InvalidCERO</span><span class="p">(</span><span class="s2">&quot;The &#39;</span><span class="si">%d</span><span class="s2">&#39;th CERO in the list (zero-indexed) is invalid.&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">overwrite</span> <span class="o">=</span> <span class="p">[</span><span class="n">overwrite</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ceros</span><span class="p">)</span>
+
+        <span class="c1"># In the case first value is neglected because it is ineffectual...</span>
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">overwrite</span><span class="p">),</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">overwrite</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ceros</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">overwrite</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">cero</span> <span class="o">=</span> <span class="n">ceros</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">next_cero</span><span class="p">,</span> <span class="n">ow</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ceros</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">overwrite</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ow</span><span class="p">:</span>
+                <span class="c1"># Check the intersection of indices</span>
+                <span class="n">itsn</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">next_cero</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">itsn</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CERO</span><span class="o">.</span><span class="n">CEROIndexConflict</span><span class="p">((</span><span class="s2">&quot;Attempted to combine CEROs with duplicate indices &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;(and &#39;overwrite&#39; is not allowed). The duplicated indices are: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">itsn</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">next_cero</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># #TODO: combine_first can output array of different dtypes then inputs. I have not isolated the circumstances \</span>
+            <span class="c1"># that this occurs however...</span>
+
+        <span class="k">if</span> <span class="n">verify_cero</span><span class="p">:</span>
+            <span class="n">CERO</span><span class="o">.</span><span class="n">is_cero</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>  <span class="c1"># check there have been no errors</span>
+
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+<div class="viewcode-block" id="CERO.rename_index_values"><a class="viewcode-back" href="../reference.html#cero.CERO.rename_index_values">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rename_index_values</span><span class="p">(</span><span class="n">cero</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">map_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param cero: The CERO object to rename the index values of. The order of the CERO.index imposes order on the mapping operation - that is, the CERO retains its original order.</span>
+<span class="sd">        :param map_dict: A `dict` of (old name, new name) are (key, value) pairs.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">map_dict</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The mapping dictionary must be a subclass of dict.&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># Copied from within pandas.core.generic.rename()</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">map_dict</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">map_dict</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">cero</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">cero</span>
+
+        <span class="n">cero</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">_transform_index</span><span class="p">(</span><span class="n">cero</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_transform_index</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply function to all values found in index.</span>
+
+<span class="sd">        This includes transforming multiindex entries separately.</span>
+<span class="sd">        Only apply function to one level of the MultiIndex if level is specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Copied from pandas.core.internals._transform_index() with minor modification in response to pandas bug #19497</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">level</span> <span class="k">else</span> <span class="n">y</span>
+                               <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">index</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">index</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="n">tupleize_cols</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,353 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>model &#8212; ConCERO 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model</h1><div class="highlight"><pre>
+<span></span><span class="c1">#      ConCERO - a program to automate data format conversion and the execution of economic modelling software.</span>
+<span class="c1">#      Copyright (C) 2018  CSIRO Energy Business Unit</span>
+<span class="c1">#</span>
+<span class="c1">#     This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#     it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#     the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#     (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#     This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#     but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#     GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#     You should have received a copy of the GNU General Public License</span>
+<span class="c1">#     along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Feb 05 12:28:55 2018</span>
+
+<span class="sd">.. sectionauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">.. codeauthor:: Lyle Collins &lt;Lyle.Collins@csiro.au&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="kn">import</span> <span class="nn">concero.conf</span> <span class="k">as</span> <span class="nn">conf</span>
+<span class="kn">import</span> <span class="nn">concero.modfuncs</span> <span class="k">as</span> <span class="nn">modfuncs</span>
+<span class="kn">from</span> <span class="nn">concero.from_cero</span> <span class="k">import</span> <span class="n">FromCERO</span>
+<span class="kn">from</span> <span class="nn">concero.to_cero</span> <span class="k">import</span> <span class="n">ToCERO</span>
+<span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
+
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">_modified_environ</span><span class="p">(</span><span class="o">*</span><span class="n">remove</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">update</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Temporarily updates the ``os.environ`` dictionary in-place.</span>
+
+<span class="sd">    The ``os.environ`` dictionary is updated in-place so that the modification</span>
+<span class="sd">    is sure to work in all situations.</span>
+
+<span class="sd">    :param remove: Environment variables to remove.</span>
+<span class="sd">    :param wd: Directory to change to (before any changes to environment variables are made). By default, current working directory.</span>
+<span class="sd">    :param update: Dictionary of environment variables and values to add/update.</span>
+
+<span class="sd">    Code for this function from: ``https://stackoverflow.com/questions/2059482/python-temporarily-modify-the-current-processs-environment``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">update</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">update</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span>
+
+    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+    <span class="n">update</span> <span class="o">=</span> <span class="n">update</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">remove</span> <span class="o">=</span> <span class="n">remove</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="c1"># List of environment variables being updated or removed.</span>
+    <span class="n">stomped</span> <span class="o">=</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">update</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">remove</span><span class="p">))</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="c1"># Environment variables and values to restore on exit.</span>
+    <span class="n">update_after</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">stomped</span><span class="p">}</span>
+    <span class="c1"># Environment variables and values to remove on exit.</span>
+    <span class="n">remove_after</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">update</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env</span><span class="p">)</span>
+
+    <span class="n">old_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">wd</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">wd</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="c1"># Attempt to create directory if it doesn&#39;t exist</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">wd</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">wd</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">remove</span><span class="p">]</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update_after</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">remove_after</span><span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">old_dir</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../reference.html#model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;Model&quot;</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param model: A `dict` containing ``Model`` options.</span>
+<span class="sd">        :param args: Passed to superclass (`dict`) at initialisation.</span>
+<span class="sd">        :param &quot;Model&quot; parent: If provided, inherits all key-value pairs from ``parent``.</span>
+<span class="sd">        :param kwargs: Passed to superclass (`dict`) at initialisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;output_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;wd&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]]</span>
+
+        <span class="c1"># Locate and load configuration files...</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="n">input_conf</span><span class="p">)</span>
+            <span class="n">par_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]))}</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">parent</span><span class="o">=</span><span class="n">par_dict</span><span class="p">)</span>
+
+        <span class="c1"># Locate and load configuration files...</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">output_conf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_file</span><span class="p">(</span><span class="n">output_conf</span><span class="p">)</span>
+            <span class="n">par_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]))}</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">ToCERO</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">parent</span><span class="o">=</span><span class="n">par_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.is_valid"><a class="viewcode-back" href="../reference.html#model.Model.is_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the validity of ``self`` as a ``Model`` object. Method does not ensure runtime issues will not occur.</span>
+<span class="sd">        :param bool raise_exception:</span>
+<span class="sd">        :return bool: Returns `True` if ``self`` is a valid ``Model``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;cmds&quot;</span><span class="p">,</span> <span class="s2">&quot;input_conf&quot;</span><span class="p">,</span> <span class="s2">&quot;output_conf&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">req_keys</span><span class="p">]):</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;All models must have all of the keys: </span><span class="si">%s</span><span class="s2">. Attempted to create model&quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot; with at least one of these keys missing.&quot;</span> <span class="o">%</span> <span class="n">req_keys</span><span class="p">)</span>
+
+            <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">ic</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">oc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ToCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">oc</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Model.run_checks"><a class="viewcode-back" href="../reference.html#model.Model.run_checks">[docs]</a>    <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs runtime checks on ``self`` to ensure it is a valid Model object. Failure of runtime checks indicates that the model is not ready to run.</span>
+
+<span class="sd">        :param bool raise_exception: If True, an exception is raised on check failure (as opposed to returning `False`).</span>
+<span class="sd">        :return bool:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">check_config</span><span class="p">(</span><span class="n">ic</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">runtime</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_checks</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.run"><a class="viewcode-back" href="../reference.html#model.Model.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cero</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;CERO&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param pandas.DataFrame cero: A CERO that contains all necessary data for conversion to input files (for \</span>
+<span class="sd">        model execution).</span>
+<span class="sd">        :return pandas.DataFrame: A CERO of relevant output data (&#39;relevant&#39; is defined by ``output_conf``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">input_conf</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;input_conf&quot;</span><span class="p">]:</span>
+            <span class="n">input_conf</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed converting CERO to model input files (</span><span class="si">%s</span><span class="s2">). Now processing commands...&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Command string processing</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]]</span>
+
+        <span class="k">with</span> <span class="n">_modified_environ</span><span class="p">(</span><span class="n">wd</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wd&quot;</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_vars&quot;</span><span class="p">,</span> <span class="p">{})):</span>
+
+            <span class="k">for</span> <span class="n">cmdobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]:</span>
+
+                <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;shell&quot;</span><span class="p">,</span> <span class="s2">&quot;shell&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span> <span class="c1"># Default command</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmdobj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="c1"># cmd is interpreted as shell command by default</span>
+                    <span class="c1"># cmdobj = cmdobj.split(&quot; &quot;)</span>
+                    <span class="n">cmd</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">cmdobj</span><span class="p">})</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmdobj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">cmd</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cmdobj</span><span class="p">)</span> <span class="c1"># Add user updates</span>
+                    <span class="k">if</span> <span class="s2">&quot;args&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;args&#39; must be provided for command of type &#39;dict&#39;.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid command object in configuration file.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Change to command-specific directory</span>
+                <span class="n">cmd_run_dir</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wd&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">cmd_run_dir</span><span class="p">:</span>
+                    <span class="n">cmd_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cmd_run_dir</span><span class="p">)</span>
+
+                <span class="n">cmd_type</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Execute commands</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;In directory &#39;</span><span class="si">%s</span><span class="s2">&#39;, executing command &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_run_dir</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+                <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">_modified_environ</span><span class="p">(</span><span class="n">wd</span><span class="o">=</span><span class="n">cmd_run_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;env_vars&quot;</span><span class="p">,</span> <span class="p">{})):</span>
+
+                    <span class="c1"># Depending on cmd_type, execute command in different ways...</span>
+                    <span class="k">if</span> <span class="n">cmd_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;shell&quot;</span><span class="p">]:</span>
+                        <span class="n">args</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;args&quot;</span><span class="p">)</span>
+                        <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Executing shell command: </span><span class="si">%s</span><span class="s2">, with keyword args: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">cmd</span><span class="p">))</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+                                                                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                                                                    <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                    <span class="o">**</span><span class="n">cmd</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Command &#39;</span><span class="si">%s</span><span class="s2">&#39; failed with returncode: </span><span class="si">%s</span><span class="s2">, and message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                                   <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;Program logs may have more information.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+                            <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="n">e</span>
+                        <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">])</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Command returned: </span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">cmd_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;python_method&quot;</span><span class="p">]:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">assert</span><span class="p">(</span><span class="s2">&quot;func&quot;</span> <span class="ow">in</span> <span class="n">cmd</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;func&#39; must be defined for commands of type &#39;python_method&#39;.&quot;</span><span class="p">)</span>
+                        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">modfuncs</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;func&quot;</span><span class="p">))</span>
+                        <span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">cmd</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported command type specified.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">CERO</span><span class="o">.</span><span class="n">create_empty</span><span class="p">()</span>
+
+        <span class="n">ceros</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">oc</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;output_conf&quot;</span><span class="p">]:</span>
+            <span class="n">ceros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oc</span><span class="o">.</span><span class="n">create_cero</span><span class="p">())</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CERO</span><span class="o">.</span><span class="n">CEROIndexConflict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeWarning</span><span class="p">(</span><span class="s2">&quot;Attempts to duplicate the export of data - i.e. one or more data series are being &quot;</span> <span class="o">+</span>
+                                 <span class="s2">&quot;exported more than once (which should be avoided). The last procedure will define &quot;</span> <span class="o">+</span>
+                                 <span class="s2">&quot;the intended data.&quot;</span><span class="p">)</span>
+            <span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cero</span></div>
+
+    <span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">orig_filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
+            <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Model.find_file(): testing path: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; not found.&quot;</span> <span class="o">%</span> <span class="n">orig_filename</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
