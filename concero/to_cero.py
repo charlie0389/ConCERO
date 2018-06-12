@@ -247,8 +247,8 @@ that deviates from the default. Please see `File independent options`_ for more 
 
 .. _GDX files:
 
-File Objects - GDX files
-------------------------
+File Objects - GDX files (currently unsupported)
+------------------------------------------------
 
 Currently, ``GDX`` files are not supported (though large amounts of the framework is in place).
 
