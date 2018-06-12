@@ -26,11 +26,7 @@ Note that this example assumes the CSV is in the default format - one header row
     ```
     The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
 
-3. Run the python interpreter (version 3.4 or above):
-
-    ````python```
-
-4. Then run the commands:
+3. Then in python (version 3.4 or above) run the commands:
 
     ```python
     import concero
@@ -42,6 +38,14 @@ Note that this example assumes the CSV is in the default format - one header row
     In the working directory, you will find that ``export_data.xlsx`` has been created.
 
 More examples can be found on the *Quickstart: Common ConCERO-Related Commands* page.
+
+# Introduction and Features
+
+ ConCERO allows for automatic data format conversion for data that is time-based. ConCERO was designed to make it easy for distributed projects to automate the conversion of data formats. Initially, ConCERO was designed so that multiple economic forecasting models could easily be run, and data transferred between them (e.g. the output data of one model can be used as input to another). This is a non-trivial exercise because economic forecasting models come in a variety of types - from proprietary programs to simple python scripts. However, they do all have one thing in common - all input and output data is time-referenced. ConCERO exploits this similarity - this allows the user to write simple files that define the structure of the input/output data files, and using these files ConCERO automates the data format conversion. Furthermore, ConCERO can automate the execution of the models themselves, creating a pipeline of execution of economic models and data format conversion.
+
+    - Documented
+    - Simple API that can be used from a python script, or by defining data structure files in YAML syntax
+    - Can execute any program that has a command line interface
 
 # Bug Reporting
 
