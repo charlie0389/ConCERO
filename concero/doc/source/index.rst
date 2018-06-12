@@ -13,7 +13,9 @@ ConCERO is a Python 3 based program for achieving two primary tasks:
       * AusTIMES
       * GLOBIOM
 
-By 'economic models', it is meant a computer program for calculating predictions of the future state of an economy. **Currently, not all of the economic models listed are supported.**
+By 'economic models', it is meant a computer program for calculating predictions of the future state of an economy. The list above is not exhaustive - **the interface supports expansion to any computer program that can be run from a command line/terminal interface.**
+
+ConCERO is released under Version 3 of the Gnu General Public License (GPL). Please see the ``LICENSE`` file for a copy of the GPL v3.
 
 Creating a common format facilitates automating the transfer of information between the economic models. Regardless of the economic models involved, ConCERO converts the output files of the listed economic models into appropriate input files with 2 simple steps.
 
@@ -28,7 +30,7 @@ For a more thorough yet simple introduction to YAML files, `this webpage <http:/
 
 The founding author of ConCERO is Lyle Collins, and can be contacted for questions and comments at `Lyle.Collins@csiro.au <Lyle.Collins@csiro.com>`_.
 
-If you use this program for academic publications, a citation, such as below, would be much appreciated:
+If you use this program for academic publications, a citation, such as below, is requested and much appreciated:
 
 .. [1] Collins, Lyle D. *ConCERO\: Software for automating the execution of economic models and data format conversion between them.* CSIRO, Newcastle, Australia. 2018.
 
@@ -36,10 +38,12 @@ If using ``gdx`` files, the author of ``gdxpds`` (an underlying library) request
 
 .. [2] Hale, Elaine T. *gdxpds 1.0.4*. NREL, Colorado, USA. 2016. https://pypi.python.org/pypi/gdxpds/
 
+The latest version of ``gdxpds`` (and citation format) can be found on `GitHub <https://github.com/NREL/gdx-pandas/tree/master/gdxpds>`_.
+
 .. And if using ``har`` files, the author of ``harpy`` - an underlying library - requests a citation:
 .. <>
 
-**Note regarding the use of '/' and '\\' in file names**: Note that different operating systems prefer a different style to define file locations. The Windows operating system uses the backslash (\\), whereas Linux/Mac based systems use the forward slash (/). **When specifying filenames for the purpose of using ConCERO, forward slashes (/) are preferred**. The reason being that '\\' is also the escape character in Python (for example, ``\n`` indicates a new line, not a backslash followed by 'n'). However, for filenames in YAML files, \\ is correctly interpreted as a directory separator on *Windows-based systems only*. This should not be considered a sufficient reason to use \\ in filenames, because it detracts from the operating-system independent nature of ConCERO, and it is reasonably likely that other operating systems will be used, especially in the context of supercomputers (for which Linux has >90% market share). In summary, / is preferred because ConCERO correctly interprets it on all operating systems, whereas \\ is correctly interpreted on Windows-based systems only.
+**Note regarding the use of '/' and '\\' in file names (applicable if running ConCERO on different operating systems)**: Note that different operating systems prefer a different style to define file locations. The Windows operating system uses the backslash (\\), whereas Linux/Mac based systems use the forward slash (/). **When specifying filenames for the purpose of using ConCERO, forward slashes (/) are preferred**. The reason being that '\\' is also the escape character in Python (for example, ``\n`` indicates a new line, not a backslash followed by 'n'). However, for filenames in YAML files, \\ is correctly interpreted as a directory separator on *Windows-based systems only*. This should not be considered a sufficient reason to use \\ in filenames, because it detracts from the operating-system independent nature of ConCERO, and it is reasonably likely that other operating systems will be used, especially in the context of supercomputers (for which Linux has >90% market share). In summary, / is preferred because ConCERO correctly interprets it on all operating systems, whereas \\ is correctly interpreted on Windows-based systems only.
 
 **There is an exception to this guideline (regardless of the operating system in use).** When specifying commands to be executed (such as commands to execute a model run), it is *necessary* that the directory separator be the same style as that required by the operating system that the command is to be executed on. This is because the commands are passed directly to the command line (and it is infeasible for ConCERO to understand, parse and modify all the possible commands that may be used for either operating system style).
 
@@ -48,6 +52,7 @@ Contents:
 .. toctree::
     :maxdepth: 3
 
+    reference
     quickstart
     design_philosophy
     install_requirements

@@ -238,7 +238,7 @@
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="log_func"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.log_func">[docs]</a><span class="k">def</span> <span class="nf">log_func</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="log_func"><a class="viewcode-back" href="../reference.html#libfuncs_wrappers.log_func">[docs]</a><span class="k">def</span> <span class="nf">log_func</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Logging decorator - for debugging purposes. To apply to function ``func``:</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -256,7 +256,7 @@
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
-<div class="viewcode-block" id="dataframe_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.dataframe_op">[docs]</a><span class="k">def</span> <span class="nf">dataframe_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="dataframe_op"><a class="viewcode-back" href="../reference.html#libfuncs_wrappers.dataframe_op">[docs]</a><span class="k">def</span> <span class="nf">dataframe_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This decorator is designed to provide ``func`` (the encapsulated function) with a restricted form \</span>
 <span class="sd">    of ``df`` (a CERO). A \</span>
@@ -354,7 +354,7 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<div class="viewcode-block" id="series_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.series_op">[docs]</a><span class="k">def</span> <span class="nf">series_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="series_op"><a class="viewcode-back" href="../reference.html#libfuncs_wrappers.series_op">[docs]</a><span class="k">def</span> <span class="nf">series_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This decorator provides ``func`` (the encapsulated function) with the first ``pandas.Series`` \</span>
 <span class="sd">    in a ``pandas.DataFrame`` (i.e. the first row in ``df``). Note that this wrapper is encapsulated within \</span>
 <span class="sd">    the ``dataframe_op`` wrapper.&quot;&quot;&quot;</span>
@@ -388,7 +388,7 @@
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
-<div class="viewcode-block" id="recursive_op"><a class="viewcode-back" href="../libfuncs_wrappers.html#libfuncs_wrappers.recursive_op">[docs]</a><span class="k">def</span> <span class="nf">recursive_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="recursive_op"><a class="viewcode-back" href="../reference.html#libfuncs_wrappers.recursive_op">[docs]</a><span class="k">def</span> <span class="nf">recursive_op</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Applies the encapsulated function (``func``) iteratively to the elements of \</span>
 <span class="sd">        ``array`` from left to right, with ``init`` prepended to ``array`` \</span>
 <span class="sd">        and ``post`` postpended.&quot;&quot;&quot;</span>

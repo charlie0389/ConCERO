@@ -1,0 +1,14 @@
+Please consult ConCERO's documentation for installation instructions. Please also note that citing ConCERO (and any relevant dependent libraries) is requested and appreciated. Citation instructions can be found on the main page of ConCERO's documentation. The documentation can be read by opening, in a web browser, the file:
+
+concero/doc/build/html/index.html
+
+Dependencies/Attributions:
+
+ - Pandas - a data analytics library.
+ - Harpy - used to interact with .har files (commonly associated with the program RunDynam written by GEMPACK software).
+ - Gdxpds - used to interact with .gdx files (associated with the program GAMS).
+ - Numpy - for number/matrix/array calculations.
+ - Pyyaml - for reading/writing YAML files.
+ - Matplotlib - for plotting.
+ - Seaborn - makes matplotlib plots look nice.
+ - Xlrd - for interacting with xlsx files.

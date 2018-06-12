@@ -1,0 +1,582 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Technical Reference &#8212; ConCERO 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Common ConCERO-Related Commands" href="quickstart.html" />
+    <link rel="prev" title="Welcome to ConCERO!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="technical-reference">
+<span id="reference"></span><h1>Technical Reference<a class="headerlink" href="#technical-reference" title="Permalink to this headline">¶</a></h1>
+<p>This page serves as ‘one place’ to find all technical reference documentation. Other documentation pages provide examples (unlike this page).</p>
+<dl class="class">
+<dt id="cero.CERO">
+<em class="property">class </em><code class="descclassname">cero.</code><code class="descname">CERO</code><a class="reference internal" href="_modules/cero.html#CERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="exception">
+<dt id="cero.CERO.CEROIndexConflict">
+<em class="property">exception </em><code class="descname">CEROIndexConflict</code><a class="reference internal" href="_modules/cero.html#CERO.CEROIndexConflict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.CEROIndexConflict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="cero.CERO.EmptyCERO">
+<em class="property">exception </em><code class="descname">EmptyCERO</code><a class="reference internal" href="_modules/cero.html#CERO.EmptyCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.EmptyCERO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="cero.CERO.InvalidCERO">
+<em class="property">exception </em><code class="descname">InvalidCERO</code><a class="reference internal" href="_modules/cero.html#CERO.InvalidCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.InvalidCERO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.combine_ceros">
+<em class="property">static </em><code class="descname">combine_ceros</code><span class="sig-paren">(</span><em>ceros: list</em>, <em>overwrite=True</em>, <em>verify_cero=True</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/cero.html#CERO.combine_ceros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.combine_ceros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine multiple CEROs (provided as a <code class="docutils literal notranslate"><span class="pre">list</span></code>) into a common CERO. If <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> is True, a CERO         that is later in <code class="docutils literal notranslate"><span class="pre">ceros</span></code> (i.e. has a higher index) will overwrite the merger of all preceding CEROs. If         <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> is False and duplicate indices are detected, an <code class="docutils literal notranslate"><span class="pre">CERO.CEROIndexConflict</span></code> exception         will be raised.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">verify_cero</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then a check is performed before and after combination to ensure that         only CEROs are combined with other CEROs, to form a CERO. By disabling this, <code class="docutils literal notranslate"><span class="pre">combine_ceros</span></code> can be         applied to <code class="docutils literal notranslate"><span class="pre">pandas.DataFrames</span></code> as well.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.create_cero_index">
+<em class="property">static </em><code class="descname">create_cero_index</code><span class="sig-paren">(</span><em>values: List[str, tuple]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_cero_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.create_cero_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates pandas.Index object that adheres to CERO constraints.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.create_empty">
+<em class="property">static </em><code class="descname">create_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.create_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns empty CERO.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.is_cero">
+<em class="property">static </em><code class="descname">is_cero</code><span class="sig-paren">(</span><em>obj</em>, <em>raise_exception=True</em>, <em>empty_ok=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.is_cero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.is_cero" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> – The object that may or may not be a CERO.</li>
+<li><strong>raise_exception</strong> – If <cite>True</cite> will raise an exception on the event that obj is not a CERO.</li>
+<li><strong>empty_ok</strong> – If <cite>True</cite>, <code class="docutils literal notranslate"><span class="pre">obj</span></code> must have at least one value that is not an NaN to qualify as a CERO. <cite>False</cite> by default.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.read_csv">
+<em class="property">static </em><code class="descname">read_csv</code><span class="sig-paren">(</span><em>csv_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads CEROs that have been exported to csv file. It is assumed that ‘;’ are used to seperate the fields (if more than one) of the identifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>csv_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file containing the CERO.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return pandas.DataFrame:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">The imported CERO.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.read_xlsx">
+<em class="property">static </em><code class="descname">read_xlsx</code><span class="sig-paren">(</span><em>xlsx_file</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_xlsx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.read_xlsx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads CEROs that have been exported to xlsx files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – Name of xlsx file that CERO resides in.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cero.CERO.rename_index_values">
+<em class="property">static </em><code class="descname">rename_index_values</code><span class="sig-paren">(</span><em>cero: pandas.core.frame.DataFrame</em>, <em>map_dict: dict</em>, <em>inplace: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.rename_index_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.rename_index_values" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cero</strong> – The CERO object to rename the index values of. The order of the CERO.index imposes order on the mapping operation - that is, the CERO retains its original order.</li>
+<li><strong>map_dict</strong> – A <cite>dict</cite> of (old name, new name) are (key, value) pairs.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="to_cero.ToCERO">
+<em class="property">class </em><code class="descclassname">to_cero.</code><code class="descname">ToCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/to_cero.html#ToCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a ToCERO configuration, suitable for creating CEROs from data files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>]</em><em>'</em>) – The configuration dictionary, or a path to a YAML file containing the configuration dictionary. If a path, it must be provided as an absolute path, or relative to the current working directory.</li>
+<li><strong>args</strong> – Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
+<li><strong>kwargs</strong> – Passed to the superclass (<cite>dict</cite>) at initialisation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="to_cero.ToCERO.create_cero">
+<code class="descname">create_cero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.create_cero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.create_cero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a CERO from the configuration (defined by <code class="docutils literal notranslate"><span class="pre">self</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return pd.DataFrame:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">A CERO is returned.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="to_cero.ToCERO.is_valid">
+<em class="property">static </em><code class="descname">is_valid</code><span class="sig-paren">(</span><em>conf</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs static validity checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code> as a <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – An object, which may or may not suitable as a ToCERO object.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and <cite>False</cite> is returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last">A <cite>bool</cite> indicating the validity of <code class="docutils literal notranslate"><span class="pre">conf</span></code> as a <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="to_cero.ToCERO.load_config">
+<em class="property">static </em><code class="descname">load_config</code><span class="sig-paren">(</span><em>conf</em>, <em>parent: dict = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>]</em><em>'</em>) – A configuration dictionary, or a <cite>str</cite> to a path containing a configuration dictionary.</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A dict from which to inherit.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body"><p class="first last">The configuration dictionary (suitable as a ToCERO object).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="to_cero.ToCERO.run_checks">
+<em class="property">static </em><code class="descname">run_checks</code><span class="sig-paren">(</span><em>conf</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_cero.html#ToCERO.run_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_cero.ToCERO.run_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs dynamic validity checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code> as a <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – An object, which may or may not suitable as a ToCERO object.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) an exception will be raised in the event a test is failed. Otherwise (in this event) an error message is printed to stdout and <cite>False</cite> is returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last">A <cite>bool</cite> indicating the validity of <code class="docutils literal notranslate"><span class="pre">conf</span></code> as a <code class="docutils literal notranslate"><span class="pre">ToCERO</span></code> object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="from_cero.FromCERO">
+<em class="property">class </em><code class="descclassname">from_cero.</code><code class="descname">FromCERO</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>*args</em>, <em>parent=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Any additional arguments and keyword arguments are passed to the superclass at initialisation (i.e. the <cite>dict</cite> class).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conf</strong> (<em>&quot;Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>]</em><em>&quot;</em>) – A dictionary containing the configuration. If a <cite>str</cite> is provided, it is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory).</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – If provided, the created object will inherit from <code class="docutils literal notranslate"><span class="pre">parent</span></code> (a <cite>dict</cite>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="from_cero.FromCERO.exec_procedures">
+<code class="descname">exec_procedures</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.exec_procedures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.exec_procedures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all the procedures of the FromCERO object
+.
+:param pandas.DataFrame cero: A CERO to serve as input for the procedures. The argument is not mutated/modified.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.is_valid">
+<em class="property">static </em><code class="descname">is_valid</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs static checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code> to verify if <code class="docutils literal notranslate"><span class="pre">conf</span></code> can be converted to a FromCERO object.</p>
+<dl class="docutils">
+<dt>Checks include:</dt>
+<dd><ul class="first last simple">
+<li>Valid type.</li>
+<li>Valid procedures.</li>
+<li>If <code class="docutils literal notranslate"><span class="pre">file</span></code> given, that the user has write permissions in that directory.</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The object to check the validity of.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and <cite>False</cite> returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last"><cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">conf</span></code> passes all static checks.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.load_config">
+<em class="property">static </em><code class="descname">load_config</code><span class="sig-paren">(</span><em>conf</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads configuration of FromCERO. If conf is a <cite>str</cite>, this is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory). Otherwise conf must be a dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conf</strong> (<em>'Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>]</em><em>'</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="from_cero.FromCERO.run_checks">
+<em class="property">static </em><code class="descname">run_checks</code><span class="sig-paren">(</span><em>conf: dict</em>, <em>cero: pandas.core.frame.DataFrame</em>, <em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/from_cero.html#FromCERO.run_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#from_cero.FromCERO.run_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs runtime checks on <code class="docutils literal notranslate"><span class="pre">conf</span></code>, given <code class="docutils literal notranslate"><span class="pre">cero</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The object to check the validity of.</li>
+<li><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If <cite>True</cite> (the default) then an exception will be raised on failure. Otherwise an error message will be printed to stdout and <cite>False</cite> returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"><p class="first last"><cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">conf</span></code> passes all runtime checks.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">model.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>model: dict</em>, <em>*args</em>, <em>parent: Union[model.Model</em>, <em>NoneType] = None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model"><span class="viewcode-link">[source]</span></a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – A <cite>dict</cite> containing <code class="docutils literal notranslate"><span class="pre">Model</span></code> options.</li>
+<li><strong>args</strong> – Passed to superclass (<cite>dict</cite>) at initialisation.</li>
+<li><strong>parent</strong> (<em>&quot;Model&quot;</em>) – If provided, inherits all key-value pairs from <code class="docutils literal notranslate"><span class="pre">parent</span></code>.</li>
+<li><strong>kwargs</strong> – Passed to superclass (<cite>dict</cite>) at initialisation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="descname">is_valid</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.is_valid"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Checks the validity of <code class="docutils literal notranslate"><span class="pre">self</span></code> as a <code class="docutils literal notranslate"><span class="pre">Model</span></code> object. Method does not ensure runtime issues will not occur.
+:param bool raise_exception:
+:return bool: Returns <cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">self</span></code> is a valid <code class="docutils literal notranslate"><span class="pre">Model</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span> &#x2192; concero.cero.CERO<a class="reference internal" href="_modules/model.html#Model.run"><span class="viewcode-link">[source]</span></a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cero</strong> (<em>pandas.DataFrame</em>) – A CERO that contains all necessary data for conversion to input files (for         model execution).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return pandas.DataFrame:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">A CERO of relevant output data (‘relevant’ is defined by <code class="docutils literal notranslate"><span class="pre">output_conf</span></code>).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">run_checks</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.run_checks"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Performs runtime checks on <code class="docutils literal notranslate"><span class="pre">self</span></code> to ensure it is a valid Model object. Failure of runtime checks indicates that the model is not ready to run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If True, an exception is raised on check failure (as opposed to returning <cite>False</cite>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="scenario.Scenario">
+<em class="property">class </em><code class="descclassname">scenario.</code><code class="descname">Scenario</code><span class="sig-paren">(</span><em>sc_def: dict</em>, <em>*args</em>, <em>parent: dict = None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sc_def</strong> – A scenario definition object.</li>
+<li><strong>args</strong> – Passed to the superclass (dict) as positional arguments at initialisation.</li>
+<li><strong>kwargs</strong> – Passed to the superclass (dict) as keyword arguments at initialisation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="scenario.Scenario.get_linked_scenarios">
+<code class="descname">get_linked_scenarios</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.get_linked_scenarios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.get_linked_scenarios" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return “List[‘ScenariosSet’]”:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">A list of linked <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scenario.Scenario.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><em>long_form: bool = True</em>, <em>raise_exception=False</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/scenario.html#Scenario.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>, which is dependent on the first linked <code class="docutils literal notranslate"><span class="pre">ScenariosSet</span></code> object.
+:param long_form: If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) return a long-form of the name. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, return a short form.
+:return: The name of the <code class="docutils literal notranslate"><span class="pre">Scenario</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scenario.Scenario.is_valid">
+<code class="descname">is_valid</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/scenario.html#Scenario.is_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs static checks on <code class="docutils literal notranslate"><span class="pre">self</span></code> to ensure it is a valid Scenario object.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="scenario.Scenario.load_scenario">
+<em class="property">static </em><code class="descname">load_scenario</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenario" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scen_def</strong> – The file containing a single scenario definition, or a scenario definition <cite>dict</cite> .</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return ‘Scenario’:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">A single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="scenario.Scenario.load_scenarios">
+<em class="property">static </em><code class="descname">load_scenarios</code><span class="sig-paren">(</span><em>scen_def: str</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.load_scenarios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.load_scenarios" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load one or more scenarios from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scen_def</strong> – The file containing one or more scenario definitions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return “Union[‘Scenario’,List[‘Scenario’]]”:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">Either a single <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> , or a <cite>list</cite> of <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> s.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scenario.Scenario.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/scenario.html#Scenario.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a scenario run.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scenario.Scenario.run_checks">
+<code class="descname">run_checks</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scenario.html#Scenario.run_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scenario.Scenario.run_checks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs runtime checks on <code class="docutils literal notranslate"><span class="pre">self</span></code> to ensure it is a valid Scenario object. Failure of runtime checks indicates that the scenario is not ready to run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raise_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.dataframe_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">dataframe_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#dataframe_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.dataframe_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator is designed to provide <code class="docutils literal notranslate"><span class="pre">func</span></code> (the encapsulated function) with a restricted form     of <code class="docutils literal notranslate"><span class="pre">df</span></code> (a CERO). A     <em>restricted</em> <code class="docutils literal notranslate"><span class="pre">df</span></code> is the original <code class="docutils literal notranslate"><span class="pre">df</span></code> limited to a subset of rows and/or columns. Note that a restriction on <code class="docutils literal notranslate"><span class="pre">df.columns</span></code>     will be <em>compact</em> (the mathematical property), but this is not necessarily the case for restriction on <code class="docutils literal notranslate"><span class="pre">df.index</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.series_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">series_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#series_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.series_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator provides <code class="docutils literal notranslate"><span class="pre">func</span></code> (the encapsulated function) with the first <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>     in a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> (i.e. the first row in <code class="docutils literal notranslate"><span class="pre">df</span></code>). Note that this wrapper is encapsulated within     the <code class="docutils literal notranslate"><span class="pre">dataframe_op</span></code> wrapper.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.recursive_op">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">recursive_op</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#recursive_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.recursive_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the encapsulated function (<code class="docutils literal notranslate"><span class="pre">func</span></code>) iteratively to the elements of         <code class="docutils literal notranslate"><span class="pre">array</span></code> from left to right, with <code class="docutils literal notranslate"><span class="pre">init</span></code> prepended to <code class="docutils literal notranslate"><span class="pre">array</span></code>         and <code class="docutils literal notranslate"><span class="pre">post</span></code> postpended.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libfuncs_wrappers.log_func">
+<code class="descclassname">libfuncs_wrappers.</code><code class="descname">log_func</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libfuncs_wrappers.html#log_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libfuncs_wrappers.log_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logging decorator - for debugging purposes. To apply to function <code class="docutils literal notranslate"><span class="pre">func</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@log_func</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to ConCERO!</a></li>
+      <li>Next: <a href="quickstart.html" title="next chapter">Common ConCERO-Related Commands</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/reference.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, CSIRO.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/reference.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

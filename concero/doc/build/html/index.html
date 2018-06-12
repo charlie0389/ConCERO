@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Common ConCERO-Related Commands" href="quickstart.html" />
+    <link rel="next" title="Technical Reference" href="reference.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -50,7 +50,8 @@
 </ul>
 </div></blockquote>
 </div></blockquote>
-<p>By ‘economic models’, it is meant a computer program for calculating predictions of the future state of an economy. <strong>Currently, not all of the economic models listed are supported.</strong></p>
+<p>By ‘economic models’, it is meant a computer program for calculating predictions of the future state of an economy. The list above is not exhaustive - <strong>the interface supports expansion to any computer program that can be run from a command line/terminal interface.</strong></p>
+<p>ConCERO is released under Version 3 of the Gnu General Public License (GPL). Please see the <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code> file for a copy of the GPL v3.</p>
 <p>Creating a common format facilitates automating the transfer of information between the economic models. Regardless of the economic models involved, ConCERO converts the output files of the listed economic models into appropriate input files with 2 simple steps.</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -62,7 +63,7 @@
 <p>At the heart of the programs operation is appropriate configuration files which, once configured the first time, are unlikely to undergo significant alteration. Configuration files are written in <code class="docutils literal notranslate"><span class="pre">YAML</span></code> format and, for the sake of convention, should be named <code class="docutils literal notranslate"><span class="pre">model_to_cero.yaml</span></code> or <code class="docutils literal notranslate"><span class="pre">cero_to_model.yaml</span></code>, where <code class="docutils literal notranslate"><span class="pre">model</span></code> is the name of the economic model. Do not be intimidated by the acronym - the YAML format is very simple and human readable. Typically, study of the YAML format should be unnecessary - how to alter the file is, in general, obvious if an example configuration file is accessible. Documentation for constructing the configuration file for converting <em>to</em> a CERO can be found at <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a> and <em>from</em> a CERO can be found at <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a>.</p>
 <p>For a more thorough yet simple introduction to YAML files, <a class="reference external" href="http://docs.ansible.com/ansible/latest/YAMLSyntax.html">this webpage</a> is recommended, or reviewing the yaml files in the <code class="docutils literal notranslate"><span class="pre">tests/data</span></code> subdirectory of the ConCERO system directory, alongside the documentation, should be sufficient as an introduction to YAML.</p>
 <p>The founding author of ConCERO is Lyle Collins, and can be contacted for questions and comments at <a class="reference external" href="mailto:Lyle&#46;Collins&#37;&#52;&#48;csiro&#46;com">Lyle<span>&#46;</span>Collins<span>&#64;</span>csiro<span>&#46;</span>au</a>.</p>
-<p>If you use this program for academic publications, a citation, such as below, would be much appreciated:</p>
+<p>If you use this program for academic publications, a citation, such as below, is requested and much appreciated:</p>
 <table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -76,11 +77,13 @@
 <tr><td class="label">[2]</td><td>Hale, Elaine T. <em>gdxpds 1.0.4</em>. NREL, Colorado, USA. 2016. <a class="reference external" href="https://pypi.python.org/pypi/gdxpds/">https://pypi.python.org/pypi/gdxpds/</a></td></tr>
 </tbody>
 </table>
-<p><strong>Note regarding the use of ‘/’ and ‘' in file names</strong>: Note that different operating systems prefer a different style to define file locations. The Windows operating system uses the backslash (\), whereas Linux/Mac based systems use the forward slash (/). <strong>When specifying filenames for the purpose of using ConCERO, forward slashes (/) are preferred</strong>. The reason being that ‘' is also the escape character in Python (for example, <code class="docutils literal notranslate"><span class="pre">\n</span></code> indicates a new line, not a backslash followed by ‘n’). However, for filenames in YAML files, \ is correctly interpreted as a directory separator on <em>Windows-based systems only</em>. This should not be considered a sufficient reason to use \ in filenames, because it detracts from the operating-system independent nature of ConCERO, and it is reasonably likely that other operating systems will be used, especially in the context of supercomputers (for which Linux has &gt;90% market share). In summary, / is preferred because ConCERO correctly interprets it on all operating systems, whereas \ is correctly interpreted on Windows-based systems only.</p>
+<p>The latest version of <code class="docutils literal notranslate"><span class="pre">gdxpds</span></code> (and citation format) can be found on <a class="reference external" href="https://github.com/NREL/gdx-pandas/tree/master/gdxpds">GitHub</a>.</p>
+<p><strong>Note regarding the use of ‘/’ and ‘' in file names (applicable if running ConCERO on different operating systems)</strong>: Note that different operating systems prefer a different style to define file locations. The Windows operating system uses the backslash (\), whereas Linux/Mac based systems use the forward slash (/). <strong>When specifying filenames for the purpose of using ConCERO, forward slashes (/) are preferred</strong>. The reason being that ‘' is also the escape character in Python (for example, <code class="docutils literal notranslate"><span class="pre">\n</span></code> indicates a new line, not a backslash followed by ‘n’). However, for filenames in YAML files, \ is correctly interpreted as a directory separator on <em>Windows-based systems only</em>. This should not be considered a sufficient reason to use \ in filenames, because it detracts from the operating-system independent nature of ConCERO, and it is reasonably likely that other operating systems will be used, especially in the context of supercomputers (for which Linux has &gt;90% market share). In summary, / is preferred because ConCERO correctly interprets it on all operating systems, whereas \ is correctly interpreted on Windows-based systems only.</p>
 <p><strong>There is an exception to this guideline (regardless of the operating system in use).</strong> When specifying commands to be executed (such as commands to execute a model run), it is <em>necessary</em> that the directory separator be the same style as that required by the operating system that the command is to be executed on. This is because the commands are passed directly to the command line (and it is infeasible for ConCERO to understand, parse and modify all the possible commands that may be used for either operating system style).</p>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Technical Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Common ConCERO-Related Commands</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#installing-concero">Installing ConCERO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#example-import-a-csv-file-export-an-xlsx-file">Example: Import a CSV file, export an XLSX file</a></li>
@@ -212,7 +215,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="quickstart.html" title="next chapter">Common ConCERO-Related Commands</a></li>
+      <li>Next: <a href="reference.html" title="next chapter">Technical Reference</a></li>
   </ul></li>
 </ul>
 </div>

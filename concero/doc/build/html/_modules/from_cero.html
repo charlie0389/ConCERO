@@ -347,7 +347,7 @@
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FromCERO"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO">[docs]</a><span class="k">class</span> <span class="nc">FromCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="FromCERO"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO">[docs]</a><span class="k">class</span> <span class="nc">FromCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="n">sup_output_types</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;excel&#39;</span><span class="p">,</span> <span class="s1">&#39;npy&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">,</span> <span class="s1">&#39;eps&#39;</span><span class="p">,</span> <span class="s1">&#39;svg&#39;</span><span class="p">}</span>
     <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -728,7 +728,7 @@
 
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;self.procedures: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="FromCERO.exec_procedures"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.exec_procedures">[docs]</a>    <span class="k">def</span> <span class="nf">exec_procedures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cero</span><span class="p">):</span>
+<div class="viewcode-block" id="FromCERO.exec_procedures"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO.exec_procedures">[docs]</a>    <span class="k">def</span> <span class="nf">exec_procedures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cero</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Execute all the procedures of the FromCERO object</span>
 <span class="sd">        .</span>
 <span class="sd">        :param pandas.DataFrame cero: A CERO to serve as input for the procedures. The argument is not mutated/modified.</span>
@@ -797,7 +797,7 @@
         <span class="k">return</span> <span class="nb">set</span>
 
 
-<div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="FromCERO.load_config"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads configuration of FromCERO. If conf is a `str`, this is interpreted as a file (in YAML format) containing a configuration dictionary (relative to the current working directory). Otherwise conf must be a dictionary.</span>
@@ -867,7 +867,7 @@
 
         <span class="k">return</span> <span class="n">_conf</span></div>
 
-<div class="viewcode-block" id="FromCERO.is_valid"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="FromCERO.is_valid"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs static checks on ``conf`` to verify if ``conf`` can be converted to a FromCERO object.</span>
@@ -908,7 +908,7 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="FromCERO.run_checks"><a class="viewcode-back" href="../from_cero.html#from_cero.FromCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="FromCERO.run_checks"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cero</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs runtime checks on ``conf``, given ``cero``.</span>
