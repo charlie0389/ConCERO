@@ -1,6 +1,6 @@
 # Installing and Using ConCERO
 
-Please consult ConCERO's documentation for installation instructions. Please also note that citing ConCERO (and any relevant dependent libraries) is requested and appreciated. Citation instructions can be found on the main page of ConCERO's documentation. The documentation can be read by opening, in a web browser, the file:
+Please consult ConCERO's documentation for installation instructions. Please also note that citing ConCERO (and any relevant dependent libraries) is requested and appreciated. Citation instructions can be found on the main page of ConCERO's documentation. The documentation can be read by downloading ConCERO as a zip file, extracting the zip and then opening, in a web browser, the file:
 
 `concero/doc/build/html/index.html`
 
