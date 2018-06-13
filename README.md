@@ -6,7 +6,16 @@ Please consult ConCERO's documentation for installation instructions. Please als
 
 # Quick Example
 
-Note that this example assumes the CSV is in the default format - one header row labelling the years the data refers to, the first column names the data, with all following columns containing floating-point (or integer) numbers (corresponding to each year labelled in the header). More complex files (for example, HAR files) require more specification - please see :ref:`to_cero` and :ref:`from_cero` for a complete outline.
+Note that this example assumes the CSV is in the default format - one header row labelling the years the data refers to, the first column names the data, with all following columns containing floating-point (or integer) numbers (corresponding to each year labelled in the header). An example file could be:
+
+```
+EnergyUse,2018,2019,2020
+Gas,5,10,15
+Coal,20,10,5
+Oil,15,12,9.5
+```
+
+More complex files (for example, HAR files) require more specification - please see *Converting TO the Collins Economics Result Object (CERO) format* and *Converting FROM the Collins Economics Result Object (CERO) format* for a complete outline.
 
 1. Create the import file ``import_data.yaml``, to import the file ``import_data.csv``:
 
