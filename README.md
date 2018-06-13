@@ -30,10 +30,10 @@ Note that this example assumes the CSV is in the default format - one header row
 
     ```python
     import concero
-    tc = concero.ToCERO("import_data.yaml") # Loads the import configuration file and creates the import object (a.k.a. a ``ToCERO`` object)
-    cero = tc.create_cero("import_data.yaml") # creates a "common object" (a.k.a. a 'CERO')
+    tc = concero.ToCERO("import_data.yaml")   # Loads the import configuration file and creates the import object (a.k.a. a ``ToCERO`` object)
+    cero = tc.create_cero()                   # creates a "common object" (a.k.a. a 'CERO')
     fc = concero.FromCERO("export_data.yaml") # Loads the export configuration file and creates the export object (a.k.a. a ``FromCERO`` object)
-    fc.exec_procedures(cero) # Executes the procedures defined in ``export_data.yaml`` on the common object (``cero``).
+    fc.exec_procedures(cero)                  # Executes the procedures defined in ``export_data.yaml`` on the common object (``cero``).
     ```
     In the working directory, you will find that ``export_data.xlsx`` has been created.
 

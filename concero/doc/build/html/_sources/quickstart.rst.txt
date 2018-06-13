@@ -54,10 +54,10 @@ The definition of files/data to be imported and exported is now complete. To cre
         .. code-block:: python
 
             import concero
-            tc = concero.ToCERO("import_data.yaml") # creates the import object (a.k.a. a ``ToCERO`` object)
-            cero = tc.create_cero("import_data.yaml") # creates a common object (a.k.a. a 'CERO')
+            tc = concero.ToCERO("import_data.yaml")   # creates the import object (a.k.a. a ``ToCERO`` object)
+            cero = tc.create_cero()                   # creates a common object (a.k.a. a 'CERO')
             fc = concero.FromCERO("export_data.yaml") # creates the export object (a.k.a. a ``FromCERO`` object)
-            fc.exec_procedures(cero) # execute the procedures defined in ``export_data.yaml`` on ``cero``.
+            fc.exec_procedures(cero)                  # execute the procedures defined in ``export_data.yaml`` on ``cero``.
 
 In the working directory, you will find that ``export_data.xlsx`` has been created.
 

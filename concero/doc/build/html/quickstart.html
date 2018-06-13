@@ -96,10 +96,10 @@
 <li><p class="first">The run the commands:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">concero</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">ToCERO</span><span class="p">(</span><span class="s2">&quot;import_data.yaml&quot;</span><span class="p">)</span> <span class="c1"># creates the import object (a.k.a. a ``ToCERO`` object)</span>
-<span class="n">cero</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">create_cero</span><span class="p">(</span><span class="s2">&quot;import_data.yaml&quot;</span><span class="p">)</span> <span class="c1"># creates a common object (a.k.a. a &#39;CERO&#39;)</span>
+<span class="n">tc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">ToCERO</span><span class="p">(</span><span class="s2">&quot;import_data.yaml&quot;</span><span class="p">)</span>   <span class="c1"># creates the import object (a.k.a. a ``ToCERO`` object)</span>
+<span class="n">cero</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">create_cero</span><span class="p">()</span>                   <span class="c1"># creates a common object (a.k.a. a &#39;CERO&#39;)</span>
 <span class="n">fc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">FromCERO</span><span class="p">(</span><span class="s2">&quot;export_data.yaml&quot;</span><span class="p">)</span> <span class="c1"># creates the export object (a.k.a. a ``FromCERO`` object)</span>
-<span class="n">fc</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span> <span class="c1"># execute the procedures defined in ``export_data.yaml`` on ``cero``.</span>
+<span class="n">fc</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>                  <span class="c1"># execute the procedures defined in ``export_data.yaml`` on ``cero``.</span>
 </pre></div>
 </div>
 </div></blockquote>
