@@ -44,13 +44,13 @@
 <p>A scenario definition object must have the options:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the scenario. For example, <code class="docutils literal notranslate"><span class="pre">'A1'</span></code> or <code class="docutils literal notranslate"><span class="pre">'ExistingTrends'</span></code>. The name of the scenario is not constrained by <code class="docutils literal notranslate"><span class="pre">scenarios_set</span></code>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">models:</span> <span class="pre">list[model</span> <span class="pre">objects]</span></code> - the structure of model objects are described here - <a class="reference internal" href="models.html#model-objects"><span class="std std-ref">Model Objects</span></a>.</li>
 </ul>
 </div></blockquote>
 <p>And may have the options:</p>
 <blockquote>
 <div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the scenario. For example, <code class="docutils literal notranslate"><span class="pre">'A1'</span></code> or <code class="docutils literal notranslate"><span class="pre">'ExistingTrends'</span></code>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - an input configuration file that defines all of the scenario inputs. See <a class="reference internal" href="to_cero.html#to-cero"><span class="std std-ref">Converting TO the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
 <li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code> - an output configuration file that defines outputs from the scenario. See <a class="reference internal" href="from_cero.html#from-cero"><span class="std std-ref">Converting FROM the Collins Economics Result Object (CERO) format</span></a> for more information.</li>
 <li><code class="docutils literal notranslate"><span class="pre">run_no:</span> <span class="pre">(int)</span></code> - An integer numbering the execution run of the scenario. By default is 1. This integer will appear in the filenames of any files output as intermediate steps.</li>
@@ -61,7 +61,7 @@
 </div>
 <div class="section" id="scenario-example">
 <span id="id1"></span><h3>Scenario Example<a class="headerlink" href="#scenario-example" title="Permalink to this headline">¶</a></h3>
-<p>An example scenario definition file, with a single scenario definition object, is:</p>
+<p>An example scenario definition file that demonstrates all options is:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">A1</span>
 <span class="l l-Scalar l-Scalar-Plain">run_no</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data/test_scen_inputs.yaml</span>

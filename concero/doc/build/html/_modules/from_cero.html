@@ -118,12 +118,9 @@
 
 <span class="sd">A *procedure object* can be either a ``str`` or a ``dict``. The ``dict`` form is the more general form - if a \</span>
 <span class="sd">procedure object is provided as the (``str``) ``ser_obj``, it is immediately converted to the equivalent form \</span>
-<span class="sd">``{&#39;name&#39;: ser_obj}`` - a ``dict`` containing the one mandatory option:</span>
+<span class="sd">``{&#39;name&#39;: ser_obj}``. The complete list of options is:</span>
 
-<span class="sd">    * ``name: (str)`` - the name given to the procedure.</span>
-
-<span class="sd">Often, more specification will be necessary. Other options include:</span>
-
+<span class="sd">    * ``name: (str)`` - the name given to the procedure. Will, by default, given the name ``Unnamed_proc``.</span>
 <span class="sd">    * ``file: (str)`` - if provided, the output from this procedure object, and only this procedure object, will \</span>
 <span class="sd">    be exported to ``file``.</span>
 <span class="sd">    * ``inputs: list(str|list(str))`` - is a list of identifiers corresponding to identifiers in the CERO. \</span>
@@ -367,7 +364,8 @@
         <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">proc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s1">&#39;FromCERO&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
             <span class="c1"># Add default options here</span>
-            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;operations&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unnamed_proc&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;operations&quot;</span><span class="p">:</span> <span class="p">[],</span>
                         <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[],</span>
                         <span class="s2">&quot;ref_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">{},</span>
@@ -862,6 +860,9 @@
             <span class="n">parent</span> <span class="o">=</span> <span class="n">_conf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;procedures&quot;</span><span class="p">)</span>  <span class="c1"># Avoid recursive inheritance loop</span>
             <span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>  <span class="c1"># Procedure should not output to file unless a file is specified</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
+                <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Unnamed_proc_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">idx</span>
 
             <span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">_conf</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
 

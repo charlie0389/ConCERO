@@ -38,26 +38,15 @@ Note that this example assumes the CSV is in the default format - one header row
         .. code-block:: yaml
 
             procedures:
-               - name: export_data
-                 file: export_data.xlsx
+               - file: export_data.xlsx
 
-The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
+       The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
 
-    #. Run the python interpreter (version 3.4 or above):
+    #. Then run the command (from the comand line):
 
         .. code-block:: bash
 
-            python
-
-    #. The run the commands:
-
-        .. code-block:: python
-
-            import concero
-            tc = concero.ToCERO("import_data.yaml")   # creates the import object (a.k.a. a ``ToCERO`` object)
-            cero = tc.create_cero()                   # creates a common object (a.k.a. a 'CERO')
-            fc = concero.FromCERO("export_data.yaml") # creates the export object (a.k.a. a ``FromCERO`` object)
-            fc.exec_procedures(cero)                  # execute the procedures defined in ``export_data.yaml`` on ``cero``.
+            concero convert import_data.yaml export_data.yaml
 
 In the working directory, you will find that ``export_data.xlsx`` has been created.
 
@@ -77,7 +66,7 @@ Anything that can be run from the command line can be run by ConCERO. Let's assu
 
         .. code-block:: bash
 
-            concero example_scenario.yaml
+            concero run example_scenario.yaml
 
 Alternatively (to step 2), running the scenario could be accomplished in the python interpreter by executing the code:
 
@@ -102,6 +91,12 @@ Let's assume that ``model_output.yaml`` defines the import of ``interesting_data
               cmds: python model.py
               output_conf: model_output.yaml
         output_conf: scenario_output.yaml
+
+And the scenario run from the command line with:
+
+    .. code-block:: bash
+
+        concero run example_scenario.yaml
 
 This file defines the process:
 
@@ -132,15 +127,15 @@ Other Commands
 
         .. code-block:: python
 
-            concero scenario.yaml
+            concero run scenario.yaml
 
     * Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any 'obvious' errors with configuration files) ...
 
         .. code-block:: python
 
-            concero --fake_run scenario.yaml
+            concero run --fake_run scenario.yaml
 
-       Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).
+      Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).
 
     * Test installation has been successful by running tests:
 
@@ -149,13 +144,13 @@ Other Commands
             cd ..
             python -m concero.tests.test_concero
 
-       As long as their are no *failures*, then ConCERO has been installed correctly.
+      As long as their are no *failures*, then ConCERO has been installed correctly.
 
     * Clone the source directory into ``DIR`` using git:
 
         .. code-block:: shell
 
-            git clone https://col530@bitbucket.csiro.au/scm/energy/concero.git DIR
+            git clone https://github.com/charlie0389/ConCERO DIR
 
     * Check version of your python interpreter:
 

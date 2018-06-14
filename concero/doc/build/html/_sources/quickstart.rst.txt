@@ -38,26 +38,15 @@ Note that this example assumes the CSV is in the default format - one header row
         .. code-block:: yaml
 
             procedures:
-               - name: export_data
-                 file: export_data.xlsx
+               - file: export_data.xlsx
 
-The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
+       The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
 
-    #. Run the python interpreter (version 3.4 or above):
+    #. Then run the command (from the comand line):
 
         .. code-block:: bash
 
-            python
-
-    #. The run the commands:
-
-        .. code-block:: python
-
-            import concero
-            tc = concero.ToCERO("import_data.yaml")   # creates the import object (a.k.a. a ``ToCERO`` object)
-            cero = tc.create_cero()                   # creates a common object (a.k.a. a 'CERO')
-            fc = concero.FromCERO("export_data.yaml") # creates the export object (a.k.a. a ``FromCERO`` object)
-            fc.exec_procedures(cero)                  # execute the procedures defined in ``export_data.yaml`` on ``cero``.
+            concero convert import_data.yaml export_data.yaml
 
 In the working directory, you will find that ``export_data.xlsx`` has been created.
 
@@ -70,20 +59,16 @@ Anything that can be run from the command line can be run by ConCERO. Let's assu
 
         .. code-block:: yaml
 
-            name: example_scenario
             models:
-                - name: a_model
-                  cmds: python model.py
-
-       This scenario (an execution sequence of one or more models) has been named "example_scenario" (required).
+                - cmds: python model.py
 
     #. Then, from the command line:
 
         .. code-block:: bash
 
-            concero example_scenario.yaml
+            concero run example_scenario.yaml
 
-    #. Alternatively, running the scenario could be accomplished in the python interpreter by executing the code:
+Alternatively (to step 2), running the scenario could be accomplished in the python interpreter by executing the code:
 
         .. code-block:: python
 
@@ -100,21 +85,25 @@ Let's assume that ``model_output.yaml`` defines the import of ``interesting_data
 
     .. code-block:: yaml
 
-        name: example_scenario
         input_conf: import_data.yaml
         models:
-            - name: a_model
-              input_conf: data_export.yaml
+            - input_conf: data_export.yaml
               cmds: python model.py
               output_conf: model_output.yaml
         output_conf: scenario_output.yaml
 
+And the scenario run from the command line with:
+
+    .. code-block:: bash
+
+        concero run example_scenario.yaml
+
 This file defines the process:
 
-    #. Any input data that you (the user of ConCERO) wishes to convert (so to provide models such as ``a_model`` with input data) is imported and kept in an object referred to as a *CERO*. The line in the scenario definition, ``input_conf: import_data.yaml``, defines the file containing the import definition.
-    #. Data for the first model (``a_model``) is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, ``input_conf: data_export.yaml``, defines the file containing the export definition.
+    #. Any input data that you (the user of ConCERO) wishes to convert (so to provide models with input data) is imported and kept in an object referred to as a *CERO*. The line in the scenario definition, ``input_conf: import_data.yaml``, defines the file containing the import definition.
+    #. Data for the first model is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, ``input_conf: data_export.yaml``, defines the file containing the export definition.
     #. Any data generated from the first model for which subsequent models require as input data must be imported (and stored in memory as a CERO). The model definition line ``output_conf: model_output.yaml`` defines the file containing the import definition.
-    #. The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for model ``a_model``.
+    #. The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for the first model.
     #. Finally, any data stored in memory (as a CERO) that is of interest to the user is exported into files. The line ``output_conf: scenario_output.yaml`` defines the file containing the export definition.
 
 It should hopefully be clear to the reader that there are 3 types of YAML files necessary to use the full functionality of ConCERO:
@@ -138,15 +127,15 @@ Other Commands
 
         .. code-block:: python
 
-            concero scenario.yaml
+            concero run scenario.yaml
 
     * Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any 'obvious' errors with configuration files) ...
 
         .. code-block:: python
 
-            concero --fake_run scenario.yaml
+            concero run --fake_run scenario.yaml
 
-       Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).
+      Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).
 
     * Test installation has been successful by running tests:
 
@@ -155,13 +144,13 @@ Other Commands
             cd ..
             python -m concero.tests.test_concero
 
-       As long as their are no *failures*, then ConCERO has been installed correctly.
+      As long as their are no *failures*, then ConCERO has been installed correctly.
 
     * Clone the source directory into ``DIR`` using git:
 
         .. code-block:: shell
 
-            git clone https://col530@bitbucket.csiro.au/scm/energy/concero.git DIR
+            git clone https://github.com/charlie0389/ConCERO DIR
 
     * Check version of your python interpreter:
 

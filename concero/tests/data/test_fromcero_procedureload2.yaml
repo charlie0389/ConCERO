@@ -1,0 +1,7 @@
+procedures:
+  - ref_dir: .
+    inputs:
+      - A
+      - B
+      - C
+    file: procedureload2.csv

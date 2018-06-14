@@ -30,20 +30,14 @@ More complex files (for example, HAR files) require more specification - please 
 
     ```yaml
     procedures:
-       - name: export_data
-         file: export_data.xlsx
+       - file: export_data.xlsx
     ```
     The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
 
-3. Then in python (version 3.4 or above) run the commands:
+3. Then from the command line (and assuming the system python interpreter is version 3.4 or above) run:
 
-    ```python
-    import concero
-    tc = concero.ToCERO("import_data.yaml")   # Loads the import configuration file and creates the import object (a.k.a. a ``ToCERO`` object)
-    cero = tc.create_cero()                   # creates a "common object" (a.k.a. a 'CERO')
-    fc = concero.FromCERO("export_data.yaml") # Loads the export configuration file and creates the export object (a.k.a. a ``FromCERO`` object)
-    fc.exec_procedures(cero)                  # Executes the procedures defined in ``export_data.yaml`` on the common object (``cero``).
-    ```
+    ```concero convert import_data.yaml export_data.yaml```
+
     In the working directory, you will find that ``export_data.xlsx`` has been created.
 
 More examples can be found on the *Quickstart: Common ConCERO-Related Commands* page.
@@ -55,6 +49,7 @@ More examples can be found on the *Quickstart: Common ConCERO-Related Commands* 
     - Documented
     - Simple API that can be used from a python script, or by defining data structure files in YAML syntax
     - Can execute any program that has a command line interface
+    - Distributed nature
 
 # Bug Reporting
 

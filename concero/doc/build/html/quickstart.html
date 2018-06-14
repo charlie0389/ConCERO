@@ -75,31 +75,15 @@
 <li><p class="first">Create the export file <code class="docutils literal notranslate"><span class="pre">data_export.yaml</span></code>, to export to the file <code class="docutils literal notranslate"><span class="pre">xslx_file.xlsx</span></code>:</p>
 <blockquote>
 <div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
-   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">export_data</span>
-     <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">export_data.xlsx</span>
+   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">export_data.xlsx</span>
 </pre></div>
 </div>
-</div></blockquote>
-</li>
-</ol>
 </div></blockquote>
 <p>The definition of files/data to be imported and exported is now complete. To create <code class="docutils literal notranslate"><span class="pre">export_data.xlsx</span></code>:</p>
-<blockquote>
-<div><ol class="arabic">
-<li><p class="first">Run the python interpreter (version 3.4 or above):</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python
-</pre></div>
-</div>
-</div></blockquote>
 </li>
-<li><p class="first">The run the commands:</p>
+<li><p class="first">Then run the command (from the comand line):</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">concero</span>
-<span class="n">tc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">ToCERO</span><span class="p">(</span><span class="s2">&quot;import_data.yaml&quot;</span><span class="p">)</span>   <span class="c1"># creates the import object (a.k.a. a ``ToCERO`` object)</span>
-<span class="n">cero</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">create_cero</span><span class="p">()</span>                   <span class="c1"># creates a common object (a.k.a. a &#39;CERO&#39;)</span>
-<span class="n">fc</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">FromCERO</span><span class="p">(</span><span class="s2">&quot;export_data.yaml&quot;</span><span class="p">)</span> <span class="c1"># creates the export object (a.k.a. a ``FromCERO`` object)</span>
-<span class="n">fc</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>                  <span class="c1"># execute the procedures defined in ``export_data.yaml`` on ``cero``.</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>concero convert import_data.yaml export_data.yaml
 </pre></div>
 </div>
 </div></blockquote>
@@ -115,23 +99,22 @@
 <div><ol class="arabic">
 <li><p class="first">First, we create the scenario definition file, <code class="docutils literal notranslate"><span class="pre">&quot;example_scenario.yaml&quot;</span></code>:</p>
 <blockquote>
-<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">example_scenario</span>
-<span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_model</span>
-      <span class="l l-Scalar l-Scalar-Plain">cmds</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python model.py</span>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cmds</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python model.py</span>
 </pre></div>
 </div>
 </div></blockquote>
-<p>This scenario (an execution sequence of one or more models) has been named “example_scenario” (required).</p>
 </li>
 <li><p class="first">Then, from the command line:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>concero example_scenario.yaml
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>concero run example_scenario.yaml
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">Alternatively, running the scenario could be accomplished in the python interpreter by executing the code:</p>
+</ol>
+</div></blockquote>
+<p>Alternatively (to step 2), running the scenario could be accomplished in the python interpreter by executing the code:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">concero</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">Scenario</span><span class="o">.</span><span class="n">load_scenario</span><span class="p">(</span><span class="s2">&quot;example_scenario.yaml&quot;</span><span class="p">)</span> <span class="c1"># Loads the scenario from file</span>
@@ -139,33 +122,34 @@
 </pre></div>
 </div>
 </div></blockquote>
-</li>
-</ol>
-</div></blockquote>
 </div>
 <div class="section" id="example-combining-data-import-export-with-model-execution">
 <h2>Example: Combining data import/export with model execution<a class="headerlink" href="#example-combining-data-import-export-with-model-execution" title="Permalink to this headline">¶</a></h2>
 <p>For this example - which builds on the previous 2 examples - let’s consider that <code class="docutils literal notranslate"><span class="pre">model.py</span></code> requires <code class="docutils literal notranslate"><span class="pre">export_data.xlsx</span></code> to run successfully, and that file needs to be created from <code class="docutils literal notranslate"><span class="pre">import_data.csv</span></code> (as per the first example). Let’s also assume that <code class="docutils literal notranslate"><span class="pre">model.py</span></code> will generate <code class="docutils literal notranslate"><span class="pre">interesting_data.xlsx</span></code> and that we wish to plot that data after the scenario has executed. ConCERO handles this operation by converting <code class="docutils literal notranslate"><span class="pre">interesting_data.xlsx</span></code> to a <em>CERO</em> and then combining that CERO with the CERO already stored in memory (which was created from <code class="docutils literal notranslate"><span class="pre">import_data.csv</span></code> using <code class="docutils literal notranslate"><span class="pre">import_data.yaml</span></code>). The combined CERO then replaces the CERO stored in memory. Plots can then be generated by using the relevant data from the updated CERO (in an identical process to the import/export example).</p>
 <p>Let’s assume that <code class="docutils literal notranslate"><span class="pre">model_output.yaml</span></code> defines the import of <code class="docutils literal notranslate"><span class="pre">interesting_data.xlsx</span></code> and <code class="docutils literal notranslate"><span class="pre">scenario_output.yaml</span></code> defines the creation of interesting plots (and any other files we want to generate). We can change <code class="docutils literal notranslate"><span class="pre">example_scenario.yaml</span></code> (the YAML file created in the last example) to look like:</p>
 <blockquote>
-<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">example_scenario</span>
-<span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">import_data.yaml</span>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">import_data.yaml</span>
 <span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_model</span>
-      <span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data_export.yaml</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data_export.yaml</span>
       <span class="l l-Scalar l-Scalar-Plain">cmds</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python model.py</span>
       <span class="l l-Scalar l-Scalar-Plain">output_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">model_output.yaml</span>
 <span class="l l-Scalar l-Scalar-Plain">output_conf</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">scenario_output.yaml</span>
 </pre></div>
 </div>
 </div></blockquote>
+<p>And the scenario run from the command line with:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>concero run example_scenario.yaml
+</pre></div>
+</div>
+</div></blockquote>
 <p>This file defines the process:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Any input data that you (the user of ConCERO) wishes to convert (so to provide models such as <code class="docutils literal notranslate"><span class="pre">a_model</span></code> with input data) is imported and kept in an object referred to as a <em>CERO</em>. The line in the scenario definition, <code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">import_data.yaml</span></code>, defines the file containing the import definition.</li>
-<li>Data for the first model (<code class="docutils literal notranslate"><span class="pre">a_model</span></code>) is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, <code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">data_export.yaml</span></code>, defines the file containing the export definition.</li>
+<li>Any input data that you (the user of ConCERO) wishes to convert (so to provide models with input data) is imported and kept in an object referred to as a <em>CERO</em>. The line in the scenario definition, <code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">import_data.yaml</span></code>, defines the file containing the import definition.</li>
+<li>Data for the first model is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, <code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">data_export.yaml</span></code>, defines the file containing the export definition.</li>
 <li>Any data generated from the first model for which subsequent models require as input data must be imported (and stored in memory as a CERO). The model definition line <code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">model_output.yaml</span></code> defines the file containing the import definition.</li>
-<li>The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for model <code class="docutils literal notranslate"><span class="pre">a_model</span></code>.</li>
+<li>The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for the first model.</li>
 <li>Finally, any data stored in memory (as a CERO) that is of interest to the user is exported into files. The line <code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">scenario_output.yaml</span></code> defines the file containing the export definition.</li>
 </ol>
 </div></blockquote>
@@ -193,35 +177,31 @@
 </li>
 <li><p class="first">Run the ConCERO scenario defined in <code class="docutils literal notranslate"><span class="pre">scenario.yaml</span></code>:</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">concero</span> <span class="n">scenario</span><span class="o">.</span><span class="n">yaml</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">concero</span> <span class="n">run</span> <span class="n">scenario</span><span class="o">.</span><span class="n">yaml</span>
 </pre></div>
 </div>
 </div></blockquote>
 </li>
 <li><p class="first">Perform a fake-run of the scenario defined in scenario.yaml (useful to check if there has not any ‘obvious’ errors with configuration files) …</p>
 <blockquote>
-<div><blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">concero</span> <span class="o">--</span><span class="n">fake_run</span> <span class="n">scenario</span><span class="o">.</span><span class="n">yaml</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">concero</span> <span class="n">run</span> <span class="o">--</span><span class="n">fake_run</span> <span class="n">scenario</span><span class="o">.</span><span class="n">yaml</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p>Note that no runtime checks are performed (because successful operation may rely on the creation of some files that do not currently exist).</p>
-</div></blockquote>
 </li>
 <li><p class="first">Test installation has been successful by running tests:</p>
 <blockquote>
-<div><blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
 <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">concero</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">test_concero</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p>As long as their are no <em>failures</em>, then ConCERO has been installed correctly.</p>
-</div></blockquote>
 </li>
 <li><p class="first">Clone the source directory into <code class="docutils literal notranslate"><span class="pre">DIR</span></code> using git:</p>
 <blockquote>
-<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git clone https://col530@bitbucket.csiro.au/scm/energy/concero.git DIR
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/charlie0389/ConCERO DIR
 </pre></div>
 </div>
 </div></blockquote>

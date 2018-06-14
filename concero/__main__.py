@@ -24,16 +24,64 @@ Created on Apr 18 13:28:44 2018
 import sys
 import os
 import argparse as ap
+from collections import OrderedDict
 
-import concero.main
+import concero
+
 
 def launch(args=None):
+
+    def run_cmd(ns):
+        concero.main.run(**ns)
+    def convert_cmd(ns):
+        tc = concero.ToCERO(ns["import_def"])  # creates the import object (a.k.a. a ``ToCERO`` object)
+        cero = tc.create_cero()  # creates a common object (a.k.a. a 'CERO')
+        fc = concero.FromCERO(ns["export_def"])  # creates the export object (a.k.a. a ``FromCERO`` object)
+        fc.exec_procedures(cero)  # execute the procedures defined in ``export_data.yaml`` on ``cero``
+
+    class _HelpAction(ap._HelpAction):
+
+        def __call__(self, parser, namespace, values, option_string=None):
+            parser.print_help()
+
+            # retrieve subparsers from parser
+            subparsers_actions = [
+                action for action in parser._actions
+                if isinstance(action, ap._SubParsersAction)]
+
+            # there will probably only be one subparser_action,
+            # but better save than sorry
+            for subparsers_action in subparsers_actions:
+
+                cp = OrderedDict()
+                # cp ensures no duplicates because of aliases...
+                for choice, subparser in subparsers_action.choices.items():
+                    choices = cp.setdefault(subparser, [])
+                    choices.append(choice)
+                    cp[subparser] = choices
+
+                # get all subparsers and print help
+                for subparser, choices in cp.items():
+                    print("Subcommand: %s" % "|".join(choices))
+                    print(subparser.format_help())
+
+            parser.exit()
 
     if args is None:
         args = sys.argv[1:]
 
-    argpar = ap.ArgumentParser(prog="concero",
-                               description="Run a scenario with ConCERO.")
+    argp = ap.ArgumentParser(prog="concero",
+                             add_help=False,
+                             description="A program to automate data format conversion and run (economic) models.")
+    argp.add_argument("-h", "--help", action=_HelpAction, help="show this help message and exit")
+
+    sp = argp.add_subparsers()
+
+    # run command
+
+    argpar = sp.add_parser("run", description="Run a ConCERO scenario.")
+    argpar.set_defaults(func=run_cmd)
+
     argpar.add_argument('scenario', type=str,  # nargs=1,
                         help="The file that contains the scenario definition.")
     argpar.add_argument("-s", '--scenarios_set',  # nargs=1,
@@ -58,9 +106,17 @@ def launch(args=None):
                         help="By default, exceptions are raised if a check is failed. If this option is provided, " +
                              "False is returned instead (and no exceptions are raised).")
 
-    ns = vars(argpar.parse_args(args))
+    # convert command
 
-    concero.main.run(**ns)
+    conpar = sp.add_parser("convert", description="Perform data format conversion.", aliases=["co"])
+    conpar.set_defaults(func=convert_cmd)
+    conpar.add_argument("import_def", type=str, help="YAML file that defines the import of data from one or more files into a CERO.")
+    conpar.add_argument("export_def", type=str, help="YAML file that defines the export of data from a CERO into one or more files.")
+
+    ns = vars(argp.parse_args(args))
+
+    if ns == {}:
+        raise RuntimeError("Invalid ConCERO command - please execute 'concero --help' for a description of valid options.")
 
 if __name__ == "__main__":
     launch()

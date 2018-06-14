@@ -85,12 +85,9 @@ considered a 'silo' separate from others.
 
 A *procedure object* can be either a ``str`` or a ``dict``. The ``dict`` form is the more general form - if a \
 procedure object is provided as the (``str``) ``ser_obj``, it is immediately converted to the equivalent form \
-``{'name': ser_obj}`` - a ``dict`` containing the one mandatory option:
+``{'name': ser_obj}``. The complete list of options is:
 
-    * ``name: (str)`` - the name given to the procedure.
-
-Often, more specification will be necessary. Other options include:
-
+    * ``name: (str)`` - the name given to the procedure. Will, by default, given the name ``Unnamed_proc``.
     * ``file: (str)`` - if provided, the output from this procedure object, and only this procedure object, will \
     be exported to ``file``.
     * ``inputs: list(str|list(str))`` - is a list of identifiers corresponding to identifiers in the CERO. \
@@ -334,7 +331,8 @@ class FromCERO(dict):
         def load_config(proc_dict: dict, parent: 'FromCERO' = None):
 
             # Add default options here
-            defaults = {"operations": [],
+            defaults = {"name": "Unnamed_proc",
+                        "operations": [],
                         "inputs": [],
                         "ref_dir": None,
                         "sets": {},
@@ -829,6 +827,9 @@ class FromCERO(dict):
             parent = _conf.copy()
             parent.pop("procedures")  # Avoid recursive inheritance loop
             parent.pop("file")  # Procedure should not output to file unless a file is specified
+
+            if not _conf["procedures"][idx].get("name"):
+                _conf["procedures"][idx]["name"] = "Unnamed_proc_%d" % idx
 
             _conf["procedures"][idx] = FromCERO._Procedure.from_obj(_conf["procedures"][idx], parent=parent)
 

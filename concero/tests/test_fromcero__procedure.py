@@ -62,6 +62,26 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("procedureload.csv")
 
+    def test_load2(self):
+
+        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3], "D": [4], "E": [5], "F": [6], }, orient='index',
+                                      dtype=pd.np.float32)
+        cero.sort_index(inplace=True)
+        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
+
+        fc = FromCERO(cfg.d_td + "test_fromcero_procedureload2.yaml")
+        self.assertEqual(fc["procedures"][0]["name"], "Unnamed_proc_0")
+        fc.exec_procedures(cero)
+
+        df1 = pd.read_csv("procedureload2.csv", index_col=0)
+        test_list = [1, 2, 3]
+        df1_vals = [x[0] for x in df1.values.tolist()]
+        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_list, df1_vals)]))
+        test_list = ["A", "B", "C"]
+        self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
+
+        os.remove("procedureload2.csv")
+
     def test_is_valid(self):
 
         proc = {"operations": "bad_ops_format"}

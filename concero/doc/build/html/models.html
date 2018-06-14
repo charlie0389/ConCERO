@@ -36,18 +36,15 @@
 <h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="model-objects">
 <span id="id1"></span><h2>Model Objects<a class="headerlink" href="#model-objects" title="Permalink to this headline">¶</a></h2>
-<p>A model object must be of dictionary form and <em>must</em> have the following options:</p>
+<p>A model object must be of dictionary form and <em>may</em> have the following options:</p>
 <blockquote>
 <div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - the name of the model (for referencing purposes). The value of <code class="docutils literal notranslate"><span class="pre">name</span></code> does not alter scenario execution.</li>
 <li><code class="docutils literal notranslate"><span class="pre">cmds:</span> <span class="pre">(command</span> <span class="pre">object|list[command</span> <span class="pre">objects])</span></code> - a single <em>command object</em>, or a <em>list</em> of <em>command objects</em>. Command objects are discussed below here - <a class="reference internal" href="#command-objects"><span class="std std-ref">Command Objects</span></a>. A good placeholder command (to test if the data conversion process works for example) is <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> which simply outputs the text <code class="docutils literal notranslate"><span class="pre">&quot;Model</span> <span class="pre">running...&quot;</span></code> to the terminal.</li>
-</ul>
-</div></blockquote>
-<p>And <em>may</em> have the following options:</p>
-<blockquote>
-<div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str)</span></code> - the input configuration file that specifies the export of data <em>from</em> the scenario-level CERO <em>into</em> appropriate input files for the model.</li>
-<li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str)</span></code>- the output configuration file that specifies the import of data <em>into</em> the scenario-level CERO <em>from</em> the appropriate output files for the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">input_conf:</span> <span class="pre">(str|list[str])</span></code> - the input configuration file (or <cite>list</cite> of input configuration files) that specify the export of data <em>from</em> a given CERO (typically passed from a <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object) <em>into</em> appropriate input files for the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_conf:</span> <span class="pre">(str|list[str])</span></code>- the output configuration file (or <cite>list</cite> of output configuration files) that specifies the import of data <em>into</em> a CERO (typically returned to a <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object) <em>from</em> the appropriate output files for the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">wd:</span> <span class="pre">(str)</span></code>- the path to be the <em>working directory</em> for all executed commands (specified with <code class="docutils literal notranslate"><span class="pre">cmds</span></code>).</li>
+<li><code class="docutils literal notranslate"><span class="pre">search_paths:</span> <span class="pre">(str|list[str])</span></code>- a search path, or list of search paths, to look for <code class="docutils literal notranslate"><span class="pre">input_conf</span></code> and <code class="docutils literal notranslate"><span class="pre">output_conf</span></code>.</li>
 </ul>
 </div></blockquote>
 </div>
@@ -145,7 +142,8 @@ Scen_transport_ci_sc.xls</p>
 <dl class="method">
 <dt id="model.Model.run">
 <code class="descname">run</code><span class="sig-paren">(</span><em>cero</em><span class="sig-paren">)</span> &#x2192; concero.cero.CERO<a class="reference internal" href="_modules/model.html#Model.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.run" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Executes all data import/export operations (defined by <code class="docutils literal notranslate"><span class="pre">input_conf</span></code> and <code class="docutils literal notranslate"><span class="pre">output_conf</span></code> respectively) and the execution of any commands.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">

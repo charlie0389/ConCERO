@@ -126,7 +126,9 @@
 <span class="sd">        :param kwargs: Passed to superclass (`dict`) at initialisation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;default_model_name&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;cmds&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;input_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
                     <span class="s2">&quot;output_conf&quot;</span><span class="p">:</span> <span class="p">[],</span>
                     <span class="s2">&quot;search_paths&quot;</span><span class="p">:</span> <span class="p">[],</span>
                     <span class="s2">&quot;wd&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -138,6 +140,16 @@
         <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;default_model_name&quot;</span><span class="p">:</span>
+            <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Model not named - default name &#39;</span><span class="si">%s</span><span class="s2">&#39; assigned.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Command string processing</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]:</span>
+            <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No commands specified for model &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;search_paths&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
@@ -170,7 +182,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">req_keys</span><span class="p">]):</span>
 
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;All models must have all of the keys: </span><span class="si">%s</span><span class="s2">. Attempted to create model&quot;</span> <span class="o">+</span>
-                            <span class="s2">&quot; with at least one of these keys missing.&quot;</span> <span class="o">%</span> <span class="n">req_keys</span><span class="p">)</span>
+                            <span class="s2">&quot; with at least one of these keys missing.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">req_keys</span>
 
             <span class="n">Model</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
@@ -209,6 +221,7 @@
 
 <div class="viewcode-block" id="Model.run"><a class="viewcode-back" href="../reference.html#model.Model.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cero</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;CERO&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes all data import/export operations (defined by ``input_conf`` and ``output_conf`` respectively) and the execution of any commands.</span>
 
 <span class="sd">        :param pandas.DataFrame cero: A CERO that contains all necessary data for conversion to input files (for \</span>
 <span class="sd">        model execution).</span>
@@ -219,10 +232,6 @@
             <span class="n">input_conf</span><span class="o">.</span><span class="n">exec_procedures</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed converting CERO to model input files (</span><span class="si">%s</span><span class="s2">). Now processing commands...&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
-
-        <span class="c1"># Command string processing</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cmds&quot;</span><span class="p">]]</span>
 
         <span class="k">with</span> <span class="n">_modified_environ</span><span class="p">(</span><span class="n">wd</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wd&quot;</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_vars&quot;</span><span class="p">,</span> <span class="p">{})):</span>
 
