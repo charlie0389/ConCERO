@@ -4,7 +4,7 @@ Please consult ConCERO's documentation for installation instructions. Please als
 
 `concero/doc/build/html/index.html`
 
-# Quick Example
+# Quick Example 1 - Data Format conversion
 
 Note that this example assumes the CSV is in the default format - one header row labelling the years the data refers to, the first column names the data, with all following columns containing floating-point (or integer) numbers (corresponding to each year labelled in the header). An example file could be:
 
@@ -32,13 +32,29 @@ More complex files (for example, HAR files) require more specification - please 
     procedures:
        - file: export_data.xlsx
     ```
-    The definition of files/data to be imported and exported is now complete. To create ``export_data.xlsx``:
+    The definition of files/data to be imported and exported is now complete.
 
-3. Then from the command line (and assuming the system python interpreter is version 3.4 or above) run:
+3. To create ``export_data.xlsx``, from the command line (and assuming the system python interpreter is version 3.4 or above) run:
 
     ```concero convert import_data.yaml export_data.yaml```
 
     In the working directory, you will find that ``export_data.xlsx`` has been created.
+
+# Quick Example 2 - Data Format Conversion and Model Execution
+
+Lets assume that export_data.xlsx serves as the input file for a model (in the form of a python script ``model.py``), and we want to (a) convert data formats **and** (b) run the model, in a single run (the 'single run' is referred to as a *scenario*).
+
+1. The first step is to create `example_scenario.yaml`:
+
+    ```yaml
+    input_conf: import_data.yaml
+    models:
+        - input_conf: data_export.yaml
+          cmds: python model.py
+
+2. Execute the scenario:
+
+    ```concero run example_scenario.yaml```
 
 More examples can be found on the *Quickstart: Common ConCERO-Related Commands* page.
 
