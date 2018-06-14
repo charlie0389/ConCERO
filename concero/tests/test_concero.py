@@ -23,6 +23,7 @@ from concero.tests.test_plotoutput import TestPlotOutput
 from concero.tests.test_har_to_cero import TestHAR2CERO
 from concero.tests.test_replace_har_header_in_file import TestHARHeaderReplace
 from concero.tests.test_scenario import TestScenario
+from concero.tests.test_model import TestModel
 from concero.tests.test_vurm_to_cero import TestVURM2CERO
 from concero.tests.test_sceninputs_to_cero import TestScenIn2CERO
 from concero.tests.test_libfuncs import TestLibfuncs
@@ -50,6 +51,7 @@ class TestConCERO(unittest.TestSuite):
                          TestLibfuncs,
                          TestLibfuncsWrappers,
                          TestScenario,
+                         TestModel,
                          TestCERO,
                          TestCERO2HAR,
                          TestToCERO,

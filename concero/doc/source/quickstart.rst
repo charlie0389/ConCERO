@@ -70,12 +70,8 @@ Anything that can be run from the command line can be run by ConCERO. Let's assu
 
         .. code-block:: yaml
 
-            name: example_scenario
             models:
-                - name: a_model
-                  cmds: python model.py
-
-       This scenario (an execution sequence of one or more models) has been named "example_scenario" (required).
+                - cmds: python model.py
 
     #. Then, from the command line:
 
@@ -83,7 +79,7 @@ Anything that can be run from the command line can be run by ConCERO. Let's assu
 
             concero example_scenario.yaml
 
-    #. Alternatively, running the scenario could be accomplished in the python interpreter by executing the code:
+Alternatively (to step 2), running the scenario could be accomplished in the python interpreter by executing the code:
 
         .. code-block:: python
 
@@ -100,21 +96,19 @@ Let's assume that ``model_output.yaml`` defines the import of ``interesting_data
 
     .. code-block:: yaml
 
-        name: example_scenario
         input_conf: import_data.yaml
         models:
-            - name: a_model
-              input_conf: data_export.yaml
+            - input_conf: data_export.yaml
               cmds: python model.py
               output_conf: model_output.yaml
         output_conf: scenario_output.yaml
 
 This file defines the process:
 
-    #. Any input data that you (the user of ConCERO) wishes to convert (so to provide models such as ``a_model`` with input data) is imported and kept in an object referred to as a *CERO*. The line in the scenario definition, ``input_conf: import_data.yaml``, defines the file containing the import definition.
-    #. Data for the first model (``a_model``) is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, ``input_conf: data_export.yaml``, defines the file containing the export definition.
+    #. Any input data that you (the user of ConCERO) wishes to convert (so to provide models with input data) is imported and kept in an object referred to as a *CERO*. The line in the scenario definition, ``input_conf: import_data.yaml``, defines the file containing the import definition.
+    #. Data for the first model is exported by converting the relevant parts of the CERO into the appropriate files. The line in the model definition, ``input_conf: data_export.yaml``, defines the file containing the export definition.
     #. Any data generated from the first model for which subsequent models require as input data must be imported (and stored in memory as a CERO). The model definition line ``output_conf: model_output.yaml`` defines the file containing the import definition.
-    #. The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for model ``a_model``.
+    #. The previous 2 steps are repeated for any subsequent models that you wish to execute. If this was the case, additional model definitions would follow underneath the definition for the first model.
     #. Finally, any data stored in memory (as a CERO) that is of interest to the user is exported into files. The line ``output_conf: scenario_output.yaml`` defines the file containing the export definition.
 
 It should hopefully be clear to the reader that there are 3 types of YAML files necessary to use the full functionality of ConCERO:

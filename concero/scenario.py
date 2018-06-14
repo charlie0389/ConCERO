@@ -40,7 +40,9 @@ class Scenario(dict):
         :param kwargs: Passed to the superclass (dict) as keyword arguments at initialisation.
         """
 
-        defaults = {"search_paths": [],
+        defaults = {"name": None,
+                    "run_no": None,
+                    "search_paths": [],
                     "ref_dir": None,
                     "models": [],
                     "input_conf": [],
@@ -60,6 +62,14 @@ class Scenario(dict):
 
         sc_def = defaults
         super().__init__(sc_def, *args, **kwargs)
+
+        if not self.get("name"):
+            self["name"] = "scenario_unnamed"
+            self._logger.warn("Scenario name has not been specified - scenario named '%s'." % self["name"])
+
+        if not issubclass(type(self.get("run_no")), int):
+            self["run_no"] = 1
+            self._logger.info("Scenario run_no (run number) has not been specified (or is not of integer type) - defaults to %s." % self["run_no"])
 
         if isinstance(self["search_paths"], str):
             self["search_paths"] = [os.path.abspath(self["search_paths"])]
@@ -91,10 +101,6 @@ class Scenario(dict):
             self["output_conf"][idx] = FromCERO(self["output_conf"][idx], parent=par_dict)
 
         self.is_valid()  # Check Scenario is valid
-
-        if "run_no" not in self:
-            # run_no defaults to 1 if not provided
-            self["run_no"] = 1
 
     def run(self) -> None:
         """
@@ -148,8 +154,8 @@ class Scenario(dict):
         req_keys = ["name", "models", "input_conf", "output_conf"]
 
         if not all([k in self.keys() for k in req_keys]):
-            raise TypeError("Not all required key-value pairs have been defined. " +
-                            "It is necessary to define all of %s." % req_keys)
+            raise TypeError(("Not all required key-value pairs have been defined. " +
+                            "It is necessary to define all of %s.") % req_keys)
 
         if not isinstance(self["models"], list):
             raise TypeError("Scenario property \'models\' must be defined as a list.")

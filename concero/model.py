@@ -93,7 +93,9 @@ class Model(dict):
         :param kwargs: Passed to superclass (`dict`) at initialisation.
         """
 
-        defaults = {"input_conf": [],
+        defaults = {"name": "default_model_name",
+                    "cmds": [],
+                    "input_conf": [],
                     "output_conf": [],
                     "search_paths": [],
                     "wd": None}
@@ -105,6 +107,16 @@ class Model(dict):
         defaults.update(parent)
 
         super().__init__(defaults, *args, **kwargs)
+
+        if self["name"] == "default_model_name":
+            Model._logger.warning("Model not named - default name '%s' assigned." % self["name"])
+
+        # Command string processing
+        if isinstance(self["cmds"], str):
+            self["cmds"] = [self["cmds"]]
+
+        if not self["cmds"]:
+            Model._logger.info("No commands specified for model '%s'." % defaults["name"])
 
         if not self["search_paths"]:
             self["search_paths"].append(os.path.abspath("."))
@@ -137,7 +149,7 @@ class Model(dict):
         if not all([k in self for k in req_keys]):
 
             msg = ("All models must have all of the keys: %s. Attempted to create model" +
-                            " with at least one of these keys missing." % req_keys)
+                            " with at least one of these keys missing.") % req_keys
 
             Model._logger.error(msg)
             if raise_exception:
@@ -176,6 +188,7 @@ class Model(dict):
 
     def run(self, cero) -> 'CERO':
         """
+        Executes all data import/export operations (defined by ``input_conf`` and ``output_conf`` respectively) and the execution of any commands.
 
         :param pandas.DataFrame cero: A CERO that contains all necessary data for conversion to input files (for \
         model execution).
@@ -186,10 +199,6 @@ class Model(dict):
             input_conf.exec_procedures(cero)
 
         print("Completed converting CERO to model input files (%s). Now processing commands..." % self["name"])
-
-        # Command string processing
-        if isinstance(self["cmds"], str):
-            self["cmds"] = [self["cmds"]]
 
         with _modified_environ(wd=self["wd"], **self.get("env_vars", {})):
 

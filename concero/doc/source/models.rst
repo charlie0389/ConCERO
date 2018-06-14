@@ -6,15 +6,14 @@ Models
 Model Objects
 -------------
 
-A model object must be of dictionary form and *must* have the following options:
+A model object must be of dictionary form and *may* have the following options:
 
     * ``name: (str)`` - the name of the model (for referencing purposes). The value of ``name`` does not alter scenario execution.
     * ``cmds: (command object|list[command objects])`` - a single *command object*, or a *list* of *command objects*. Command objects are discussed below here - :ref:`command_objects`. A good placeholder command (to test if the data conversion process works for example) is ``echo "Model running..."`` which simply outputs the text ``"Model running..."`` to the terminal.
-
-And *may* have the following options:
-
-    * ``input_conf: (str)`` - the input configuration file that specifies the export of data *from* the scenario-level CERO *into* appropriate input files for the model.
-    * ``output_conf: (str)``- the output configuration file that specifies the import of data *into* the scenario-level CERO *from* the appropriate output files for the model.
+    * ``input_conf: (str|list[str])`` - the input configuration file (or `list` of input configuration files) that specify the export of data *from* a given CERO (typically passed from a ``Scenario`` object) *into* appropriate input files for the model.
+    * ``output_conf: (str|list[str])``- the output configuration file (or `list` of output configuration files) that specifies the import of data *into* a CERO (typically returned to a ``Scenario`` object) *from* the appropriate output files for the model.
+    * ``wd: (str)``- the path to be the *working directory* for all executed commands (specified with ``cmds``).
+    * ``search_paths: (str|list[str])``- a search path, or list of search paths, to look for ``input_conf`` and ``output_conf``.
 
 .. _command_objects:
 

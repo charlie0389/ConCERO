@@ -29,7 +29,7 @@ import harpy
 
 import concero.conf
 import concero.scenario as sn
-from concero.tests.data_tools import DataTools, DefaultTestCase
+from concero.tests.data_tools import DefaultTestCase
 
 
 class TestScenario(DefaultTestCase):
