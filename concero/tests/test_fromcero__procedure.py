@@ -339,6 +339,89 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("test_stitch_time.csv")
 
+        proc = FromCERO._Procedure({"name": "test_stitch_time",
+                                    "file": "test_stitch_time2.csv",
+                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]},
+                                    "inputs": ["a_set", "b_set"],
+                                    "operations": [{"func": "noop",
+                                                    "rename": {"b_set": "a_set"}},
+                                                   {"func": "pc_change",
+                                                    "arrays": ["a_set"],
+                                                    "init_cols": 2018}],
+                                    "ref_dir": "."})
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), "test_stitch_time2.csv")}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
+        os.remove("test_stitch_time2.csv")
+
+        out_file = "test_stitch_time3.csv"
+        proc = FromCERO._Procedure({"name": "test_stitch_time",
+                                    "file": out_file,
+                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]},
+                                    "inputs": ["a_set", "b_set"],
+                                    "operations": [{"func": "noop",
+                                                    "rename": {"b_set": "a_set"}},
+                                                   {"func": "pc_change",
+                                                    "arrays": ["a_set"],
+                                                    "init_icols": 0}],
+                                    "ref_dir": "."})
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), out_file)}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
+        os.remove(out_file)
+
+        out_file = "test_stitch_time4.csv"
+        proc = FromCERO._Procedure({"name": "test_stitch_time",
+                                    "file": out_file,
+                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]},
+                                    "inputs": ["a_set", "b_set"],
+                                    "operations": [{"func": "noop",
+                                                    "rename": {"b_set": "a_set"}},
+                                                   {"func": "pc_change",
+                                                    "arrays": ["a_set"],
+                                                    "init_icols": [0]}],
+                                    "ref_dir": "."})
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), out_file)}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
+        os.remove(out_file)
+
+        out_file = "test_stitch_time5.csv"
+        proc = FromCERO._Procedure({"name": "test_stitch_time",
+                                    "file": out_file,
+                                    "sets": {"a_set": ["A", "B", "C"],
+                                             "b_set": ["D", "E", "F"]},
+                                    "inputs": ["a_set", "b_set"],
+                                    "operations": [{"func": "noop",
+                                                    "rename": {"b_set": "a_set"}},
+                                                   {"func": "pc_change",
+                                                    "arrays": ["a_set"],
+                                                    "init_icols": [-3]}],
+                                    "ref_dir": "."})
+        proc.exec_ops(cero)
+
+        tc = ToCERO({"files": [{"file": os.path.join(os.path.abspath("."), out_file)}]})
+        df = tc.create_cero()
+
+        self.assertTrue(df.equals(test_df))
+
+        os.remove(out_file)
+
     def test_rename(self):
 
         cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],

@@ -370,20 +370,28 @@ def recursive_op(func):
                 auto_post: int = None,
                 init_cols: list = None,
                 post_cols: list = None,
+                init_icols: list = None,
+                post_icols: list = None,
                 **kwargs) -> pd.Series:
         '''
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.
         :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.
         :param list post: ``post`` is post-pended to ``array`` before the recursive operation is applied.
+        :param auto_init:
+        :param auto_post:
+        :param 'Union[int, List[int]]' init_cols: Specifies the year to use as initialisation values.
+        :param 'Union[int, List[int]]' post_cols: Specifies the year to use as post-pended values.
+        :param 'Union[int, List[int]]' init_icols: Specifies the index (zero-indexed) to use as initialisation values.
+        :param 'Union[int, List[int]]' post_icols: Specifies the index (zero-indexed) to use as post-pended values.
         :arg (bool) inplace: If `True` (the default), the operation will be applied on the array inplace, such that the result from a previous iteration is used in subsequent iterations. If `False`, the operation proceeds ignorant of the results of previous iterations.
         :returns (pandas.Series): Returns the result of the recursively-applied function. Will copy ``name`` and ``index`` properties of the provided ``pandas.Series`` object to the returned object.'''
 
-        if [bool(init), bool(auto_init), bool(init_cols)].count(True) >= 2:
-            msg = "Only one of the keyword arguments 'init', 'auto_init' and 'init_cols' must be provided."
+        if [bool(init), bool(auto_init), bool(init_cols), bool(init_icols)].count(True) >= 2:
+            msg = "Only one of the keyword arguments 'init', 'auto_init', 'init_cols' and 'init_icols' must be provided."
             log.error(msg)
             raise ValueError(msg)
-        if [bool(post), bool(auto_post), bool(post_cols)].count(True) >= 2:
-            msg = "Only one of the keyword arguments 'post', 'auto_post' and 'post_cols' must be provided."
+        if [bool(post), bool(auto_post), bool(post_cols), bool(post_icols)].count(True) >= 2:
+            msg = "Only one of the keyword arguments 'post', 'auto_post', 'post_cols' and 'post_icols' must be provided."
             log.error(msg)
             raise ValueError(msg)
 
@@ -396,12 +404,15 @@ def recursive_op(func):
         if not init_cols: init_cols = []
         if not post_cols: post_cols = []
 
+        if init_icols is None: init_icols = []
+        if post_icols is None: post_icols = []
+
         if not isinstance(auto_init, int) or auto_init < 0:
-            msg = "'auto_init' keyword argument must be provided as an integer greater than 0."
+            msg = "'auto_init' keyword argument must be provided as an integer greater than or equal to 0."
             log.error(msg)
             raise TypeError(msg)
         if not isinstance(auto_post, int) or auto_post < 0:
-            msg = "'auto_post' keyword argument must be provided as an integer greater than 0."
+            msg = "'auto_post' keyword argument must be provided as an integer greater than or equal to 0."
             log.error(msg)
             raise TypeError(msg)
 
@@ -413,8 +424,16 @@ def recursive_op(func):
         sl_start = None
         sl_end = None
 
+        if init_icols != []:
+            if issubclass(type(init_icols), int): init_icols = [init_icols]
+            init_cols = [dt.year for dt in array.index[init_icols].tolist()]
+
+        if post_icols != []:
+            if issubclass(type(post_icols), int): post_icols = [post_icols]
+            post_cols = [dt.year for dt in array.index[post_icols].tolist()]
+
         if init_cols:
-            if isinstance(init_cols, int): init_cols = [dt.year for dt in array.index.tolist()[:init_cols]]
+            if isinstance(init_cols, int): init_cols = [init_cols]
             try:
                 init = array.loc[pd.to_datetime(init_cols, format="%Y")].tolist()
             except KeyError:
@@ -423,7 +442,7 @@ def recursive_op(func):
                 raise KeyError(msg)
             sl_start = len(init)
         if post_cols:
-            if isinstance(post_cols, int): post_cols = [dt.year for dt in array.index.tolist()[-post_cols:]]
+            if isinstance(post_cols, int): post_cols = [post_cols]
             try:
                 post = array.loc[pd.to_datetime(post_cols, format="%Y")].tolist()
             except KeyError:
@@ -431,6 +450,7 @@ def recursive_op(func):
                 log.error(msg)
                 raise KeyError(msg)
             sl_end = -len(post)
+
         sl = slice(sl_start, sl_end)
 
         array_list = init + array.values.tolist()[sl] + post

@@ -241,7 +241,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
                      [4, 17, 20, 23, 8],
                      [9, 31, 33, 25, 2]]
 
-        sum_3(cero, init_cols=1, post_cols=1, inplace=False) # Uses integer form of init_cols
+        sum_3(cero, init_icols=0, post_icols=-1, inplace=False) # Uses integer form of init_cols
         self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
 
         cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
@@ -259,7 +259,7 @@ class TestLibfuncsWrappers(DefaultTestCase):
                      [4, 17, 32, 47, 8],
                      [9, 31, 54, 67, 2]]
 
-        sum_3(cero, init_cols=1, post_cols=1)  # Uses inplace form
+        sum_3(cero, init_icols=0, post_icols=-1)  # Uses inplace form
         self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
 
     def test_create_series(self):
