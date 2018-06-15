@@ -15,58 +15,51 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Created on Feb 06 10:56:13 2018
+Created on Jun 15 10:40:59 2018
 
 .. sectionauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 .. codeauthor:: Lyle Collins <Lyle.Collins@csiro.au>
 """
+
 import os
 import unittest
-import shutil
 
 import concero.conf
-import concero.main
+import concero.__main__
 from concero.tests.data_tools import DefaultTestCase
 
 
-class TestMain(DefaultTestCase):
-    '''Tests main-related methods.'''
+class Test_Main_(DefaultTestCase):
+    '''Tests __main__ methods.'''
 
     _dd = os.path.join(os.path.dirname(__file__), "data", "")
 
-    def test_normal_run(self):
+    def test_convert(self):
 
-        src = concero.conf.find_file("dummy_model.py")
-        shutil.copy2(src, "dummy_model_run.py")
+        concero.__main__.launch(args=["convert", Test_Main_._dd + "test_import_data.yaml", Test_Main_._dd + "test_export_data.yaml"])
 
-        scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
-
-        concero.main.run(scen_file)
+        self.assertTrue(os.path.isfile("test_export_data.xlsx"))
 
         # Clean up...
-        os.remove('test_scen_outputs.har')
-        os.remove('test_model_input.har')
-        os.remove('test_model_output.har')
-        os.remove('A1_001_step_00.xlsx')
-        os.remove("dummy_model_run.py")
+        os.remove('test_export_data.xlsx')
 
-    def test_fake_run(self):
-        scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
+    def test_convert2(self):
 
-        concero.main.run(scen_file, fake_run=True)
+        concero.__main__.launch(args=["co", Test_Main_._dd + "test_import_data.yaml", Test_Main_._dd + "test_export_data.yaml"])
 
-        concero.main.run(scen_file, fake_run=True)
+        self.assertTrue(os.path.isfile("test_export_data.xlsx"))
 
-        # TODO: Come up with more thorough way of checking the scenario hasn't run
+        # Clean up...
+        os.remove('test_export_data.xlsx')
 
-    def test_check(self):
-        scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
+    def test_run(self):
 
-        concero.main.run(scen_file, fake_run=True)
+        concero.__main__.launch(
+            args=["run", Test_Main_._dd + "test_scenario_without_models.yaml"])
 
-        concero.main.run(scen_file, check=True)
+        self.assertTrue(os.path.isfile("test_export_data.xlsx"))
 
-        # TODO: Come up with more thorough way of checking that checks have occured
+        os.remove('test_export_data.xlsx')
 
 if __name__ == '__main__':
     unittest.main()

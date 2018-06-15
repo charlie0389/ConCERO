@@ -40,6 +40,7 @@ from concero.tests.test_fromcero import TestFromCERO
 from concero.tests.test_fromcero__procedure import TestFromCERO_Procedure
 from concero.tests.test__identifier import Test_Identifier
 from concero.tests.test_main import TestMain
+from concero.tests.test__main__ import Test_Main_
 
 class TestConCERO(unittest.TestSuite):
     """TestConCERO is a unittest.TestSuite, which provides an easy access point to run all the tests.
@@ -60,6 +61,7 @@ class TestConCERO(unittest.TestSuite):
                          TestToCERO_FileObj,
                          TestFromCERO_Procedure,
                          TestMain,
+                         Test_Main_,
                          TestGTAPE2CERO,
                          # TestCERO2GALLME,
                          TestCERO2LUTO,
