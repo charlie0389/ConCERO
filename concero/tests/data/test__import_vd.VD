@@ -1,0 +1,20 @@
+*  GDX2VEDAversion- 2005-10-07
+*         ImportID- Scenario:NewCSTTest-GG20
+*       VEDAFlavor- TIMES
+*       Dimensions- Attribute;Commodity;Process;Period;Region;Vintage;TimeSlice;UserConstraint;PV
+* ParentDimensions- Commodity: Region; Process: Region; UserConstraint: Region
+*      SetsAllowed- Commodity;Process;UserConstraint
+*        FieldSize- Attribute:31;Commodity:31;Process:31;Period:31;Region:31;Vintage:31;TimeSlice:31;UserConstraint:31;PV:20
+*       NotIndexed- PV
+*         ValueDim- PV
+*  DefaultValueDim- PV
+*   FieldSeparator- ,
+*        TextDelim- "
+
+"VAR_Act","-","FT_COMELC","2015","ACT","2015","PD","-",0.740833333333336
+"VAR_Act","-","FT_COMELC","2016","ACT","2015","PD","-",0.740833333333336
+"VAR_Act","-","FT_COMELC","2020","ACT","2015","PD","-",0.8005115537522
+"VAR_Act","-","FT_COMELC","2025","ACT","2015","PD","-",0.829127920241238
+"Cost_Salv","-","EN_WinONS-26","-","ADE","2040","-","-",1.39891653080538
+"Cost_NPV","-","EE_StmTurb009","-","CQ","-","-","ACT",19.6047685777802
+"Reg_irec","-","-","-","WA","-","-","-",31516.8951973493

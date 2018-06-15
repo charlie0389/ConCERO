@@ -244,6 +244,37 @@ thrown.
 Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format \
 that deviates from the default. Please see `File independent options`_ for more information.
 
+File Objects - VD files
+-----------------------
+
+The coder writing the import connector is not familiar with the diversity of VEDA data files (if there are any). Consequently, the VEDA data file importer has been written with several assumptions. Specifically:
+
+    #. Lines starting with an asterisk (*) are comments.
+    #. The number of data columns remain constant throughout a single file.
+
+If these assumptions are incorrect, please raise an issue on GitHub.
+
+To specify the import of a vd file, it is mandatory to specify:
+
+    * ``date_col: (int)``, where ``date_col`` is the zero-indexed number of the column containing the date.
+    * ``val_col: (int)``, where ``val_col`` is the zero-indexed number of the column containing the values.
+
+And optional to specify:
+
+    * ``default_year: (int)`` - If left unspecified, all records with an invalid date in ``date_col`` are dropped. If specified (as a year), the value of ``date_col`` in all records with an invalid date are changed to ``default_year``.
+
+Example:
+
+.. code-block:: yaml
+
+    files:
+      - file: a_file.vd
+        date_col: 3
+        val_col: 8
+        default_year: 2018
+
+Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format \
+that deviates from the default. Please see `File independent options`_ for more information.
 
 .. _GDX files:
 
@@ -345,7 +376,7 @@ class ToCERO(dict):
 
     class _FileObj(dict):
 
-        supported_file_types = ["har", "csv", "xlsx", "xls", "shk", "gdx"]
+        supported_file_types = ["har", "csv", "xlsx", "xls", "shk", "gdx", "vd"]
 
         def __init__(self, *args, parent: dict=None,
                      **kwargs):
@@ -451,11 +482,11 @@ class ToCERO(dict):
             try:
                 df = self._import_file() # _import_file documents the state of df.
             except xlrd.biffh.XLRDError as e:
-                msg = e.__str__() + ". Failed to import file '%s' - invalid sheet name." % self["file"]
+                msg = e.__str__() + " Failed to import file '%s' - invalid sheet name." % self["file"]
                 ToCERO._logger.error(msg)
                 raise ImportError(msg)
             except Exception as e:
-                msg = e.__str__() + ". Failed to import file '%s'." % self["file"]
+                msg = e.__str__() + " Failed to import file '%s'." % self["file"]
                 ToCERO._logger.error(msg)
                 raise e.__class__(msg)
 
@@ -559,6 +590,9 @@ class ToCERO(dict):
 
             elif (self["type"] == 'har') or (self["type"] == 'shk'):
                 df = self._import_har()
+
+            elif self["type"] in ['vd']:
+                df = self._import_vd()
 
             # If df does not fit these requirements, must be error in import...
             assert isinstance(df, pd.DataFrame)
@@ -775,6 +809,52 @@ class ToCERO(dict):
                 header_dfs.append(df)
 
             return CERO.combine_ceros(header_dfs, overwrite=False, verify_cero=False)
+
+        def _import_vd(self): # VEDA data file
+            """ Import VEDA data files.
+
+            Assumption: The number of columns in first line of data is consistent throughout file.
+
+            :return: pandas.DataFrame (not of CERO type).
+            """
+
+            self["default_year"] = self.get("default_year", None)
+
+            if not issubclass(type(self["date_col"]), int):
+                raise TypeError("'date_col' for file '%s' must be provided as an int." % self["file"])
+
+            if not issubclass(type(self["val_col"]), int):
+                raise TypeError("'val_col' for file '%s' must be provided as an int." % self["file"])
+
+            with open(self["file"], "r") as f:
+                data = f.readlines()
+
+            data = [l.rstrip() for l in data if (l[0] != "\n" and l[0] != "*")]  # Remove comments and empty lines
+            data = [[l.rstrip("\"").lstrip("\"") for l in l.split(",")] for l in data] # Strip quotation marks
+
+            def drop_data(line):
+                try:
+                    line[self["date_col"]] = int(line[self["date_col"]]) # Attempt to convert to int
+                except ValueError:
+                    if self["default_year"] is None:
+                        return False # False has the effect of dropping this record...
+                    line[self["date_col"]] = self["default_year"] # Set to the given default if provided
+                return line
+
+            data = list(map(drop_data, data))
+            data = list(filter(None, data))
+
+            no_cols = len(data[0]) # Assumes number of columns in first line holds for the rest
+            index_col = [x for x in range(no_cols) if ((x != self["val_col"]) and (x != self["date_col"]))]
+
+            df = pd.DataFrame(data=data)
+            df.index = CERO.create_cero_index([[l[x] for x in index_col] for l in data])
+
+            df = df[[self["date_col"], self["val_col"]]] # Remove the now-unneeded data
+            df = df.pivot(columns=self["date_col"]) # NOTE: Pivot can change index to non-logical order
+            df.columns = df.columns.droplevel()
+
+            return df
 
         def _import_gdx(self) -> pd.DataFrame:
             """

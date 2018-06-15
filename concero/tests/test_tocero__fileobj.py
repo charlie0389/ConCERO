@@ -26,7 +26,10 @@ import unittest
 import shutil
 import sys
 
+import pandas as pd
+
 from concero.to_cero import ToCERO
+from concero.cero import CERO
 from concero.tests.data_tools import DataTools, DefaultTestCase
 
 
@@ -113,6 +116,53 @@ class TestToCERO_FileObj(DefaultTestCase):
         df = DataTools.get_test_data(TestToCERO_FileObj._dd + "test_har_repetitive_sets.pickle")
 
         self.assertTrue(cero.equals(df))
+
+    def test__import_vd(self):
+
+        fo = {"file": TestToCERO_FileObj._dd + "test__import_vd.VD",
+              "date_col": 3,
+              "val_col": 8}
+
+        fo = ToCERO._FileObj(fo)
+        df = fo._import_vd()
+        df.columns.set_names([None], inplace=True)
+        df = df.astype(pd.np.float32)
+
+        test_df = pd.DataFrame.from_dict({("VAR_Act", "-", "FT_COMELC", "ACT", "2015", "PD", "-"):
+                                              [0.740833333333336, 0.740833333333336, 0.8005115537522, 0.829127920241238]},
+                                         orient="index",
+                                    dtype=pd.np.float32)
+        test_df.columns = pd.Index([2015, 2016, 2020, 2025])
+        test_df.sort_index(inplace=True)
+
+        self.assertTrue(test_df.equals(df))
+
+        fo = {"file": TestToCERO_FileObj._dd + "test__import_vd.VD",
+              "date_col": 3,
+              "val_col": 8,
+              "default_year": 2018}
+
+        fo = ToCERO._FileObj(fo)
+        df = fo._import_vd()
+        df.columns.set_names([None], inplace=True)
+        df = df.astype(pd.np.float32)
+        df.sort_index(inplace=True)
+
+        test_df = pd.DataFrame(data=[[0.740833333333336, 0.740833333333336, pd.np.nan, 0.8005115537522,
+                                               0.829127920241238],
+                                     [pd.np.nan, pd.np.nan, 1.39891653080538, pd.np.nan, pd.np.nan],
+                                     [pd.np.nan, pd.np.nan, 19.6047685777802, pd.np.nan, pd.np.nan],
+                                     [pd.np.nan, pd.np.nan, 31516.8951973493, pd.np.nan, pd.np.nan],
+                                     ],
+                               columns=[2015, 2016, 2018, 2020, 2025],
+                               dtype=pd.np.float32)
+        test_df.index = CERO.create_cero_index([("VAR_Act", "-", "FT_COMELC", "ACT", "2015", "PD", "-"),
+                                                ("Cost_Salv", "-", "EN_WinONS-26", "ADE", "2040", "-", "-"),
+                                                ("Cost_NPV", "-", "EE_StmTurb009", "CQ", "-", "-", "ACT"),
+                                                ("Reg_irec", "-", "-", "WA", "-", "-", "-"),
+                                                ])
+        test_df.sort_index(inplace=True)
+        self.assertTrue(test_df.equals(df))
 
 
 if __name__ == "__main__":

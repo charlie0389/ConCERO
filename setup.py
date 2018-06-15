@@ -20,7 +20,7 @@ doc_files = package_files('concero/aux', append_to=doc_files)
 doc_files.append('doc/Makefile')
 
 setup(name='concero',
-    version='0.3beta',
+    version='0.3b1',
     description='Automates the running of models and data format conversion for csv, xlsx and har files.',
     author='Lyle Collins',
     author_email='Lyle.Collins@csiro.au',
