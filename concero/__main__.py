@@ -27,13 +27,13 @@ import argparse as ap
 from collections import OrderedDict
 
 import concero
-
+import concero.main
 
 def launch(args=None):
 
-    def run_cmd(ns):
+    def run_cmd(**ns):
         concero.main.run(**ns)
-    def convert_cmd(ns):
+    def convert_cmd(**ns):
         tc = concero.ToCERO(ns["import_def"])  # creates the import object (a.k.a. a ``ToCERO`` object)
         cero = tc.create_cero()  # creates a common object (a.k.a. a 'CERO')
         fc = concero.FromCERO(ns["export_def"])  # creates the export object (a.k.a. a ``FromCERO`` object)
@@ -117,6 +117,8 @@ def launch(args=None):
 
     if ns == {}:
         raise RuntimeError("Invalid ConCERO command - please execute 'concero --help' for a description of valid options.")
+
+    ns["func"](**ns)
 
 if __name__ == "__main__":
     launch()
