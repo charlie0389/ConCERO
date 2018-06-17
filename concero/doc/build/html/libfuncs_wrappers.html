@@ -110,6 +110,12 @@
 <div><ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">init:</span> <span class="pre">list(float)</span></code> - values that precede the data series that serve as initialisation values.</li>
 <li><code class="docutils literal notranslate"><span class="pre">post:</span> <span class="pre">list(float)</span></code> - values that follow the data series for non-causal recursive functions.</li>
+<li><code class="docutils literal notranslate"><span class="pre">auto_init:</span> <span class="pre">init</span></code> - automatically prepend the first value in the array an <code class="docutils literal notranslate"><span class="pre">auto_init</span></code> number of times to the series (and therefore using that as the initial conditions).</li>
+<li><code class="docutils literal notranslate"><span class="pre">auto_post:</span> <span class="pre">int</span></code> - automatically postpend the last value in the array an <code class="docutils literal notranslate"><span class="pre">auto_post</span></code> number of times to the series (and therefore using that as the post conditions).</li>
+<li><code class="docutils literal notranslate"><span class="pre">init_cols:</span> <span class="pre">list(int)</span></code> - specifies the year(s) to use as initialisation values.</li>
+<li><code class="docutils literal notranslate"><span class="pre">post_cols:</span> <span class="pre">list(int)</span></code> - specifies the year(s) to use as post-pended values.</li>
+<li><code class="docutils literal notranslate"><span class="pre">init_icols:</span> <span class="pre">list(int)</span></code> - specifies the index (zero-indexed) to use as initialisation values.</li>
+<li><code class="docutils literal notranslate"><span class="pre">post_icols:</span> <span class="pre">list(int)</span></code> - specifies the index (zero-indexed) to use as post-pended values.</li>
 <li><code class="docutils literal notranslate"><span class="pre">inplace:</span> <span class="pre">bool</span></code> - If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the recursive operation will be applied on the array         inplace, such that the result from a previous iteration is used in subsequent         iterations. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the operation proceeds ignorant of the results of         previous iterations. <code class="docutils literal notranslate"><span class="pre">True</span></code> by default.</li>
 </ul>
 </div></blockquote>

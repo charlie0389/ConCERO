@@ -115,6 +115,12 @@ options are:
 
     * ``init: list(float)`` - values that precede the data series that serve as initialisation values.
     * ``post: list(float)`` - values that follow the data series for non-causal recursive functions.
+    * ``auto_init: init`` - automatically prepend the first value in the array an ``auto_init`` number of times to the series (and therefore using that as the initial conditions).
+    * ``auto_post: int`` - automatically postpend the last value in the array an ``auto_post`` number of times to the series (and therefore using that as the post conditions).
+    * ``init_cols: list(int)`` - specifies the year(s) to use as initialisation values.
+    * ``post_cols: list(int)`` - specifies the year(s) to use as post-pended values.
+    * ``init_icols: list(int)`` - specifies the index (zero-indexed) to use as initialisation values.
+    * ``post_icols: list(int)`` - specifies the index (zero-indexed) to use as post-pended values.
     * ``inplace: bool`` - If ``True``, then the recursive operation will be applied on the array \
         inplace, such that the result from a previous iteration is used in subsequent \
         iterations. If ``False``, the operation proceeds ignorant of the results of \
@@ -377,8 +383,8 @@ def recursive_op(func):
         :param pandas.Series array: A ``pandas`` series for which the encapsulated recursive function will be applied to.
         :param list init: ``init`` is pre-pended to ``array`` before the recursive operation is applied.
         :param list post: ``post`` is post-pended to ``array`` before the recursive operation is applied.
-        :param auto_init:
-        :param auto_post:
+        :param int auto_init: Automatically prepend the first value in ``array`` an ``auto_init`` number of times to the series (and therefore using that as the initial conditions).
+        :param int auto_post: Automatically postpend the last value in ``array`` an ``auto_post`` number of times to the series (and therefore using that as the post conditions).
         :param 'Union[int, List[int]]' init_cols: Specifies the year to use as initialisation values.
         :param 'Union[int, List[int]]' post_cols: Specifies the year to use as post-pended values.
         :param 'Union[int, List[int]]' init_icols: Specifies the index (zero-indexed) to use as initialisation values.
@@ -386,11 +392,11 @@ def recursive_op(func):
         :arg (bool) inplace: If `True` (the default), the operation will be applied on the array inplace, such that the result from a previous iteration is used in subsequent iterations. If `False`, the operation proceeds ignorant of the results of previous iterations.
         :returns (pandas.Series): Returns the result of the recursively-applied function. Will copy ``name`` and ``index`` properties of the provided ``pandas.Series`` object to the returned object.'''
 
-        if [bool(init), bool(auto_init), bool(init_cols), bool(init_icols)].count(True) >= 2:
+        if [bool(init is not None), bool(auto_init is not None), bool(init_cols is not None), bool(init_icols is not None)].count(True) >= 2:
             msg = "Only one of the keyword arguments 'init', 'auto_init', 'init_cols' and 'init_icols' must be provided."
             log.error(msg)
             raise ValueError(msg)
-        if [bool(post), bool(auto_post), bool(post_cols), bool(post_icols)].count(True) >= 2:
+        if [bool(post is not None), bool(auto_post is not None), bool(post_cols is not None), bool(post_icols is not None)].count(True) >= 2:
             msg = "Only one of the keyword arguments 'post', 'auto_post', 'post_cols' and 'post_icols' must be provided."
             log.error(msg)
             raise ValueError(msg)
@@ -408,11 +414,11 @@ def recursive_op(func):
         if post_icols is None: post_icols = []
 
         if not isinstance(auto_init, int) or auto_init < 0:
-            msg = "'auto_init' keyword argument must be provided as an integer greater than or equal to 0."
+            msg = "'auto_init' keyword argument must be provided as an integer greater than 0."
             log.error(msg)
             raise TypeError(msg)
         if not isinstance(auto_post, int) or auto_post < 0:
-            msg = "'auto_post' keyword argument must be provided as an integer greater than or equal to 0."
+            msg = "'auto_post' keyword argument must be provided as an integer greater than 0."
             log.error(msg)
             raise TypeError(msg)
 

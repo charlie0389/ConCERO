@@ -144,7 +144,7 @@ Other Commands
             cd ..
             python -m concero.tests.test_concero
 
-      As long as their are no *failures*, then ConCERO has been installed correctly.
+      **NOTE**: You will need write permissions to the current working directory. As long as their are no *failures*, then ConCERO has been installed correctly.
 
     * Clone the source directory into ``DIR`` using git:
 

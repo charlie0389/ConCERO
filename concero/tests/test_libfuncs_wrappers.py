@@ -202,6 +202,28 @@ class TestLibfuncsWrappers(DefaultTestCase):
 
         self.assertTrue(np.allclose(cero.iloc[0].values, np.array([10 / 3, 4.0, 14 / 3])))
 
+    def test_no_double_initpost_spec(self):
+
+        @libfuncs_wrappers.recursive_op
+        def sum_3(nm1, n, n1):
+            return (nm1 + n + n1)
+
+        cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
+                                       "B": [6, 4, 5, 6, 7],
+                                       "C": [4, 5, 8, 7, 8],
+                                       "D": [9, 10, 12, 11, 2],
+                                       }, orient="index",
+                                      dtype=pd.np.float32)
+
+        cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
+        cero.sort_index(inplace=True)
+
+        cero_cp = cero.copy(True)
+        with self.assertRaises(ValueError):
+            sum_3(cero_cp, init_cols=2017, init_icols=0, inplace=False)  # Checks prevention of double specification
+        with self.assertRaises(ValueError):
+            sum_3(cero_cp, post_cols=2017, post_icols=0, inplace=False)  # Checks prevention of double specification
+
     def test_initpostcols(self):
 
         @libfuncs_wrappers.recursive_op
@@ -223,44 +245,67 @@ class TestLibfuncsWrappers(DefaultTestCase):
                      [4, 17, 20, 23, 8],
                      [9, 31, 33, 25, 2]]
 
-        sum_3(cero, init_cols=[2017], post_cols=[2021], inplace=False)
-        self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
+        cero_cp = cero.copy(True)
+        sum_3(cero_cp, init_cols=[2017], post_cols=[2021], inplace=False)
+        self.assertTrue(np.allclose(test_vals, cero_cp.values.tolist()))
+
+        cero_cp = cero.copy(True)
+        sum_3(cero_cp, init_cols=2017, post_cols=2021, inplace=False)
+        self.assertTrue(np.allclose(test_vals, cero_cp.values.tolist()))
+
+    def test_initposticols(self):
+
+        @libfuncs_wrappers.recursive_op
+        def sum_3(nm1, n, n1):
+            return (nm1 + n + n1)
 
         cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
                                        "B": [6, 4, 5, 6, 7],
                                        "C": [4, 5, 8, 7, 8],
                                        "D": [9, 10, 12, 11, 2],
-                                       }, orient="index",
-                                      dtype=pd.np.float32)
+                                     }, orient="index",
+                                    dtype=pd.np.float32)
 
         cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         cero.sort_index(inplace=True)
 
-        test_vals = [[1, 6, 9, 12, 5],
+        test_vals = [[1, 6,  9,  12, 5],
                      [6, 15, 15, 18, 7],
                      [4, 17, 20, 23, 8],
                      [9, 31, 33, 25, 2]]
 
-        sum_3(cero, init_icols=0, post_icols=-1, inplace=False) # Uses integer form of init_cols
-        self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
+        cero_cp = cero.copy()
+        sum_3(cero_cp, init_icols=[0], post_icols=[-1], inplace=False)
+        self.assertTrue(np.allclose(test_vals, cero_cp.values.tolist()))
+
+        cero_cp = cero.copy()
+        sum_3(cero_cp, init_icols=0, post_icols=-1, inplace=False)  # Uses integer form of init_cols
+        self.assertTrue(np.allclose(test_vals, cero_cp.values.tolist()))
+
+    def test_initpostauto(self):
+
+        @libfuncs_wrappers.recursive_op
+        def sum_3(nm1, n, n1):
+            return (nm1 + n + n1)
 
         cero = pd.DataFrame.from_dict({"A": [1, 2, 3, 4, 5],
                                        "B": [6, 4, 5, 6, 7],
                                        "C": [4, 5, 8, 7, 8],
                                        "D": [9, 10, 12, 11, 2],
-                                       }, orient="index",
-                                      dtype=pd.np.float32)
+                                     }, orient="index",
+                                    dtype=pd.np.float32)
 
         cero.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019, 2020, 2021], format="%Y"))
         cero.sort_index(inplace=True)
 
-        test_vals = [[1, 6,  13, 22, 5],
-                     [6, 15, 26, 39, 7],
-                     [4, 17, 32, 47, 8],
-                     [9, 31, 54, 67, 2]]
+        test_vals = [[4, 6,  9,  12, 14],
+                     [16, 15, 15, 18, 20],
+                     [13, 17, 20, 23, 23],
+                     [28, 31, 33, 25, 15]]
 
-        sum_3(cero, init_icols=0, post_icols=-1)  # Uses inplace form
-        self.assertTrue(np.allclose(test_vals, cero.values.tolist()))
+        cero_cp = cero.copy()
+        sum_3(cero_cp, auto_init=1, auto_post=1, inplace=False)
+        self.assertTrue(np.allclose(test_vals, cero_cp.values.tolist()))
 
     def test_create_series(self):
 
