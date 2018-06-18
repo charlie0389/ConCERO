@@ -1,12 +1,13 @@
 # Changelog
 
-## [Unreleased]:
+## [Unreleased - 0.3]:
 
 ...
 
 ### Added
 
  * Support for *importing* VEDA data files.
+ * `-v`/`--version` option for printing program version.
  * Tests of ``__main__``.
  * Added tests and documentation of `init`, `init_cols`, `init_icols`, `auto_init` and corresponding post keyword arguments of wrapper functions.
 

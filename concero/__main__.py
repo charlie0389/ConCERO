@@ -38,6 +38,10 @@ def launch(args=None):
         cero = tc.create_cero()  # creates a common object (a.k.a. a 'CERO')
         fc = concero.FromCERO(ns["export_def"])  # creates the export object (a.k.a. a ``FromCERO`` object)
         fc.exec_procedures(cero)  # execute the procedures defined in ``export_data.yaml`` on ``cero``
+    def version():
+        with open(os.path.join(os.path.dirname(__file__), '..', 'VERSION')) as version_file:
+            version = version_file.read().strip()
+        return "ConCERO v%s" % version
 
     class _HelpAction(ap._HelpAction):
 
@@ -74,6 +78,7 @@ def launch(args=None):
                              add_help=False,
                              description="A program to automate data format conversion and run (economic) models.")
     argp.add_argument("-h", "--help", action=_HelpAction, help="show this help message and exit")
+    argp.add_argument("-v", "--version", action='version', help="Display the version string.", version=version())
 
     sp = argp.add_subparsers()
 
