@@ -375,7 +375,7 @@ class FromCERO(dict):
                 lf_files.append(system_libfuncs)
                 defaults["libfuncs"].append(system_libfuncs)
 
-            # Load modules if necessary
+            # Load all libfuncs modules
             mods = []
             for idx, (lf, mod) in enumerate(zip(lf_files, defaults["libfuncs"])):
                 if issubclass(type(mod), str):

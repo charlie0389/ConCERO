@@ -7,6 +7,7 @@
 ### Added
 
  * Tests of ``__main__``.
+ * Added tests and documentation of `init`, `init_cols`, `init_icols`, `auto_init` and corresponding post keyword arguments of wrapper functions.
 
 ## [0.2] - 2018-06-14:
 
