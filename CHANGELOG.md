@@ -7,6 +7,7 @@
  * Support for *importing* VEDA data files (no export support yet).
  * Anaconda environment file to simplify install process.
  * `-v`/`--version` option for printing program version.
+ * Date and time is now printed at completion of model execution.
  * Tests of ``__main__``.
  * Added tests and documentation of `init`, `init_cols`, `init_icols`, `auto_init` and corresponding post keyword arguments of wrapper functions.
 
