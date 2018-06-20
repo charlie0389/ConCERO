@@ -32,11 +32,11 @@ setup(name='concero',
     url=r'https://github.com/charlie0389/ConCERO',
     packages=find_packages(),
     python_requires=">=3.5",
-    setup_requires=["numpy", "pandas>=0.23"], # Pandas >=0.23 necessary for bug: https://github.com/numpy/numpy/issues/2434
-    install_requires=["pandas>=0.23", "pyqt=4", "seaborn>=0.8.1", "pyyaml", "xlrd>=1.1.0", "openpyxl"],
+    setup_requires=["pandas>=0.23"], # Pandas >=0.23 necessary for bug: https://github.com/numpy/numpy/issues/2434
+    install_requires=["pandas>=0.23", "seaborn>=0.8.1", "pyyaml", "xlrd>=1.1.0", "openpyxl"],
     tests_require=["harpy>=0.3", "gdxpds"],
     test_suite="concero.tests.test_concero.TestConCERO.__init__",
     package_data={'concero': doc_files},
     entry_points={'console_scripts': ['concero = concero.__main__:launch']},
-    keyword="concero convert economic data har csv xlsx vd model",
+    keywords="concero convert economic data har csv xlsx vd model",
 )
