@@ -22,6 +22,8 @@ Created on Feb 05 09:44:50 2018
 """
 import os
 
+import datetime as dt
+
 import concero.conf as conf
 from concero.format_convert_tools import read_yaml
 from concero.model import Model
@@ -118,7 +120,7 @@ class Scenario(dict):
 
         for idx, model in enumerate(self["models"]):
             m_cero = model.run(self.cero)
-            print("Completed run of model (%s)." % model["name"])
+            print("Completed run of model (%s) at %s." % (model["name"], dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
 
             # If ouput_conf is not defined for a model, then None is returned...
             if m_cero is None:
