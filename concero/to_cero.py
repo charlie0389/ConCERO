@@ -913,9 +913,6 @@ class ToCERO(dict):
                     s = df.loc[(name,),].iloc[0]  # Ugly, but pandas isn't friendly with tuple index values
                     assert (isinstance(s, pd.Series))
                 except KeyError as e:
-                    # print(df.index.values)
-                    # print(names)
-                    # print(name in df.index.values)
                     msg = e.__str__() + (". There are several likely reasons: \n" + \
                                          "1. File orientation is in columns and this has not been specified.\n" +
                                          "2. Series names do not match those given in the file. Remember to " +
@@ -926,8 +923,6 @@ class ToCERO(dict):
                                          )
                     raise KeyError(msg)
                 except IndexError as e:
-                    # print(name)
-                    # print(df.index.values)
                     msg = ("Invalid series identifier. A cause for this error may be " +
                            "a lack of uniqueness in series identifier (consider expanding " +
                            "the number index columns).")

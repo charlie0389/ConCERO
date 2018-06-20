@@ -34,7 +34,7 @@ More complex files (for example, HAR files) require more specification - please 
     ```
     The definition of files/data to be imported and exported is now complete.
 
-3. To create ``export_data.xlsx``, from the command line (and assuming the system python interpreter is version 3.4 or above) run:
+3. To create ``export_data.xlsx``, from the command line (and assuming the system python interpreter is version 3.5 or above) run:
 
     ```concero convert import_data.yaml export_data.yaml```
 

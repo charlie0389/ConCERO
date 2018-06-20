@@ -1,7 +1,7 @@
 Quickstart: Common ConCERO-Related Commands
 ===========================================
 
-This page serves to present the most simple case of downloading, installing and using ConCERO. It is assumed that your python interpreter is version 3.4 or above (see *Other Commands* to identify your python version).
+This page serves to present the most simple case of downloading, installing and using ConCERO. It is assumed that your python interpreter is version 3.5 or above (see *Other Commands* to identify your python version).
 
 Installing ConCERO
 ------------------
