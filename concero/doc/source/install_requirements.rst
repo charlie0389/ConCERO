@@ -81,8 +81,6 @@ Matplotlib is necessary if you wish to use ConCERO's plotting integration. Instr
 Installing PyQt4
 -------------------------------------------------------------------------------
 
-**NOTE - All platforms:** Installing PyQt4 is only necessary if Matplotlib is not already installed.
-
 **NOTE - Windows Only**: It *may* be necessary to install PyQt4 on Windows through a manual process:
 
     #. Download the appropriate ``PyQt4`` package from `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4>`_.

@@ -177,6 +177,39 @@
 <p>If the data has no time dimension (which <em>definitely should be avoided</em>) and therefore <code class="docutils literal notranslate"><span class="pre">time_dim</span></code> is not specified, then <code class="docutils literal notranslate"><span class="pre">default_year</span></code> <strong>must</strong> be provided (or inherited from the file object) - otherwise a ValueError will be thrown.</p>
 <p>Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format that deviates from the default. Please see <a class="reference internal" href="#file-independent-options">File independent options</a> for more information.</p>
 </div>
+<div class="section" id="file-objects-vd-files">
+<h2>File Objects - VD files<a class="headerlink" href="#file-objects-vd-files" title="Permalink to this headline">¶</a></h2>
+<p>The coder writing the import connector is not familiar with the diversity of VEDA data files (if there are any). Consequently, the VEDA data file importer has been written with several assumptions. Specifically:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Lines starting with an asterisk (*) are comments.</li>
+<li>The number of data columns remain constant throughout a single file.</li>
+</ol>
+</div></blockquote>
+<p>If these assumptions are incorrect, please raise an issue on GitHub.</p>
+<p>To specify the import of a vd file, it is mandatory to specify:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">date_col:</span> <span class="pre">(int)</span></code>, where <code class="docutils literal notranslate"><span class="pre">date_col</span></code> is the zero-indexed number of the column containing the date.</li>
+<li><code class="docutils literal notranslate"><span class="pre">val_col:</span> <span class="pre">(int)</span></code>, where <code class="docutils literal notranslate"><span class="pre">val_col</span></code> is the zero-indexed number of the column containing the values.</li>
+</ul>
+</div></blockquote>
+<p>And optional to specify:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">default_year:</span> <span class="pre">(int)</span></code> - If left unspecified, all records with an invalid date in <code class="docutils literal notranslate"><span class="pre">date_col</span></code> are dropped. If specified (as a year), the value of <code class="docutils literal notranslate"><span class="pre">date_col</span></code> in all records with an invalid date are changed to <code class="docutils literal notranslate"><span class="pre">default_year</span></code>.</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">files</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">a_file.vd</span>
+    <span class="l l-Scalar l-Scalar-Plain">date_col</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+    <span class="l l-Scalar l-Scalar-Plain">val_col</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+    <span class="l l-Scalar l-Scalar-Plain">default_year</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">2018</span>
+</pre></div>
+</div>
+<p>Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format that deviates from the default. Please see <a class="reference internal" href="#file-independent-options">File independent options</a> for more information.</p>
+</div>
 <div class="section" id="file-objects-gdx-files-currently-unsupported">
 <span id="gdx-files"></span><h2>File Objects - GDX files (currently unsupported)<a class="headerlink" href="#file-objects-gdx-files-currently-unsupported" title="Permalink to this headline">¶</a></h2>
 <p>Currently, <code class="docutils literal notranslate"><span class="pre">GDX</span></code> files are not supported (though large amounts of the framework is in place).</p>
@@ -337,6 +370,7 @@ What follows is an example, using the defaults of <code class="docutils literal 
 <li><a class="reference internal" href="#file-objects-csv-files">File Objects - CSV files</a></li>
 <li><a class="reference internal" href="#file-objects-excel-files">File Objects - Excel files</a></li>
 <li><a class="reference internal" href="#file-objects-har-or-shk-files">File Objects - HAR (or SHK) files</a></li>
+<li><a class="reference internal" href="#file-objects-vd-files">File Objects - VD files</a></li>
 <li><a class="reference internal" href="#file-objects-gdx-files-currently-unsupported">File Objects - GDX files (currently unsupported)</a></li>
 <li><a class="reference internal" href="#file-independent-options">File Independent Options:</a></li>
 <li><a class="reference internal" href="#tocero-technical-specification">ToCERO Technical Specification</a></li>

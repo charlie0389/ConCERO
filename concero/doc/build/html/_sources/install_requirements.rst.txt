@@ -14,7 +14,7 @@ This documentation assumes the reader is familiar with basic python data types, 
 
 To run this program, the user will need
 
- * python 3 (>= 3.4),
+ * python 3 (>= 3.5),
  * pandas (>= 0.22),
  * matplotlib,
  * xlrd (>= 1.1.0),
@@ -78,15 +78,15 @@ Installing Matplotlib (necessary to plot using Python/ConCERO)
 
 Matplotlib is necessary if you wish to use ConCERO's plotting integration. Instructions can be found at `<https://matplotlib.org/users/installing.html#install-requirements>`_.
 
-Installing PyQt4 (Windows Only - may be necessary to plot using Python/ConCERO)
+Installing PyQt4
 -------------------------------------------------------------------------------
 
-It *may* be necessary to install PyQt4 on Windows through a manual process:
+**NOTE - Windows Only**: It *may* be necessary to install PyQt4 on Windows through a manual process:
 
     #. Download the appropriate ``PyQt4`` package from `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4>`_.
     #. From the directory containing the downloaded file, execute from the command line ``pip install <downloaded PyQt4 file>`` .
 
-If using Anaconda, then
+**All platforms:** If using Anaconda, then
 
     #. Execute command ``conda install pyqt=4`` .
 
