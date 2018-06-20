@@ -15,17 +15,31 @@ This documentation assumes the reader is familiar with basic python data types, 
 To run this program, the user will need
 
  * python 3 (>= 3.5),
- * pandas (>= 0.22),
- * matplotlib,
+ * pandas (>= 0.23),
+ * seaborn (>=0.8.1),
  * xlrd (>= 1.1.0),
  * pyyaml and
- * seaborn
+ * openpyxl (which is actually an unlisted dependency of `pandas`).
 
 installed. ``matplotlib`` provides plotting functionality and ``seaborn`` is a plotting library that basically 'makes matplotlib plots look nice'. PyYAML provides YAML read functionality (necessary to read all the configuration files). No attempt has been made to make ConCERO backwards compatible with python 2. Unfortunately, it may be necessary to go through a rather arduous install process if it is necessary to have support for gdx file reading and/or har files (described below).
 
 ``xlrd`` is an excel spreadsheet file-reading program. It will be installed by default with ``pandas``, but may not be of a sufficiently high version. On Windows, a bug in older versions may cause an exception to be raised when reading legitimate excel files. To upgrade ``xlrd``, run the command:
 
     ``pip install xlrd --upgrade``
+
+Installing PyQt4
+-------------------------------------------------------------------------------
+
+PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on `matplotlib`.
+
+**All platforms:** If using Anaconda, then
+
+    #. Execute command ``conda install pyqt=4`` .
+
+**NOTE - Windows Only**: It *may* be necessary to install PyQt4 on Windows through a manual process:
+
+    #. Download the appropriate ``PyQt4`` package from `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4>`_.
+    #. From the directory containing the downloaded file, execute from the command line ``pip install <downloaded PyQt4 file>`` .
 
 Install GAMS Python API (Incomplete)
 ------------------------------------
@@ -72,24 +86,6 @@ Installing harpy is a simple process. The source code can be found at `github <h
 If you have both python 2 and python 3 on your system, the install command may instead be:
 
     ``python3 setup.py install``
-
-Installing Matplotlib (necessary to plot using Python/ConCERO)
---------------------------------------------------------------
-
-Matplotlib is necessary if you wish to use ConCERO's plotting integration. Instructions can be found at `<https://matplotlib.org/users/installing.html#install-requirements>`_.
-
-Installing PyQt4
--------------------------------------------------------------------------------
-
-**NOTE - Windows Only**: It *may* be necessary to install PyQt4 on Windows through a manual process:
-
-    #. Download the appropriate ``PyQt4`` package from `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4>`_.
-    #. From the directory containing the downloaded file, execute from the command line ``pip install <downloaded PyQt4 file>`` .
-
-**All platforms:** If using Anaconda, then
-
-    #. Execute command ``conda install pyqt=4`` .
-
 
 Installing ConCERO
 ------------------

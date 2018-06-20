@@ -49,17 +49,34 @@
 <blockquote>
 <div><ul class="simple">
 <li>python 3 (&gt;= 3.5),</li>
-<li>pandas (&gt;= 0.22),</li>
-<li>matplotlib,</li>
+<li>pandas (&gt;= 0.23),</li>
+<li>seaborn (&gt;=0.8.1),</li>
 <li>xlrd (&gt;= 1.1.0),</li>
 <li>pyyaml and</li>
-<li>seaborn</li>
+<li>openpyxl (which is actually an unlisted dependency of <cite>pandas</cite>).</li>
 </ul>
 </div></blockquote>
 <p>installed. <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> provides plotting functionality and <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> is a plotting library that basically ‘makes matplotlib plots look nice’. PyYAML provides YAML read functionality (necessary to read all the configuration files). No attempt has been made to make ConCERO backwards compatible with python 2. Unfortunately, it may be necessary to go through a rather arduous install process if it is necessary to have support for gdx file reading and/or har files (described below).</p>
 <p><code class="docutils literal notranslate"><span class="pre">xlrd</span></code> is an excel spreadsheet file-reading program. It will be installed by default with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, but may not be of a sufficiently high version. On Windows, a bug in older versions may cause an exception to be raised when reading legitimate excel files. To upgrade <code class="docutils literal notranslate"><span class="pre">xlrd</span></code>, run the command:</p>
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xlrd</span> <span class="pre">--upgrade</span></code></div></blockquote>
+<div class="section" id="installing-pyqt4">
+<h2>Installing PyQt4<a class="headerlink" href="#installing-pyqt4" title="Permalink to this headline">¶</a></h2>
+<p>PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on <cite>matplotlib</cite>.</p>
+<p><strong>All platforms:</strong> If using Anaconda, then</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Execute command <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">pyqt=4</span></code> .</li>
+</ol>
+</div></blockquote>
+<p><strong>NOTE - Windows Only</strong>: It <em>may</em> be necessary to install PyQt4 on Windows through a manual process:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Download the appropriate <code class="docutils literal notranslate"><span class="pre">PyQt4</span></code> package from <a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4">https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4</a>.</li>
+<li>From the directory containing the downloaded file, execute from the command line <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&lt;downloaded</span> <span class="pre">PyQt4</span> <span class="pre">file&gt;</span></code> .</li>
+</ol>
+</div></blockquote>
+</div>
 <div class="section" id="install-gams-python-api-incomplete">
 <h2>Install GAMS Python API (Incomplete)<a class="headerlink" href="#install-gams-python-api-incomplete" title="Permalink to this headline">¶</a></h2>
 <p>The instructions in this section are only relevant if it is necessary to interact with GAMS <code class="docutils literal notranslate"><span class="pre">.gdx</span></code> files.</p>
@@ -93,26 +110,6 @@
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
 </div>
-<div class="section" id="installing-matplotlib-necessary-to-plot-using-python-concero">
-<h2>Installing Matplotlib (necessary to plot using Python/ConCERO)<a class="headerlink" href="#installing-matplotlib-necessary-to-plot-using-python-concero" title="Permalink to this headline">¶</a></h2>
-<p>Matplotlib is necessary if you wish to use ConCERO’s plotting integration. Instructions can be found at <a class="reference external" href="https://matplotlib.org/users/installing.html#install-requirements">https://matplotlib.org/users/installing.html#install-requirements</a>.</p>
-</div>
-<div class="section" id="installing-pyqt4">
-<h2>Installing PyQt4<a class="headerlink" href="#installing-pyqt4" title="Permalink to this headline">¶</a></h2>
-<p><strong>NOTE - Windows Only</strong>: It <em>may</em> be necessary to install PyQt4 on Windows through a manual process:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Download the appropriate <code class="docutils literal notranslate"><span class="pre">PyQt4</span></code> package from <a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4">https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4</a>.</li>
-<li>From the directory containing the downloaded file, execute from the command line <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&lt;downloaded</span> <span class="pre">PyQt4</span> <span class="pre">file&gt;</span></code> .</li>
-</ol>
-</div></blockquote>
-<p><strong>All platforms:</strong> If using Anaconda, then</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Execute command <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">pyqt=4</span></code> .</li>
-</ol>
-</div></blockquote>
-</div>
 <div class="section" id="installing-concero">
 <h2>Installing ConCERO<a class="headerlink" href="#installing-concero" title="Permalink to this headline">¶</a></h2>
 <p>Similar to harpy, the install command is either:</p>
@@ -145,11 +142,10 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Install Requirements and Assumed Knowledge</a><ul>
+<li><a class="reference internal" href="#installing-pyqt4">Installing PyQt4</a></li>
 <li><a class="reference internal" href="#install-gams-python-api-incomplete">Install GAMS Python API (Incomplete)</a></li>
 <li><a class="reference internal" href="#installing-gdxpds-necessary-for-gdx-files">Installing gdxpds (necessary for gdx files)</a></li>
 <li><a class="reference internal" href="#installing-harpy-necessary-for-har-or-shk-files">Installing harpy (necessary for har or shk files)</a></li>
-<li><a class="reference internal" href="#installing-matplotlib-necessary-to-plot-using-python-concero">Installing Matplotlib (necessary to plot using Python/ConCERO)</a></li>
-<li><a class="reference internal" href="#installing-pyqt4">Installing PyQt4</a></li>
 <li><a class="reference internal" href="#installing-concero">Installing ConCERO</a></li>
 </ul>
 </li>
