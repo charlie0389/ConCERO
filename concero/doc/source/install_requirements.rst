@@ -28,7 +28,7 @@ installed. ``matplotlib`` provides plotting functionality and ``seaborn`` is a p
     ``pip install xlrd --upgrade``
 
 Installing PyQt4
--------------------------------------------------------------------------------
+----------------
 
 PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on `matplotlib`.
 
@@ -107,5 +107,14 @@ Assuming ConCERO has been installed successfully, you can identify how to run Co
     ``concero --help``
 
 .. [1] To check whether this library (``lib``) is installed (correctly), the simplest way is to open python on the command line. For example - ``python``. Then, in the python interpreter, execute ``import lib``, where ``lib`` is the relevant library. If no errors are raised, then the program is installed correctly.
+
+Installing ConCERO using Anaconda
+---------------------------------
+
+If the environment manager *Anaconda* is installed, a ConCERO environment can be installed by executing:
+
+    ``conda env create -f concero/misc/concero_env.yaml``
+
+**NOTE:** If installing using this method, the PyQt4 manual install process can be skipped. The manual install process for Harpy is still required however.
 
 

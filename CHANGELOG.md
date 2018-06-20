@@ -2,17 +2,18 @@
 
 ## [Unreleased - 0.3]:
 
+### Added
+
+ * Support for *importing* VEDA data files (no export support yet).
+ * Anaconda environment file to simplify install process.
+ * `-v`/`--version` option for printing program version.
+ * Tests of ``__main__``.
+ * Added tests and documentation of `init`, `init_cols`, `init_icols`, `auto_init` and corresponding post keyword arguments of wrapper functions.
+
 ### Changed
 
  * Minimum python requirement increased to `3.5`.
  * Minimum pandas requirement increased to `0.23`.
-
-### Added
-
- * Support for *importing* VEDA data files (no export support yet).
- * `-v`/`--version` option for printing program version.
- * Tests of ``__main__``.
- * Added tests and documentation of `init`, `init_cols`, `init_icols`, `auto_init` and corresponding post keyword arguments of wrapper functions.
 
 ## [0.2] - 2018-06-14:
 
