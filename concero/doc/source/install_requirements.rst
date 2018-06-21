@@ -65,16 +65,9 @@ You may get warnings regarding the python version mismatch.
 Installing gdxpds (necessary for gdx files)
 -------------------------------------------
 
-If working with the ``.gdx`` data type, in addition to ConCERO's requirements, it is necessary to install:
+Can be done through pip:
 
- 1. GAMS python API - more details of which can be found at `the GAMS website <https://www.gams.com/latest/docs/API_PY_TUTORIAL.html#PY_GETTING_STARTED>`_ - and
- 2. gdxpds,
-
-*in that order*.
-
-Installing/using the GAMS API is much easier (and probably more reliable) if the version of the python interpreter matches the version of the installed GAMS API files. That is, using Python 3.4 interpreter with Python 3.4 GAMS API. GAMS will complain even if the interpreter is more recent than that - for example, a version 3.5 interpreter with a 3.4 GAMS API. It is possible to install it anyway and link libraries manually, but that is a non-trivial process.
-
-*gdxpds* will complain if it is not imported before pandas. Where possible, this program intends to heed this warning, but this may not always be the case, and so far, no adverse affects have been discovered by failing to heed the warning. Future versions of this program may remove this dependency.
+    ``pip install gdxpds``
 
 Installing harpy (necessary for har or shk files)
 -------------------------------------------------
