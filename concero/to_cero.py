@@ -866,36 +866,62 @@ class ToCERO(dict):
             :return:
             """
 
-            if not self.get("pars"):
-                dfs_dict = gdxpds.to_dataframes(self["file"])
-                self["pars"] = []
-                for name, df in dfs_dict.items():
-                    self["pars"].append({"name": name,
-                                         "time_col": df.shape[1] - 2,
-                                         })
-            else:
-                dfs_dict = OrderedDict()
-                for idx, pars in enumerate(self["pars"]):
+            parent_dict = self.copy()
+            parent_dict.pop("file")
 
-                    if isinstance(pars, str):
-                        self["pars"][idx] = {"name": pars}
-                        pars = self["pars"][idx]
+            sym_defs = {}
+            sym_defs.update(parent_dict)
 
-                    dfs_dict.update(gdxpds.to_dataframe(self["file"], pars['name']))
-                    self["pars"][idx]["time_col"] = self["pars"][idx].get("time_col", dfs_dict[pars['name']].shape[1] - 2)
+            # if issubclass(type(self.get("symbols")), str):
+            #     self["symbols"] = [{"name": self["symbols"]}]
+            if issubclass(type(self.get("symbols")), dict):
+                self["symbols"] = [self["symbols"]]
+            # elif self.get("symbols", []) == []:
+            #     self["symbols"] = [{"name": s.name} for s in gdxpds.list_symbols(self["file"])] # If symbols aren't specified, assume that user wants them all
+            elif not issubclass(type(self.get("symbols", [])), list):
+                raise TypeError("'symbols' must be provided as a dict, or a list of dicts. Each symbol must have 'name' and 'date_col' specified.")
+
+            sym_tmp = []
+            for sym in self["symbols"]:
+                tmp = sym_defs.copy()
+                # if issubclass(type(sym), str):
+                #     tmp.update({"name": sym})
+                if issubclass(type(sym), dict):
+                    tmp.update(sym)
+                else:
+                    raise TypeError("Symbol '%s' is of invalid type (not a dict)." % (sym))
+                sym_tmp.append(tmp)
+
+            self["symbols"] = sym_tmp
+
+            req_keys = ["name", "date_col"]
+            for sym in self["symbols"]:
+                try:
+                    assert issubclass(type(sym), dict)
+                except AssertionError as e:
+                    ToCERO._logger.error("Symbol %s is not of dict type." % sym)
+                    raise e
+                try:
+                    assert all([(k in sym) for k in req_keys])
+                except AssertionError as e:
+                    msg = "Symbol %s does not have all of %s specified." % (sym, req_keys)
+                    ToCERO._logger.error(msg)
+                    raise TypeError(msg)
+
+            dfs_dict = OrderedDict([(sym["name"], gdxpds.to_dataframe(self["file"], sym["name"])[sym["name"]]) for sym in self["symbols"]])
 
             df_list = []
-            for idx, par in enumerate(self["pars"]):
-                df = dfs_dict[par["name"]]
+            for idx, sym in enumerate(self["symbols"]):
+                df = dfs_dict[sym["name"]]
 
                 # Renames the initial columns to a number string...
                 col_labels = ["%d" % i for i in range(df.shape[1])]
                 col_labels[-1] = "Value"
-                col_labels[par["time_col"]] = "Year"
+                col_labels[sym["date_col"]] = "YEAR"
                 df.columns = pd.Index(col_labels)
 
                 df.set_index(col_labels[:-1], inplace=True)
-                new_level_order = [col_labels[par["time_col"]]] + [x for i, x in enumerate(col_labels[:-1]) if i != par["time_col"]]
+                new_level_order = [col_labels[sym["date_col"]]] + [x for i, x in enumerate(col_labels[:-1]) if i != sym["date_col"]]
                 df = df.reorder_levels(new_level_order) #: Assumption: Year index is always the lowest-level in column hierarchy
                 df = df.unstack(0)
                 df.columns = df.columns.droplevel()

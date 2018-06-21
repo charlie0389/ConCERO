@@ -25,6 +25,7 @@ import os
 import unittest
 import shutil
 import sys
+import pickle
 
 import pandas as pd
 
@@ -163,6 +164,18 @@ class TestToCERO_FileObj(DefaultTestCase):
                                                 ])
         test_df.sort_index(inplace=True)
         self.assertTrue(test_df.equals(df))
+
+    def test__import_gdx(self):
+
+        fo = {"file": TestToCERO_FileObj._dd + "test__import_gdx.gdx",
+              "symbols": {"name": "L_EXPORT", "date_col": 2}}
+        fo = ToCERO._FileObj(fo)
+        df = fo._import_gdx()
+
+        with open(TestToCERO_FileObj._dd + "test__import_gdx.pickle", "rb") as f:
+            test_df = pickle.load(f)
+
+        self.assertTrue(df.equals(test_df))
 
 
 if __name__ == "__main__":
