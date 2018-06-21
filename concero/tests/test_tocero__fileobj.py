@@ -29,6 +29,7 @@ import pickle
 
 import pandas as pd
 
+import concero.conf
 from concero.to_cero import ToCERO
 from concero.cero import CERO
 from concero.tests.data_tools import DataTools, DefaultTestCase
@@ -165,6 +166,7 @@ class TestToCERO_FileObj(DefaultTestCase):
         test_df.sort_index(inplace=True)
         self.assertTrue(test_df.equals(df))
 
+    @unittest.skipIf(not concero.conf.gdxpds_installed, "gdxpds not installed")
     def test__import_gdx(self):
 
         fo = {"file": TestToCERO_FileObj._dd + "test__import_gdx.gdx",
@@ -176,6 +178,17 @@ class TestToCERO_FileObj(DefaultTestCase):
             test_df = pickle.load(f)
 
         self.assertTrue(df.equals(test_df))
+
+    @unittest.skipIf(not concero.conf.gdxpds_installed, "gdxpds not installed")
+    def test_gtape2cero(self):
+
+        dd = os.path.join(os.path.dirname(__file__), "data", "")
+
+        g2c = ToCERO(dd + r'test_gtape_to_cero.yaml')
+        cero = g2c.create_cero()
+        df = DataTools.get_test_data(dd + r'test_gtape_to_cero_finaldata.pickle')
+
+        self.assertTrue(cero.equals(df))
 
 
 if __name__ == "__main__":

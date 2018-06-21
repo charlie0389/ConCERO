@@ -27,10 +27,7 @@ from concero.tests.test_model import TestModel
 from concero.tests.test_vurm_to_cero import TestVURM2CERO
 from concero.tests.test_sceninputs_to_cero import TestScenIn2CERO
 from concero.tests.test_libfuncs import TestLibfuncs
-from concero.tests.test_gtape_to_cero import TestGTAPE2CERO
 from concero.tests.test_cero_to_luto import TestCERO2LUTO
-from concero.tests.test_cero_to_gallme import TestCERO2GALLME
-# from concero.tests.test_cero_to_austimes import TestCERO2AusTIMES
 from concero.tests.test_cero_to_har import TestCERO2HAR
 from concero.tests.test_cero import TestCERO
 from concero.tests.test_libfuncs_wrappers import TestLibfuncsWrappers
@@ -62,8 +59,6 @@ class TestConCERO(unittest.TestSuite):
                          TestFromCERO_Procedure,
                          TestMain,
                          Test_Main_,
-                         TestGTAPE2CERO,
-                         # TestCERO2GALLME,
                          TestCERO2LUTO,
                      ):
             self.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(testcase))
