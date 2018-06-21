@@ -495,7 +495,7 @@ class FromCERO(dict):
             if "file" in self:
                 # If file is specified, all 'outputs' from this procedure go to its own file
                 output_type = os.path.splitext(self["file"])[1][1:]
-                FromCERO._dataframe_out(out_df, self["file"], output_type, self.get("output_kwargs"))
+                FromCERO.dataframe_out(out_df, self["file"], output_type, self.get("output_kwargs"))
             else:
                 # procedure output name is that provided
                 return {self["name"]: out_df}
@@ -730,7 +730,7 @@ class FromCERO(dict):
             file_ext = os.path.splitext(self["file"])[1][1:]
             if file_ext in FromCERO.sup_output_types:
                 out_df = CERO.combine_ceros(list(self.output_procedures.values()))
-                FromCERO._dataframe_out(out_df, self["file"], output_type=file_ext)
+                FromCERO.dataframe_out(out_df, self["file"], output_type=file_ext)
             elif file_ext in FromCERO._Procedure.sup_output_types:
                 raise ValueError("This data type is not supported for general export, because it probably has a more than 2 dimensions - export using 'procedures' instead.")
             else:
@@ -917,7 +917,14 @@ class FromCERO(dict):
         return True
 
     @staticmethod
-    def _dataframe_out(df, output_file, output_type, output_kwargs: dict=None):
+    def dataframe_out(df: pd.DataFrame, output_file: str, output_type: str, output_kwargs: dict=None):
+
+        if df.empty:
+            msg = "CERO is empty - no data to export."
+            print(msg)
+            FromCERO._logger.warning(msg)
+            return
+
         output_file = output_file + "." + output_type if os.path.splitext(output_file)[1] == "" else output_file
         if output_type.lower() in ['npy']:
             FromCERO._numpy_out(df.values, output_file, output_kwargs=output_kwargs)
@@ -926,7 +933,7 @@ class FromCERO(dict):
         elif output_type.lower() in ["csv"]:
             FromCERO._csv_out(df, output_file, output_kwargs=output_kwargs)
         elif output_type.lower() in ["xlsx", "excel"]:
-            FromCERO.xlsx_out(df, output_file, output_kwargs=output_kwargs)
+            FromCERO._xlsx_out(df, output_file, output_kwargs=output_kwargs)
         elif output_type.lower() in {"gdx"}:
             FromCERO._gdx_out(df, output_file, output_kwargs=output_kwargs)
         else:
@@ -946,13 +953,7 @@ class FromCERO(dict):
         df.to_csv(output_file, **output_kwargs)
 
     @staticmethod
-    def xlsx_out(df: pd.DataFrame, output_file: str, output_kwargs: dict=None, **kwargs):
-
-        if df.empty:
-            msg = "Attempted to export empty CERO."
-            print(msg)
-            FromCERO._logger.warning(msg)
-            return
+    def _xlsx_out(df: pd.DataFrame, output_file: str, output_kwargs: dict=None, **kwargs):
 
         defaults = {"columns": df.columns.strftime("%Y"),
                     "sheet_name": "CERO",

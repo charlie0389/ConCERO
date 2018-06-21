@@ -116,7 +116,7 @@ class Scenario(dict):
             self.cero = CERO.combine_ceros(ceros)
             print("Successfully loaded scenario inputs as CERO.")
 
-        FromCERO.xlsx_out(self.cero, (self.get_name() + "_%03d_step_%02d.xlsx" % (self["run_no"], 0)))
+        FromCERO.dataframe_out(self.cero, (self.get_name() + "_%03d_step_%02d.xlsx" % (self["run_no"], 0)), "xlsx")
 
         for idx, model in enumerate(self["models"]):
             m_cero = model.run(self.cero)
