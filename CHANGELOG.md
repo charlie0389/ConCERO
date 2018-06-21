@@ -5,6 +5,7 @@
 ### Added
 
  * Support for *importing* VEDA data files (no export support yet).
+ * Support for *importing* GDX data files (no export support yet).
  * Anaconda environment file to simplify install process.
  * `-v`/`--version` option for printing program version.
  * Date and time is now printed at completion of model execution.

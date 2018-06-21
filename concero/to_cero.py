@@ -278,10 +278,16 @@ that deviates from the default. Please see `File independent options`_ for more 
 
 .. _GDX files:
 
-File Objects - GDX files (currently unsupported)
-------------------------------------------------
+File Objects - GDX files
+------------------------
 
-Currently, ``GDX`` files are not supported (though large amounts of the framework is in place).
+GDX files can be imported by providing the option:
+    * ``symbols: list(dict)`` - where each `list` item is a `dict` (referred to as a "symbol dict").
+
+Each symbol dict must have the options:
+
+    * ``name: (str)`` - where ``name`` is the name of the symbol to load.
+    * ``date_col: (int)`` - where ``date_col`` specifies the (zero-indexed) column that includes the date reference.
 
 .. _File independent options:
 
@@ -588,7 +594,7 @@ class ToCERO(dict):
             elif self["type"] == 'gdx':
                 df = self._import_gdx()
 
-            elif (self["type"] == 'har') or (self["type"] == 'shk'):
+            elif self["type"] in ['har', 'shk']:
                 df = self._import_har()
 
             elif self["type"] in ['vd']:
