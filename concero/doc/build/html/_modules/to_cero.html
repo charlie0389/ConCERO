@@ -9,7 +9,7 @@
     <title>to_cero &#8212; ConCERO 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -311,10 +311,16 @@
 
 <span class="sd">.. _GDX files:</span>
 
-<span class="sd">File Objects - GDX files (currently unsupported)</span>
-<span class="sd">------------------------------------------------</span>
+<span class="sd">File Objects - GDX files</span>
+<span class="sd">------------------------</span>
 
-<span class="sd">Currently, ``GDX`` files are not supported (though large amounts of the framework is in place).</span>
+<span class="sd">GDX files can be imported by providing the option:</span>
+<span class="sd">    * ``symbols: list(dict)`` - where each `list` item is a `dict` (referred to as a &quot;symbol dict&quot;).</span>
+
+<span class="sd">Each symbol dict must have the options:</span>
+
+<span class="sd">    * ``name: (str)`` - where ``name`` is the name of the symbol to load.</span>
+<span class="sd">    * ``date_col: (int)`` - where ``date_col`` specifies the (zero-indexed) column that includes the date reference.</span>
 
 <span class="sd">.. _File independent options:</span>
 
@@ -621,7 +627,7 @@
             <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;gdx&#39;</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_gdx</span><span class="p">()</span>
 
-            <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;har&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;shk&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;har&#39;</span><span class="p">,</span> <span class="s1">&#39;shk&#39;</span><span class="p">]:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_har</span><span class="p">()</span>
 
             <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;vd&#39;</span><span class="p">]:</span>
@@ -899,36 +905,62 @@
 <span class="sd">            :return:</span>
 <span class="sd">            &quot;&quot;&quot;</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pars&quot;</span><span class="p">):</span>
-                <span class="n">dfs_dict</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
-                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
-                                         <span class="s2">&quot;time_col&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span>
-                                         <span class="p">})</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">dfs_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pars</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]):</span>
+            <span class="n">parent_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">parent_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">pars</span><span class="p">}</span>
-                        <span class="n">pars</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">sym_defs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">sym_defs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent_dict</span><span class="p">)</span>
 
-                    <span class="n">dfs_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">pars</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="s2">&quot;time_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_col&quot;</span><span class="p">,</span> <span class="n">dfs_dict</span><span class="p">[</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># if issubclass(type(self.get(&quot;symbols&quot;)), str):</span>
+            <span class="c1">#     self[&quot;symbols&quot;] = [{&quot;name&quot;: self[&quot;symbols&quot;]}]</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbols&quot;</span><span class="p">)),</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]]</span>
+            <span class="c1"># elif self.get(&quot;symbols&quot;, []) == []:</span>
+            <span class="c1">#     self[&quot;symbols&quot;] = [{&quot;name&quot;: s.name} for s in gdxpds.list_symbols(self[&quot;file&quot;])] # If symbols aren&#39;t specified, assume that user wants them all</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbols&quot;</span><span class="p">,</span> <span class="p">[])),</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;symbols&#39; must be provided as a dict, or a list of dicts. Each symbol must have &#39;name&#39; and &#39;date_col&#39; specified.&quot;</span><span class="p">)</span>
+
+            <span class="n">sym_tmp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">sym_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="c1"># if issubclass(type(sym), str):</span>
+                <span class="c1">#     tmp.update({&quot;name&quot;: sym})</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">sym</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">tmp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Symbol &#39;</span><span class="si">%s</span><span class="s2">&#39; is of invalid type (not a dict).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">))</span>
+                <span class="n">sym_tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym_tmp</span>
+
+            <span class="n">req_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;date_col&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">sym</span><span class="p">),</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Symbol </span><span class="si">%s</span><span class="s2"> is not of dict type.&quot;</span> <span class="o">%</span> <span class="n">sym</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">all</span><span class="p">([(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">sym</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">req_keys</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Symbol </span><span class="si">%s</span><span class="s2"> does not have all of </span><span class="si">%s</span><span class="s2"> specified.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">req_keys</span><span class="p">)</span>
+                    <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">dfs_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">sym</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">sym</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])[</span><span class="n">sym</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]])</span> <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]])</span>
 
             <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">par</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;pars&quot;</span><span class="p">]):</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">dfs_dict</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">sym</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">dfs_dict</span><span class="p">[</span><span class="n">sym</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span>
 
                 <span class="c1"># Renames the initial columns to a number string...</span>
                 <span class="n">col_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
                 <span class="n">col_labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Value&quot;</span>
-                <span class="n">col_labels</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;Year&quot;</span>
+                <span class="n">col_labels</span><span class="p">[</span><span class="n">sym</span><span class="p">[</span><span class="s2">&quot;date_col&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;YEAR&quot;</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">col_labels</span><span class="p">)</span>
 
                 <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">col_labels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">new_level_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_labels</span><span class="p">[</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">col_labels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">par</span><span class="p">[</span><span class="s2">&quot;time_col&quot;</span><span class="p">]]</span>
+                <span class="n">new_level_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_labels</span><span class="p">[</span><span class="n">sym</span><span class="p">[</span><span class="s2">&quot;date_col&quot;</span><span class="p">]]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">col_labels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">sym</span><span class="p">[</span><span class="s2">&quot;date_col&quot;</span><span class="p">]]</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reorder_levels</span><span class="p">(</span><span class="n">new_level_order</span><span class="p">)</span> <span class="c1">#: Assumption: Year index is always the lowest-level in column hierarchy</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">droplevel</span><span class="p">()</span>
@@ -1173,7 +1205,7 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>

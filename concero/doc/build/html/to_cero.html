@@ -9,7 +9,7 @@
     <title>Converting TO the Collins Economics Result Object (CERO) format &#8212; ConCERO 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -210,9 +210,22 @@
 </div>
 <p>Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format that deviates from the default. Please see <a class="reference internal" href="#file-independent-options">File independent options</a> for more information.</p>
 </div>
-<div class="section" id="file-objects-gdx-files-currently-unsupported">
-<span id="gdx-files"></span><h2>File Objects - GDX files (currently unsupported)<a class="headerlink" href="#file-objects-gdx-files-currently-unsupported" title="Permalink to this headline">¶</a></h2>
-<p>Currently, <code class="docutils literal notranslate"><span class="pre">GDX</span></code> files are not supported (though large amounts of the framework is in place).</p>
+<div class="section" id="file-objects-gdx-files">
+<span id="gdx-files"></span><h2>File Objects - GDX files<a class="headerlink" href="#file-objects-gdx-files" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>GDX files can be imported by providing the option:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">symbols:</span> <span class="pre">list(dict)</span></code> - where each <cite>list</cite> item is a <cite>dict</cite> (referred to as a “symbol dict”).</li>
+</ul>
+</dd>
+</dl>
+<p>Each symbol dict must have the options:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">(str)</span></code> - where <code class="docutils literal notranslate"><span class="pre">name</span></code> is the name of the symbol to load.</li>
+<li><code class="docutils literal notranslate"><span class="pre">date_col:</span> <span class="pre">(int)</span></code> - where <code class="docutils literal notranslate"><span class="pre">date_col</span></code> specifies the (zero-indexed) column that includes the date reference.</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="file-independent-options">
 <span id="id3"></span><h2>File Independent Options:<a class="headerlink" href="#file-independent-options" title="Permalink to this headline">¶</a></h2>
@@ -371,7 +384,7 @@ What follows is an example, using the defaults of <code class="docutils literal 
 <li><a class="reference internal" href="#file-objects-excel-files">File Objects - Excel files</a></li>
 <li><a class="reference internal" href="#file-objects-har-or-shk-files">File Objects - HAR (or SHK) files</a></li>
 <li><a class="reference internal" href="#file-objects-vd-files">File Objects - VD files</a></li>
-<li><a class="reference internal" href="#file-objects-gdx-files-currently-unsupported">File Objects - GDX files (currently unsupported)</a></li>
+<li><a class="reference internal" href="#file-objects-gdx-files">File Objects - GDX files</a></li>
 <li><a class="reference internal" href="#file-independent-options">File Independent Options:</a></li>
 <li><a class="reference internal" href="#tocero-technical-specification">ToCERO Technical Specification</a></li>
 </ul>
@@ -413,7 +426,7 @@ What follows is an example, using the defaults of <code class="docutils literal 
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |

@@ -9,7 +9,7 @@
     <title>from_cero &#8212; ConCERO 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -528,7 +528,7 @@
             <span class="k">if</span> <span class="s2">&quot;file&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="c1"># If file is specified, all &#39;outputs&#39; from this procedure go to its own file</span>
                 <span class="n">output_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
-                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_dataframe_out</span><span class="p">(</span><span class="n">out_df</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">output_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_kwargs&quot;</span><span class="p">))</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">dataframe_out</span><span class="p">(</span><span class="n">out_df</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">output_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_kwargs&quot;</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># procedure output name is that provided</span>
                 <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span> <span class="n">out_df</span><span class="p">}</span>
@@ -763,7 +763,7 @@
             <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
             <span class="k">if</span> <span class="n">file_ext</span> <span class="ow">in</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">sup_output_types</span><span class="p">:</span>
                 <span class="n">out_df</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_procedures</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
-                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_dataframe_out</span><span class="p">(</span><span class="n">out_df</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">output_type</span><span class="o">=</span><span class="n">file_ext</span><span class="p">)</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">dataframe_out</span><span class="p">(</span><span class="n">out_df</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">output_type</span><span class="o">=</span><span class="n">file_ext</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">file_ext</span> <span class="ow">in</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">sup_output_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This data type is not supported for general export, because it probably has a more than 2 dimensions - export using &#39;procedures&#39; instead.&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -950,7 +950,14 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_dataframe_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dataframe_out</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;CERO is empty - no data to export.&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="n">output_file</span> <span class="o">=</span> <span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">output_type</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_file</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="n">output_file</span>
         <span class="k">if</span> <span class="n">output_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;npy&#39;</span><span class="p">]:</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_numpy_out</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="o">=</span><span class="n">output_kwargs</span><span class="p">)</span>
@@ -959,7 +966,7 @@
         <span class="k">elif</span> <span class="n">output_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">]:</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_csv_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="o">=</span><span class="n">output_kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">output_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;excel&quot;</span><span class="p">]:</span>
-            <span class="n">FromCERO</span><span class="o">.</span><span class="n">xlsx_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="o">=</span><span class="n">output_kwargs</span><span class="p">)</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_xlsx_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="o">=</span><span class="n">output_kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">output_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;gdx&quot;</span><span class="p">}:</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_gdx_out</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="o">=</span><span class="n">output_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -979,13 +986,7 @@
         <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="o">**</span><span class="n">output_kwargs</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">xlsx_out</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
-        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Attempted to export empty CERO.&quot;</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">_xlsx_out</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y&quot;</span><span class="p">),</span>
                     <span class="s2">&quot;sheet_name&quot;</span><span class="p">:</span> <span class="s2">&quot;CERO&quot;</span><span class="p">,</span>
@@ -1085,7 +1086,7 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>
