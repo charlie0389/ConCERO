@@ -2,7 +2,9 @@
 
 ## [Unreleased - 0.5]
 
-...
+### Changed
+
+ * `matplotlib`, `pyqt4` are now imported as needed, removing PyQt4 as a strict dependency for ConCERO.
 
 ## [0.4] - 2018-06-22:
 

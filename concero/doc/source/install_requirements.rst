@@ -51,8 +51,8 @@ Can be done through pip:
 
 .. _gams-install:
 
-Install GAMS Python API
------------------------
+Install GAMS Python API (necessary for gdx files)
+-------------------------------------------------
 
 The instructions in this section are only relevant if it is necessary to interact with GAMS ``.gdx`` files.
 
@@ -74,8 +74,8 @@ You may get warnings regarding the python version mismatch.
 
 .. _pyqt-install:
 
-Installing PyQt4
-----------------
+Installing PyQt4 (necessary to use in-built plotting)
+-----------------------------------------------------
 
 PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on `matplotlib`.
 

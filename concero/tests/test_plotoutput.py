@@ -38,6 +38,12 @@ class TestPlotOutput(DefaultTestCase):
     _dd = os.path.join(conf.project_dir, "tests", "data", "")
 
     def test_plotoutput(self):
+
+        try:
+            import seaborn
+        except ImportError:
+            raise unittest.SkipTest("PyQt4 not installed, and therefore ConCERO's plotting capabilities cannot be used.")
+
         nf = "AssociateProfessionals.png"
 
         # CERO path

@@ -118,7 +118,6 @@ import shutil
 
 import pandas as pd
 import numpy as np
-import seaborn
 
 import concero.conf as conf
 if getattr(conf, "harpy_installed", False):
@@ -127,8 +126,6 @@ if getattr(conf, "harpy_installed", False):
 from concero.libfuncs_wrappers import dataframe_op, series_op, recursive_op
 from concero._identifier import _Identifier
 from concero.cero import CERO
-
-seaborn.set() # Necessary from version 0.8.1 onwards to import colour palette
 
 def plotdf(df,
            figurepath,
@@ -158,6 +155,14 @@ def plotdf(df,
     :param dict plot_options: Any additional options to pass to the plotting method. Refer to the `pandas documentation<https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html>`_ for more information.
     :return:
     """
+
+    try:
+        import seaborn
+        seaborn.set()  # Necessary from version 0.8.1 onwards to import colour palette
+    except ImportError as e:
+        if str(e) != "No module named 'PyQt4'":
+            raise e
+        raise ImportError("PyQt4 has not been installed, and is necessary to use ConCERO's plotting capabilities. Please consult ConCERO documentation or the internet for install instructions.")
 
     sxl = {"xlabel": ""}
     syl = {"ylabel": "", "fontsize": 12, "fontstyle": 'italic'}
