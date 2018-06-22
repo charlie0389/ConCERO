@@ -6,10 +6,10 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Install Requirements and Assumed Knowledge &#8212; ConCERO 0.1 documentation</title>
+    <title>Installing ConCERO &#8212; ConCERO 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -32,8 +32,78 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="install-requirements-and-assumed-knowledge">
-<span id="install-requirements"></span><h1>Install Requirements and Assumed Knowledge<a class="headerlink" href="#install-requirements-and-assumed-knowledge" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="installing-concero">
+<span id="install-requirements"></span><h1>Installing ConCERO<a class="headerlink" href="#installing-concero" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-concero-from-pip-recommended">
+<h2>Installing ConCERO from PIP (recommended)<a class="headerlink" href="#installing-concero-from-pip-recommended" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to install ConCERO is through pip:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">concero</span></code></div></blockquote>
+<p><strong>NOTE: It is assumed PyQt4 (required for matplotlib) is already installed. If not, refer to</strong> <a class="reference internal" href="#pyqt-install"><span class="std std-ref">Installing PyQt4</span></a> <strong>.</strong></p>
+<p>For GDX file support, please refer to <a class="reference internal" href="#gams-install"><span class="std std-ref">Install GAMS Python API</span></a> and <a class="reference internal" href="#gdxpds-install"><span class="std std-ref">Installing gdxpds (necessary for gdx files)</span></a>.</p>
+</div>
+<div class="section" id="installing-concero-from-source">
+<h2>Installing ConCERO from source<a class="headerlink" href="#installing-concero-from-source" title="Permalink to this headline">¶</a></h2>
+<p>Change to the source directory and execute:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
+<p>To check that the installation was successful, run the test suite:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">concero.tests.test_concero</span></code></div></blockquote>
+<p>Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options (by reading the documentation) or with the command:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">concero</span> <span class="pre">--help</span></code></div></blockquote>
+<table class="docutils footnote" frame="void" id="id1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>To check whether this library (<code class="docutils literal notranslate"><span class="pre">lib</span></code>) is installed (correctly), the simplest way is to open python on the command line. Then, in the python interpreter, execute <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">lib</span></code>, where <code class="docutils literal notranslate"><span class="pre">lib</span></code> is the relevant library. If no errors are raised, then the program is installed correctly.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="installing-concero-using-anaconda">
+<h2>Installing ConCERO using Anaconda<a class="headerlink" href="#installing-concero-using-anaconda" title="Permalink to this headline">¶</a></h2>
+<p>If the environment manager <em>Anaconda</em> is installed, a ConCERO environment can be installed by executing:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">concero/misc/concero_env.yaml</span></code></div></blockquote>
+<p><strong>NOTE:</strong> If installing using this method, the PyQt4 manual install process can be skipped. The manual install process for Harpy is still required however.</p>
+</div>
+<div class="section" id="installing-gdxpds-necessary-for-gdx-files">
+<span id="gdxpds-install"></span><h2>Installing gdxpds (necessary for gdx files)<a class="headerlink" href="#installing-gdxpds-necessary-for-gdx-files" title="Permalink to this headline">¶</a></h2>
+<p>Can be done through pip:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gdxpds</span></code></div></blockquote>
+</div>
+<div class="section" id="install-gams-python-api">
+<span id="gams-install"></span><h2>Install GAMS Python API<a class="headerlink" href="#install-gams-python-api" title="Permalink to this headline">¶</a></h2>
+<p>The instructions in this section are only relevant if it is necessary to interact with GAMS <code class="docutils literal notranslate"><span class="pre">.gdx</span></code> files.</p>
+<ul class="simple">
+<li>Supported platforms for the GAMS Python API can be found at ‘Supported Platforms’ at <a class="reference external" href="https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS">https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS</a>.</li>
+<li>Install instructions and tutorial for GAMS Python API can be found at <a class="reference external" href="https://www.gams.com/latest/docs/API_PY_TUTORIAL.html">https://www.gams.com/latest/docs/API_PY_TUTORIAL.html</a>.</li>
+<li>Installing is dramatically simpler if you use a python interpreter that matches the version of the installed GAMS python API. The ‘bitness’ (i.e. 32 bit or 64 bit) of your python interpreter has to match that of the installed GAMS Python API.</li>
+<li>If your runtime version of python is <em>greater</em> than that of the installed version of GAMS, the necessary files to be symlinked into corresponding directories are contained in &lt;GAMS install directory&gt;/apifiles/Python/api_&lt;version&gt;/build/lib.</li>
+</ul>
+<p>You may get warnings regarding the python version mismatch.</p>
+</div>
+<div class="section" id="installing-pyqt4">
+<span id="pyqt-install"></span><h2>Installing PyQt4<a class="headerlink" href="#installing-pyqt4" title="Permalink to this headline">¶</a></h2>
+<p>PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on <cite>matplotlib</cite>.</p>
+<p><strong>All platforms:</strong> If using Anaconda, then</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Execute command <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">pyqt=4</span></code> .</li>
+</ol>
+</div></blockquote>
+<p><strong>NOTE - Windows Only</strong>: It <em>may</em> be necessary to install PyQt4 on Windows through a manual process:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Download the appropriate <code class="docutils literal notranslate"><span class="pre">PyQt4</span></code> package from <a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4">https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4</a>.</li>
+<li>From the directory containing the downloaded file, execute from the command line <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&lt;downloaded</span> <span class="pre">PyQt4</span> <span class="pre">file&gt;</span></code> .</li>
+</ol>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="dependencies-and-assumed-knowledge">
+<h1>Dependencies and Assumed Knowledge<a class="headerlink" href="#dependencies-and-assumed-knowledge" title="Permalink to this headline">¶</a></h1>
 <p>This documentation assumes the reader is familiar with basic python data types, particularly:</p>
 <blockquote>
 <div><ul class="simple">
@@ -57,87 +127,12 @@
 </ul>
 </div></blockquote>
 <p>installed. <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> provides plotting functionality and <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> is a plotting library that basically ‘makes matplotlib plots look nice’. PyYAML provides YAML read functionality (necessary to read all the configuration files). No attempt has been made to make ConCERO backwards compatible with python 2. Unfortunately, it may be necessary to go through a rather arduous install process if it is necessary to have support for gdx file reading and/or har files (described below).</p>
+</div>
+<div class="section" id="known-bugs">
+<h1>Known Bugs<a class="headerlink" href="#known-bugs" title="Permalink to this headline">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">xlrd</span></code> is an excel spreadsheet file-reading program. It will be installed by default with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, but may not be of a sufficiently high version. On Windows, a bug in older versions may cause an exception to be raised when reading legitimate excel files. To upgrade <code class="docutils literal notranslate"><span class="pre">xlrd</span></code>, run the command:</p>
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xlrd</span> <span class="pre">--upgrade</span></code></div></blockquote>
-<div class="section" id="installing-pyqt4">
-<h2>Installing PyQt4<a class="headerlink" href="#installing-pyqt4" title="Permalink to this headline">¶</a></h2>
-<p>PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on <cite>matplotlib</cite>.</p>
-<p><strong>All platforms:</strong> If using Anaconda, then</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Execute command <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">pyqt=4</span></code> .</li>
-</ol>
-</div></blockquote>
-<p><strong>NOTE - Windows Only</strong>: It <em>may</em> be necessary to install PyQt4 on Windows through a manual process:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Download the appropriate <code class="docutils literal notranslate"><span class="pre">PyQt4</span></code> package from <a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4">https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4</a>.</li>
-<li>From the directory containing the downloaded file, execute from the command line <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&lt;downloaded</span> <span class="pre">PyQt4</span> <span class="pre">file&gt;</span></code> .</li>
-</ol>
-</div></blockquote>
-</div>
-<div class="section" id="install-gams-python-api-incomplete">
-<h2>Install GAMS Python API (Incomplete)<a class="headerlink" href="#install-gams-python-api-incomplete" title="Permalink to this headline">¶</a></h2>
-<p>The instructions in this section are only relevant if it is necessary to interact with GAMS <code class="docutils literal notranslate"><span class="pre">.gdx</span></code> files.</p>
-<ul class="simple">
-<li>Supported platforms for the GAMS Python API can be found at ‘Supported Platforms’ at <a class="reference external" href="https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS">https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS</a>.</li>
-<li>Install instructions and tutorial for GAMS Python API can be found at <a class="reference external" href="https://www.gams.com/latest/docs/API_PY_TUTORIAL.html">https://www.gams.com/latest/docs/API_PY_TUTORIAL.html</a>.</li>
-<li>Installing is dramatically simpler if you use a python interpreter that matches the version of the installed GAMS python API. The ‘bitness’ (i.e. 32 bit or 64 bit) of your python interpreter has to match that of the installed GAMS Python API.</li>
-<li>If your runtime version of python is <em>greater</em> than that of the installed version of GAMS, the necessary files to be symlinked into corresponding directories are contained in &lt;GAMS install directory&gt;/apifiles/Python/api_&lt;version&gt;/build/lib.</li>
-</ul>
-<p>You may get warnings regarding the python version mismatch.</p>
-</div>
-<div class="section" id="installing-gdxpds-necessary-for-gdx-files">
-<h2>Installing gdxpds (necessary for gdx files)<a class="headerlink" href="#installing-gdxpds-necessary-for-gdx-files" title="Permalink to this headline">¶</a></h2>
-<p>If working with the <code class="docutils literal notranslate"><span class="pre">.gdx</span></code> data type, in addition to ConCERO’s requirements, it is necessary to install:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>GAMS python API - more details of which can be found at <a class="reference external" href="https://www.gams.com/latest/docs/API_PY_TUTORIAL.html#PY_GETTING_STARTED">the GAMS website</a> - and</li>
-<li>gdxpds,</li>
-</ol>
-</div></blockquote>
-<p><em>in that order</em>.</p>
-<p>Installing/using the GAMS API is much easier (and probably more reliable) if the version of the python interpreter matches the version of the installed GAMS API files. That is, using Python 3.4 interpreter with Python 3.4 GAMS API. GAMS will complain even if the interpreter is more recent than that - for example, a version 3.5 interpreter with a 3.4 GAMS API. It is possible to install it anyway and link libraries manually, but that is a non-trivial process.</p>
-<p><em>gdxpds</em> will complain if it is not imported before pandas. Where possible, this program intends to heed this warning, but this may not always be the case, and so far, no adverse affects have been discovered by failing to heed the warning. Future versions of this program may remove this dependency.</p>
-</div>
-<div class="section" id="installing-harpy-necessary-for-har-or-shk-files">
-<h2>Installing harpy (necessary for har or shk files)<a class="headerlink" href="#installing-harpy-necessary-for-har-or-shk-files" title="Permalink to this headline">¶</a></h2>
-<p>Installing harpy is a simple process. The source code can be found at <a class="reference external" href="https://github.com/GEMPACKsoftware/HARPY">github</a>. To install harpy, download the zip archive (‘Clone or Download’ -&gt; ‘Download ZIP’), extract into a directory, change into that directory, and run the command:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
-<p>If you have both python 2 and python 3 on your system, the install command may instead be:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
-</div>
-<div class="section" id="installing-concero">
-<h2>Installing ConCERO<a class="headerlink" href="#installing-concero" title="Permalink to this headline">¶</a></h2>
-<p>Similar to harpy, the install command is either:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
-<p>or</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></div></blockquote>
-<p>depending which command corresponds to the python 3 interpreter. To check that the installation was successful, run the test suite:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">concero.tests.test_concero</span></code></div></blockquote>
-<p>Assuming ConCERO has been installed successfully, you can identify how to run ConCERO, and the available options (by reading the documentation) or with the command:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">concero</span> <span class="pre">--help</span></code></div></blockquote>
-<table class="docutils footnote" frame="void" id="id1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[1]</td><td>To check whether this library (<code class="docutils literal notranslate"><span class="pre">lib</span></code>) is installed (correctly), the simplest way is to open python on the command line. For example - <code class="docutils literal notranslate"><span class="pre">python</span></code>. Then, in the python interpreter, execute <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">lib</span></code>, where <code class="docutils literal notranslate"><span class="pre">lib</span></code> is the relevant library. If no errors are raised, then the program is installed correctly.</td></tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="installing-concero-using-anaconda">
-<h2>Installing ConCERO using Anaconda<a class="headerlink" href="#installing-concero-using-anaconda" title="Permalink to this headline">¶</a></h2>
-<p>If the environment manager <em>Anaconda</em> is installed, a ConCERO environment can be installed by executing:</p>
-<blockquote>
-<div><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">concero/misc/concero_env.yaml</span></code></div></blockquote>
-<p><strong>NOTE:</strong> If installing using this method, the PyQt4 manual install process can be skipped. The manual install process for Harpy is still required however.</p>
-</div>
 </div>
 
 
@@ -148,15 +143,17 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Install Requirements and Assumed Knowledge</a><ul>
-<li><a class="reference internal" href="#installing-pyqt4">Installing PyQt4</a></li>
-<li><a class="reference internal" href="#install-gams-python-api-incomplete">Install GAMS Python API (Incomplete)</a></li>
-<li><a class="reference internal" href="#installing-gdxpds-necessary-for-gdx-files">Installing gdxpds (necessary for gdx files)</a></li>
-<li><a class="reference internal" href="#installing-harpy-necessary-for-har-or-shk-files">Installing harpy (necessary for har or shk files)</a></li>
-<li><a class="reference internal" href="#installing-concero">Installing ConCERO</a></li>
+<li><a class="reference internal" href="#">Installing ConCERO</a><ul>
+<li><a class="reference internal" href="#installing-concero-from-pip-recommended">Installing ConCERO from PIP (recommended)</a></li>
+<li><a class="reference internal" href="#installing-concero-from-source">Installing ConCERO from source</a></li>
 <li><a class="reference internal" href="#installing-concero-using-anaconda">Installing ConCERO using Anaconda</a></li>
+<li><a class="reference internal" href="#installing-gdxpds-necessary-for-gdx-files">Installing gdxpds (necessary for gdx files)</a></li>
+<li><a class="reference internal" href="#install-gams-python-api">Install GAMS Python API</a></li>
+<li><a class="reference internal" href="#installing-pyqt4">Installing PyQt4</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#dependencies-and-assumed-knowledge">Dependencies and Assumed Knowledge</a></li>
+<li><a class="reference internal" href="#known-bugs">Known Bugs</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
@@ -194,7 +191,7 @@
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |

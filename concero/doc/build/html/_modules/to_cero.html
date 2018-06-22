@@ -277,8 +277,8 @@
 <span class="sd">Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format \</span>
 <span class="sd">that deviates from the default. Please see `File independent options`_ for more information.</span>
 
-<span class="sd">File Objects - VD files</span>
-<span class="sd">-----------------------</span>
+<span class="sd">File Objects - VD files (Experimental)</span>
+<span class="sd">--------------------------------------</span>
 
 <span class="sd">The coder writing the import connector is not familiar with the diversity of VEDA data files (if there are any). Consequently, the VEDA data file importer has been written with several assumptions. Specifically:</span>
 
@@ -311,8 +311,8 @@
 
 <span class="sd">.. _GDX files:</span>
 
-<span class="sd">File Objects - GDX files</span>
-<span class="sd">------------------------</span>
+<span class="sd">File Objects - GDX files (Experimental)</span>
+<span class="sd">---------------------------------------</span>
 
 <span class="sd">GDX files can be imported by providing the option:</span>
 <span class="sd">    * ``symbols: list(dict)`` - where each `list` item is a `dict` (referred to as a &quot;symbol dict&quot;).</span>
@@ -911,20 +911,14 @@
             <span class="n">sym_defs</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">sym_defs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent_dict</span><span class="p">)</span>
 
-            <span class="c1"># if issubclass(type(self.get(&quot;symbols&quot;)), str):</span>
-            <span class="c1">#     self[&quot;symbols&quot;] = [{&quot;name&quot;: self[&quot;symbols&quot;]}]</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbols&quot;</span><span class="p">)),</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]]</span>
-            <span class="c1"># elif self.get(&quot;symbols&quot;, []) == []:</span>
-            <span class="c1">#     self[&quot;symbols&quot;] = [{&quot;name&quot;: s.name} for s in gdxpds.list_symbols(self[&quot;file&quot;])] # If symbols aren&#39;t specified, assume that user wants them all</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbols&quot;</span><span class="p">,</span> <span class="p">[])),</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;symbols&#39; must be provided as a dict, or a list of dicts. Each symbol must have &#39;name&#39; and &#39;date_col&#39; specified.&quot;</span><span class="p">)</span>
 
             <span class="n">sym_tmp</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;symbols&quot;</span><span class="p">]:</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">sym_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="c1"># if issubclass(type(sym), str):</span>
-                <span class="c1">#     tmp.update({&quot;name&quot;: sym})</span>
                 <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">sym</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
                     <span class="n">tmp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
