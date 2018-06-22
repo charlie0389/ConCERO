@@ -1,10 +1,16 @@
 # Changelog
 
-## [0.4]:
+## [Unreleased - 0.5]
+
+...
+
+## [0.4] - 2018-06-22:
+
+### Added
 
  * Added pip-compatible changes.
 
-## [0.3]:
+## [0.3] - 2018-06-22:
 
 ### Added
 
