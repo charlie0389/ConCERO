@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased - 0.5]
+## [0.6 - Unreleased]
+
+## [0.5] - 2018-06-22
 
 ### Changed
 
