@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4]:
+
+ * Added pip-compatible changes.
+
 ## [0.3]:
 
 ### Added
