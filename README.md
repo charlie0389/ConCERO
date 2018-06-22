@@ -1,8 +1,14 @@
 # Installing and Using ConCERO
 
-Please consult ConCERO's documentation for installation instructions. Please also note that citing ConCERO (and any relevant dependent libraries) is requested and appreciated. Citation instructions can be found on the main page of ConCERO's documentation. The documentation can be read by downloading ConCERO as a zip file, extracting the zip and then opening, in a web browser, the file:
+The simplest way to install ConCERO is through the python packaging index (PIP):
 
-`concero/doc/build/html/index.html`
+    ``pip install concero``
+
+For alternative ways to install ConCERO, please consult the documentation, which can be read by downloading ConCERO as a zip file, extracting the zip and then opening the file (in a web browser):
+
+    `concero/doc/build/html/index.html`
+
+Please also note that citing ConCERO (and any relevant dependent libraries) is requested and appreciated. Citation instructions can be found on the main page of ConCERO's documentation.
 
 # Quick Example 1 - Data Format conversion
 
