@@ -14,6 +14,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+name = "concero"
+
 from .from_cero import FromCERO
 from .to_cero import ToCERO
 from .scenario import Scenario

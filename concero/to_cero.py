@@ -244,8 +244,8 @@ thrown.
 Note that it may also be necessary to include some of the file-independent options if the time-dimension has a format \
 that deviates from the default. Please see `File independent options`_ for more information.
 
-File Objects - VD files
------------------------
+File Objects - VD files (Experimental)
+--------------------------------------
 
 The coder writing the import connector is not familiar with the diversity of VEDA data files (if there are any). Consequently, the VEDA data file importer has been written with several assumptions. Specifically:
 
@@ -278,8 +278,8 @@ that deviates from the default. Please see `File independent options`_ for more 
 
 .. _GDX files:
 
-File Objects - GDX files
-------------------------
+File Objects - GDX files (Experimental)
+---------------------------------------
 
 GDX files can be imported by providing the option:
     * ``symbols: list(dict)`` - where each `list` item is a `dict` (referred to as a "symbol dict").
@@ -878,20 +878,14 @@ class ToCERO(dict):
             sym_defs = {}
             sym_defs.update(parent_dict)
 
-            # if issubclass(type(self.get("symbols")), str):
-            #     self["symbols"] = [{"name": self["symbols"]}]
             if issubclass(type(self.get("symbols")), dict):
                 self["symbols"] = [self["symbols"]]
-            # elif self.get("symbols", []) == []:
-            #     self["symbols"] = [{"name": s.name} for s in gdxpds.list_symbols(self["file"])] # If symbols aren't specified, assume that user wants them all
             elif not issubclass(type(self.get("symbols", [])), list):
                 raise TypeError("'symbols' must be provided as a dict, or a list of dicts. Each symbol must have 'name' and 'date_col' specified.")
 
             sym_tmp = []
             for sym in self["symbols"]:
                 tmp = sym_defs.copy()
-                # if issubclass(type(sym), str):
-                #     tmp.update({"name": sym})
                 if issubclass(type(sym), dict):
                     tmp.update(sym)
                 else:
