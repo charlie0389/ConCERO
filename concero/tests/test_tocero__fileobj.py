@@ -190,6 +190,26 @@ class TestToCERO_FileObj(DefaultTestCase):
 
         self.assertTrue(cero.equals(df))
 
+    def test_csv_orientation(self):
+
+        tc = ToCERO._FileObj({"file": TestToCERO_FileObj._dd + "test_csv_orientation.csv"})
+
+        with self.assertRaises(TypeError):
+            df = tc._import_file()
+
+        tc = ToCERO._FileObj({"file": TestToCERO_FileObj._dd + "test_csv_orientation.csv",
+                     "orientation": "cols"})
+
+        df = tc._import_file()
+
+        test_df = pd.DataFrame(data=[[1, 2], [3, 4]],
+                               columns=[2016, 2017],
+                               dtype=pd.np.float32)
+        test_df.index = CERO.create_cero_index(["A", "B"])
+        test_df.sort_index(inplace=True)
+
+        self.assertTrue(df.equals(test_df))
+
 
 if __name__ == "__main__":
     unittest.main()

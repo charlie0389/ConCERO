@@ -700,7 +700,12 @@ class ToCERO(dict):
                 # Put into CERO orientation if necessary
                 df = df.transpose()
 
-            df.index = CERO.create_cero_index(df.index.tolist())
+            try:
+                df.index = CERO.create_cero_index(df.index.tolist())
+            except TypeError as e:
+                if e.__str__() == "'int' object is not iterable":
+                    raise TypeError("'int' object is not iterable - the likely cause of this error is that the date-axis of the data is in columns, not rows - if true, this can be fixed by providing the 'orientation: cols' option to the file object.")
+                raise e
 
             return df
 
