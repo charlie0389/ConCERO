@@ -690,7 +690,7 @@ class ToCERO(dict):
                 #   one letter - e.g. usecols="B,C,E:AW".
             except ValueError as e:
                 if re.match(r"^Passed header", e.__str__()):
-                    raise ValueError(e.__str__() + ". This is likely because a range has been specified with a '-' instead of a ':'")
+                    raise ValueError(e.__str__() + ". This is likely because a range has been specified with a '-' instead of a ':' or a letter(s) have not been included in the specification.")
                 raise e
 
             if self["type"] in ['xlsx', "xls"] and self.get("nrows"):
