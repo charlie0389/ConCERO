@@ -57,3 +57,5 @@ def run(scenario, **kwargs):
             print("Running scenario %s..." % sc.get_name())
             sc.run()
             print("Scenario run complete.")
+
+    return True

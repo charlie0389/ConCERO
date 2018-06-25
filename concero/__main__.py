@@ -32,12 +32,13 @@ import concero.main
 def launch(args=None):
 
     def run_cmd(**ns):
-        concero.main.run(**ns)
+        return concero.main.run(**ns)
     def convert_cmd(**ns):
         tc = concero.ToCERO(ns["import_def"])  # creates the import object (a.k.a. a ``ToCERO`` object)
         cero = tc.create_cero()  # creates a common object (a.k.a. a 'CERO')
         fc = concero.FromCERO(ns["export_def"])  # creates the export object (a.k.a. a ``FromCERO`` object)
         fc.exec_procedures(cero)  # execute the procedures defined in ``export_data.yaml`` on ``cero``
+        return True
     def version():
         with open(os.path.join(os.path.dirname(__file__), '..', 'VERSION')) as version_file:
             version = version_file.read().strip()
@@ -112,7 +113,6 @@ def launch(args=None):
                              "False is returned instead (and no exceptions are raised).")
 
     # convert command
-
     conpar = sp.add_parser("convert", description="Perform data format conversion.", aliases=["co"])
     conpar.set_defaults(func=convert_cmd)
     conpar.add_argument("import_def", type=str, help="YAML file that defines the import of data from one or more files into a CERO.")
@@ -123,7 +123,7 @@ def launch(args=None):
     if ns == {}:
         raise RuntimeError("Invalid ConCERO command - please execute 'concero --help' for a description of valid options.")
 
-    ns["func"](**ns)
+    return ns["func"](**ns)
 
 if __name__ == "__main__":
     launch()

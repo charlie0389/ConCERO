@@ -82,6 +82,11 @@ class TestToCERO_FileObj(DefaultTestCase):
 
     @unittest.skipIf(sys.platform.startswith("win"), " Impossible to disable read with os.chmod() on windows.")
     def test_run_checks(self):
+        """
+        Note that this method can erroneously fail if executed on drives that aren't managed exclusively by the local OS.
+        For example, on shared drives, permissions may be set automatically.
+        :return:
+        """
         conf = {"file": "not_a_valid_file.file", "search_paths": [os.path.abspath(".")]}
 
         with self.assertRaises(FileNotFoundError):
@@ -94,12 +99,13 @@ class TestToCERO_FileObj(DefaultTestCase):
         try:
 
             shutil.copy2(TestToCERO_FileObj._dd + "test_csv.csv", os.path.join(os.path.abspath("."), "test_csv_noread.csv"))
-            os.chmod("test_csv_noread.csv", 0o000)
+            os.chmod(os.path.join(os.path.abspath("."), "test_csv_noread.csv"), 0o000)
 
             with self.assertRaises(PermissionError):
                 ToCERO._FileObj.run_checks(conf)
 
             self.assertFalse(ToCERO._FileObj.run_checks(conf, raise_exception=False))
+
 
         finally:
             os.remove("test_csv_noread.csv")
