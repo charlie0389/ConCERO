@@ -24,6 +24,7 @@ Created on Mar 20 13:47:50 2018
 import os
 import unittest
 
+import pandas as pd
 import numpy as np
 
 from concero.cero import CERO
@@ -141,9 +142,22 @@ class TestToCERO(DefaultTestCase):
 
         self.assertTrue(cero.equals(fin_cero))
 
+    def test_regex_format(self):
 
-    # TODO: Write test for time_regex
-    # TODO: Write test for time_fmt
+        tc = ToCERO({"files": [{"file": TestToCERO._dd + "test_csv_regex.csv",
+                                "time_regex": r"(Y\d{4}).*", # Regex could pick out just the year, but want to test 'time_fmt' as well...
+                                "time_fmt": r"Y%Y"}]})
+        cero = tc.create_cero()
+
+        test_df = pd.DataFrame(data=[[1, 2], [3, 4]],
+                               columns=[2016, 2017],
+                               dtype=pd.np.float32)
+        test_df.index = CERO.create_cero_index(["A", "B"])
+        test_df.columns = pd.DatetimeIndex(pd.to_datetime([2016, 2017], format="%Y"))
+        test_df.sort_index(inplace=True)
+
+        self.assertTrue(cero.equals(test_df))
+
 
 
 if __name__ == "__main__":

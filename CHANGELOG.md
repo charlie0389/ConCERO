@@ -2,6 +2,8 @@
 
 ## [0.6 - Unreleased]
 
+ * Improved error messages for incorrectly specified `orientation` and `usecols`.
+
 ## [0.5] - 2018-06-22:
 
 ### Changed
