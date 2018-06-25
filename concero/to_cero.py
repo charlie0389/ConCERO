@@ -463,6 +463,11 @@ class ToCERO(dict):
         def run_checks(conf, raise_exception=True):
             file = ToCERO._FileObj._find_file(conf["file"], conf["search_paths"], raise_exception=raise_exception)
             if not file:
+                msg = "File '%s' not found." % file
+                ToCERO._logger.error(msg)
+                if raise_exception:
+                    raise FileNotFoundError(msg)
+                print(msg)
                 return False
 
             if not ToCERO._FileObj._check_permissions(file, raise_exception=raise_exception):
@@ -1111,8 +1116,11 @@ class ToCERO(dict):
     def check_config(conf, raise_exception=True, runtime=False):
         _conf = ToCERO.load_config(conf)
         if runtime:
-            return ToCERO.run_checks(conf, raise_exception=raise_exception)
-        return ToCERO.is_valid(_conf, raise_exception=raise_exception)
+            if not ToCERO.run_checks(conf, raise_exception=raise_exception):
+                return False
+        if not ToCERO.is_valid(_conf, raise_exception=raise_exception):
+            return False
+        return True
 
     @staticmethod
     def _find_file(file, search_paths: list, raise_exception=True):

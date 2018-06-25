@@ -38,16 +38,19 @@ def run(scenario, **kwargs):
 
     ns.update(kwargs)
     conf.set_log_level(ns["log_level"])
-    conf.set_logd(ns["log_directory"])
+    conf.set_logd(ns["log_directory"]) # TODO: Make tests to ensure log_directory works
 
     # Load Scenario(s)
     scens = Scenario.load_scenarios(ns["scenario"])
 
     if ns["fake_run"] or ns["check"]:
         for sc in scens:
-            if not sc.is_valid(raise_exception=(not ns["restrain_exceptions"])):
-                return False
+
+            # Static checks performed on load...
+
             if not sc.run_checks(raise_exception=(not ns["restrain_exceptions"])):
+                msg = "Scenario '%s' failed runtime checks." % sc["name"]
+                print(msg)
                 return False
 
     if not ns["fake_run"]:

@@ -1,0 +1,13 @@
+name: A1
+run_no: 1
+input_conf: test_scen_inputs_fail_runtime.yaml
+export_mod_xlsx: False
+export_int_xlsx: False
+models:
+  - name: VURM
+    cmds: python dummy_model_run.py
+    input_conf: nonexistant_file.yaml
+    input_conf: test_model_input.yaml
+    output_conf: test_model_output.yaml
+    export_mod_xlsx: False
+output_conf: test_scen_outputs.yaml

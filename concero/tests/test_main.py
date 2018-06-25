@@ -58,13 +58,13 @@ class TestMain(DefaultTestCase):
         self.assertFalse(os.path.exists("test_scen_outputs.har"))
 
     def test_check(self):
-        scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
 
-        concero.main.run(scen_file, fake_run=True)
+        scen_file = os.path.abspath(TestMain._dd + "test_scenarios_fail_checks.yaml")
+
+        with self.assertRaises(FileNotFoundError):
+            concero.main.run(scen_file, check=True)
 
         self.assertFalse(os.path.exists("test_scen_outputs.har"))
-
-        # TODO: Come up with more thorough way of checking that checks have occured
 
 if __name__ == '__main__':
     unittest.main()

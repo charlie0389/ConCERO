@@ -183,12 +183,14 @@ class Scenario(dict):
         """
         Performs runtime checks on ``self`` to ensure it is a valid Scenario object. Failure of runtime checks indicates that the scenario is not ready to run.
 
-        :param bool raise_exception:
+        :param bool raise_exception: If `True` (default) then an exception is raised on check failure. Otherwise (on check failure) `False` is returned.
         :return:
         """
 
         for ic in self["input_conf"]:
-            ToCERO.check_config(ic, raise_exception=raise_exception, runtime=True)
+            if not ToCERO.check_config(ic, raise_exception=raise_exception, runtime=True):
+                return False
+        return True
 
 
     def get_name(self, long_form: bool=True, raise_exception=False) -> str:

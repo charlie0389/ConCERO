@@ -1,0 +1,8 @@
+type: har
+time_series_regex: .*(\d{4})$
+time_series_fmt: '%Y'
+files:
+  - file: nonexistentfile.har
+    default_year: 2017
+    head_arrs:
+      - CAPS
