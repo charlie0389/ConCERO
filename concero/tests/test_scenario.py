@@ -23,6 +23,7 @@ Created on Feb 06 10:56:13 2018
 import os
 import unittest
 import shutil
+import subprocess
 
 import numpy as np
 import harpy
@@ -37,6 +38,7 @@ class TestScenario(DefaultTestCase):
 
     _dd = os.path.join(os.path.dirname(__file__), "data", "")
 
+    @unittest.skipUnless(concero.conf._python_correct_callable, "Tests rely on 'python' on the system path being version 3.5 or above.")
     def test_scenario_run(self):
         '''Tests a scenario run.'''
 

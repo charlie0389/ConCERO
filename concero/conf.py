@@ -16,6 +16,7 @@
 
 import os
 import logging
+import subprocess
 
 project_dir = os.path.dirname(__file__)
 d_t = os.path.join(project_dir, "tests", "") # Test directory with trailing /
@@ -24,12 +25,25 @@ _search_paths = [project_dir, d_t, d_td]
 
 _logd = None
 
+_python_correct_callable = False
+
+ver_str = subprocess.run(["python", "--version"], stderr=subprocess.PIPE)
+ver_str = str(ver_str.stderr)
+ver_str = ver_str.split(' ')[1]
+ver_str = tuple(ver_str.split('.'))
+
+if (int(ver_str[0]) >= 3) and (int(ver_str[1]) >= 5):
+    _python_correct_callable = True
+
 def set_logd(_dir):
     global _logd
     _logd = os.path.join(_dir, "ConCERO_logs")
 
     if not os.path.isdir(_logd):
         os.mkdir(_logd)
+
+def get_logd():
+    return _logd
 
 set_logd(os.getcwd())
 

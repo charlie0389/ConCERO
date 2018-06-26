@@ -792,7 +792,7 @@ class ToCERO(dict):
                             "The 'default_year' option must be provided for har files that do not have a specified 'time_dim' (time dimension).")
 
                     # Assume we have to create time dimension...
-                    time_dim_labels = ["%d" % header.get("default_year")]  # TODO: Ask Thomas what year the data references if time_dim is not specified
+                    time_dim_labels = ["%d" % header.get("default_year")]
 
                     labels = [(x["name"], x["dim_desc"]) for x in header["obj"]["sets"]]
                     tspse_tup = tuple([i for i in range(len(header["obj"]["sets"]))])  # transpose-tuple

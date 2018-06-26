@@ -34,6 +34,7 @@ class TestMain(DefaultTestCase):
 
     _dd = os.path.join(os.path.dirname(__file__), "data", "")
 
+    @unittest.skipUnless(concero.conf._python_correct_callable, "Tests rely on 'python' on the system path being version 3.5 or above.")
     def test_normal_run(self):
 
         src = concero.conf.find_file("dummy_model.py")
@@ -42,6 +43,12 @@ class TestMain(DefaultTestCase):
         scen_file = os.path.abspath(TestMain._dd + "test_scenarios.yaml")
 
         concero.main.run(scen_file)
+
+        # Check log files have been generated
+        def_log_dir = "ConCERO_logs"
+        for log_file in ["concero.from_cero.log", "concero.libfuncs_wrappers.log", "concero.model.log", "concero.modfuncs.log", \
+                "concero.scenario.log", "concero.to_cero.log"]:
+            self.assertTrue(os.path.exists(os.path.join(os.getcwd(), def_log_dir, log_file)))
 
         # Clean up...
         os.remove('test_scen_outputs.har')
