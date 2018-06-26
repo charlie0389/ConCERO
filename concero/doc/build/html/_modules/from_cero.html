@@ -31,7 +31,7 @@
           <div class="body" role="main">
             
   <h1>Source code for from_cero</h1><div class="highlight"><pre>
-<span></span><span class="c1">#      ConCERO - a program to automate data format conversion and the execution of economic modelling software.</span>
+<span class="c1">#      ConCERO - a program to automate data format conversion and the execution of economic modelling software.</span>
 <span class="c1">#      Copyright (C) 2018  CSIRO Energy Business Unit</span>
 <span class="c1">#</span>
 <span class="c1">#     This program is free software: you can redistribute it and/or modify</span>
@@ -346,7 +346,7 @@
 
 <div class="viewcode-block" id="FromCERO"><a class="viewcode-back" href="../reference.html#from_cero.FromCERO">[docs]</a><span class="k">class</span> <span class="nc">FromCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="n">sup_output_types</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;excel&#39;</span><span class="p">,</span> <span class="s1">&#39;npy&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">,</span> <span class="s1">&#39;eps&#39;</span><span class="p">,</span> <span class="s1">&#39;svg&#39;</span><span class="p">}</span>
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">_Procedure</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;_Procedure object class.&quot;&quot;&quot;</span>
@@ -356,7 +356,7 @@
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s1">&#39;FromCERO&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
             <span class="n">proc</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">proc_dict</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 
@@ -396,7 +396,7 @@
                 <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="k">pass</span>
                 <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">),</span> <span class="n">ModuleType</span><span class="p">):</span>
-                    <span class="n">lf</span> <span class="o">=</span> <span class="n">lf</span><span class="o">.</span><span class="vm">__file__</span>
+                    <span class="n">lf</span> <span class="o">=</span> <span class="n">lf</span><span class="o">.</span><span class="n">__file__</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;libfuncs&#39; must be provided as a list of strings and/or modules (not </span><span class="si">%s</span><span class="s2">).&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">lf</span><span class="p">))</span>
 
@@ -557,10 +557,10 @@
                 <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(*arrays, **op)&quot;</span> <span class="o">%</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Function call: </span><span class="si">%s</span><span class="s2">(*arrays, **op)&quot;</span> <span class="o">%</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
 
             <span class="n">ret</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">op_args</span><span class="p">,</span> <span class="n">locs</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">op</span><span class="p">)</span>
-            <span class="n">op</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>  <span class="c1"># For cleanliness of presentation</span>
+            <span class="n">op</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span>  <span class="c1"># For cleanliness of presentation</span>
 
             <span class="k">if</span> <span class="n">rename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
@@ -722,7 +722,7 @@
         <span class="n">_conf</span> <span class="o">=</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">_conf</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;self.procedures: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;procedures&quot;</span><span class="p">])</span>
 
@@ -744,7 +744,7 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">procedure</span><span class="o">.</span><span class="n">exec_ops</span><span class="p">(</span><span class="n">cero</span><span class="p">)</span>
                 <span class="c1"># if ret is not None, should be dict with key: procedure[&quot;name&quot;], value: resultant CERO</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; Error in procedure &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">procedure</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
+                <span class="k">raise</span> <span class="n">e</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; Error in procedure &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">procedure</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
 
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>

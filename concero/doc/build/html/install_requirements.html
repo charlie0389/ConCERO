@@ -39,8 +39,11 @@
 <p>The simplest way to install ConCERO is through pip:</p>
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">concero</span></code></div></blockquote>
-<p><strong>NOTE: It is assumed PyQt4 (required for matplotlib) is already installed. If not, refer to</strong> <a class="reference internal" href="#pyqt-install"><span class="std std-ref">Installing PyQt4</span></a> <strong>.</strong></p>
-<p>For GDX file support, please refer to <a class="reference internal" href="#gams-install"><span class="std std-ref">Install GAMS Python API</span></a> and <a class="reference internal" href="#gdxpds-install"><span class="std std-ref">Installing gdxpds (necessary for gdx files)</span></a>.</p>
+<p><strong>Where it is assumed that</strong> <code class="docutils literal notranslate"><span class="pre">pip</span></code> <strong>refers to the Python 3 packaging index</strong>. On some systems, the correct command will instead be:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">concero</span></code></div></blockquote>
+<p><strong>NOTE: It is assumed PyQt4 (required for matplotlib) is already installed. If not, refer to</strong> <a class="reference internal" href="#pyqt-install"><span class="std std-ref">Installing PyQt4 (necessary to use in-built plotting)</span></a> <strong>.</strong></p>
+<p>For GDX file support, please refer to <a class="reference internal" href="#gams-install"><span class="std std-ref">Install GAMS Python API (necessary for gdx files)</span></a> and <a class="reference internal" href="#gdxpds-install"><span class="std std-ref">Installing gdxpds (necessary for gdx files)</span></a>.</p>
 </div>
 <div class="section" id="installing-concero-from-source">
 <h2>Installing ConCERO from source<a class="headerlink" href="#installing-concero-from-source" title="Permalink to this headline">¶</a></h2>
@@ -72,9 +75,12 @@
 <p>Can be done through pip:</p>
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gdxpds</span></code></div></blockquote>
+<p><strong>Where it is assumed that</strong> <code class="docutils literal notranslate"><span class="pre">pip</span></code> <strong>refers to the Python 3 packaging index</strong>. On some systems, the correct command will instead be:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">gdxpds</span></code></div></blockquote>
 </div>
-<div class="section" id="install-gams-python-api">
-<span id="gams-install"></span><h2>Install GAMS Python API<a class="headerlink" href="#install-gams-python-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install-gams-python-api-necessary-for-gdx-files">
+<span id="gams-install"></span><h2>Install GAMS Python API (necessary for gdx files)<a class="headerlink" href="#install-gams-python-api-necessary-for-gdx-files" title="Permalink to this headline">¶</a></h2>
 <p>The instructions in this section are only relevant if it is necessary to interact with GAMS <code class="docutils literal notranslate"><span class="pre">.gdx</span></code> files.</p>
 <ul class="simple">
 <li>Supported platforms for the GAMS Python API can be found at ‘Supported Platforms’ at <a class="reference external" href="https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS">https://www.gams.com/latest/docs/API_MAIN.html#GAMS_HLAPIS_SUPPORTED_PLATFORMS</a>.</li>
@@ -84,8 +90,8 @@
 </ul>
 <p>You may get warnings regarding the python version mismatch.</p>
 </div>
-<div class="section" id="installing-pyqt4">
-<span id="pyqt-install"></span><h2>Installing PyQt4<a class="headerlink" href="#installing-pyqt4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing-pyqt4-necessary-to-use-in-built-plotting">
+<span id="pyqt-install"></span><h2>Installing PyQt4 (necessary to use in-built plotting)<a class="headerlink" href="#installing-pyqt4-necessary-to-use-in-built-plotting" title="Permalink to this headline">¶</a></h2>
 <p>PyQt4 is necessary to use the plotting functionalities of ConCERO, which relies on <cite>matplotlib</cite>.</p>
 <p><strong>All platforms:</strong> If using Anaconda, then</p>
 <blockquote>
@@ -133,6 +139,9 @@
 <p><code class="docutils literal notranslate"><span class="pre">xlrd</span></code> is an excel spreadsheet file-reading program. It will be installed by default with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, but may not be of a sufficiently high version. On Windows, a bug in older versions may cause an exception to be raised when reading legitimate excel files. To upgrade <code class="docutils literal notranslate"><span class="pre">xlrd</span></code>, run the command:</p>
 <blockquote>
 <div><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xlrd</span> <span class="pre">--upgrade</span></code></div></blockquote>
+<p>Or:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">xlrd</span> <span class="pre">--upgrade</span></code></div></blockquote>
 </div>
 
 
@@ -148,8 +157,8 @@
 <li><a class="reference internal" href="#installing-concero-from-source">Installing ConCERO from source</a></li>
 <li><a class="reference internal" href="#installing-concero-using-anaconda">Installing ConCERO using Anaconda</a></li>
 <li><a class="reference internal" href="#installing-gdxpds-necessary-for-gdx-files">Installing gdxpds (necessary for gdx files)</a></li>
-<li><a class="reference internal" href="#install-gams-python-api">Install GAMS Python API</a></li>
-<li><a class="reference internal" href="#installing-pyqt4">Installing PyQt4</a></li>
+<li><a class="reference internal" href="#install-gams-python-api-necessary-for-gdx-files">Install GAMS Python API (necessary for gdx files)</a></li>
+<li><a class="reference internal" href="#installing-pyqt4-necessary-to-use-in-built-plotting">Installing PyQt4 (necessary to use in-built plotting)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#dependencies-and-assumed-knowledge">Dependencies and Assumed Knowledge</a></li>
