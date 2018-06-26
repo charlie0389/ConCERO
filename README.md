@@ -6,6 +6,12 @@ The simplest way to install ConCERO is through the python packaging index (PIP):
     pip install concero
 ```
 
+**Where it is assumed that `pip` is the Python 3 packaging index**. On some systems, the correct command will instead be:
+
+```
+    pip3 install concero
+```
+
 For alternative ways to install ConCERO, please consult the documentation, which can be read by downloading ConCERO as a zip file, extracting the zip and then opening the file (in a web browser):
 
 ```

@@ -10,6 +10,10 @@ The simplest way to install ConCERO is through pip:
 
     ``pip install concero``
 
+**Where it is assumed that** ``pip`` **refers to the Python 3 packaging index**. On some systems, the correct command will instead be:
+
+    ``pip3 install concero``
+
 **NOTE: It is assumed PyQt4 (required for matplotlib) is already installed. If not, refer to** :ref:`pyqt-install` **.**
 
 For GDX file support, please refer to :ref:`gams-install` and :ref:`gdxpds_install`.
@@ -48,6 +52,10 @@ Installing gdxpds (necessary for gdx files)
 Can be done through pip:
 
     ``pip install gdxpds``
+
+**Where it is assumed that** ``pip`` **refers to the Python 3 packaging index**. On some systems, the correct command will instead be:
+
+    ``pip3 install gdxpds``
 
 .. _gams-install:
 
@@ -119,3 +127,6 @@ Known Bugs
 
     ``pip install xlrd --upgrade``
 
+Or:
+
+    ``pip3 install xlrd --upgrade``
