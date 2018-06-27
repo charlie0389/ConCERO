@@ -9,7 +9,7 @@
     <title>Models &#8212; ConCERO 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -60,14 +60,15 @@
 </dl>
 <p>Currently, two different command types are supported, and is specified with the option:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><dl class="first docutils">
 <dt><code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">(&quot;shell&quot;|&quot;python_method&quot;)</span></code> - explanations of the two types follow (<code class="docutils literal notranslate"><span class="pre">&quot;shell&quot;</span></code> is default):</dt>
 <dd><ul class="first last">
-<li><code class="docutils literal notranslate"><span class="pre">&quot;shell&quot;</span></code> command is run from the command line and so therefore is, in general, operating-system <em>dependent</em>. Commands of this type take other options that correspond to keyword arguments of the <code class="docutils literal notranslate"><span class="pre">subprocess.check_output()</span></code> method - see the <a class="reference external" href="https://docs.python.org/3.4/library/subprocess.html">subprocess documentation</a> for more information. Commands of this type, by default, have the <code class="docutils literal notranslate"><span class="pre">shell:</span> <span class="pre">True</span></code> option provided as well (in contrast to the subprocess defaults). If this option needs to be changed, you’ll know why, so no explanation is given here.</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">&quot;shell&quot;</span></code> command is run from the command line and so therefore is, in general, operating-system <em>dependent</em>. Commands of this type take other options that correspond to keyword arguments of the <code class="docutils literal notranslate"><span class="pre">subprocess.check_output()</span></code> method - see the <a class="reference external" href="https://docs.python.org/3.4/library/subprocess.html">subprocess documentation</a> for more information. Commands of this type, by default, have the <code class="docutils literal notranslate"><span class="pre">shell:</span> <span class="pre">True</span></code> option provided as well (in contrast to the subprocess defaults). If this option needs to be changed, you’ll know why, so no explanation is given here.</p>
+</li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;python_method&quot;</span></code> - commands of this type execute a (python) method that has to be included in the module <code class="docutils literal notranslate"><span class="pre">modfuncs.py</span></code> so are, in general operating-system <em>independent</em>. For commands of this type, the <code class="docutils literal notranslate"><span class="pre">func</span></code> option must be provided. In addition to <code class="docutils literal notranslate"><span class="pre">args</span></code>, the available options are:</dt>
-<dd><ul class="first last">
+<dd><ul class="first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">func:</span> <span class="pre">(str)</span></code> - this (required) option specifies the method in the <code class="docutils literal notranslate"><span class="pre">modfuncs</span></code> module to execute.</li>
 <li><code class="docutils literal notranslate"><span class="pre">kwargs:</span> <span class="pre">dict[str</span> <span class="pre">-&gt;</span> <span class="pre">objects]</span></code> - <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> is provided to the python method as keyword arguments.</li>
 </ul>
@@ -232,7 +233,7 @@ Scen_transport_ci_sc.xls</p>
       &copy;2018, CSIRO.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |

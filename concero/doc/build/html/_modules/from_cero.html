@@ -332,6 +332,7 @@
 <span class="kn">import</span> <span class="nn">getpass</span>
 <span class="kn">import</span> <span class="nn">importlib.util</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">ModuleType</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -1011,39 +1012,99 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_gdx_out</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s1">&#39;Dict[str, pd.DataFrame]&#39;</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Note: output_kwargs is in signature for compatibility with other output functions. output_kwargs could be \</span>
-<span class="sd">        implemented but is not currently.</span>
+<span class="sd">        Exports a CERO to a GDX file, using the utility CSV2GDX.</span>
 
 <span class="sd">        :param df:</span>
 <span class="sd">        :param output_file:</span>
-<span class="sd">        :param output_kwargs:</span>
+<span class="sd">        :param dict output_kwargs: ``output_kwargs`` must have:</span>
+<span class="sd">                :param str id: where ``id`` is the name of the GAMS symbol.</span>
+<span class="sd">                :param List[int] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.</span>
+<span class="sd">                :param List[str] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">output_file</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">!=</span> <span class="s1">&#39;.gdx&#39;</span><span class="p">:</span>
-            <span class="n">output_file</span> <span class="o">+=</span> <span class="s1">&#39;.gdx&#39;</span> <span class="c1"># Add file extension if necessary</span>
 
+        <span class="c1">#TODO: Insert check that CSV2GDX exists</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;index_names&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;index_col&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">if</span> <span class="n">output_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output_kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Symbol name must be provided with &#39;id&#39; keyword, which must be provided with the &#39;output_kwargs&#39; dict.&quot;</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]:</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]),</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;index_col&#39; must be provided as an int, or a list of ints (&#39;index_col&#39; is </span><span class="si">%s</span><span class="s2"> instead).&quot;</span> <span class="o">%</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Not all &#39;index_col&#39; have been specified as integers.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Too many &#39;index_col&#39; specified. The maximum number is </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]</span> <span class="c1"># Change to 1-index referencing for CSV2GDX</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]:</span>
+            <span class="c1"># Attach default names if none specified</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;col_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;There must be exactly </span><span class="si">%d</span><span class="s2"> &#39;index_names&#39;. Instead, </span><span class="si">%d</span><span class="s2"> provided: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span><span class="p">,</span>
+                                                                                          <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]),</span>
+                                                                                          <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]))</span>
+            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">])</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span> <span class="c1"># Temporary file to use GDX2CSV</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CSVGDX&quot;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Output=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">output_file</span><span class="p">,</span>
+                <span class="s2">&quot;ID=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;Index=(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;Value=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;UseHeader=Y&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;StoreZERO=Y&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="c1"># out_obj = copy.deepcopy(out_obj)</span>
 
         <span class="c1"># for out_ser, out_df in df.items():</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">e</span>
-        <span class="n">libfuncs_wrappers</span><span class="o">.</span><span class="n">_rename</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y&#39;</span><span class="p">)</span> <span class="c1"># Convert datetimes to strings</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">out_ser</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]]</span> <span class="c1"># Reorder</span>
-
-
-        <span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">gdxf</span><span class="p">:</span>
-
-            <span class="c1"># for out_ser, out_df in df.items():</span>
-            <span class="c1"># Create a new set with one dimension</span>
-            <span class="n">gdxf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">out_ser</span><span class="p">,</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Index&#39;</span><span class="p">]))</span>
-            <span class="n">gdxf</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">df</span>
-            <span class="n">gdxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span> <span class="c1"># Create a new parameter with one dimension</span>
+        <span class="c1"># try:</span>
+        <span class="c1">#     assert (issubclass(type(df), pd.DataFrame))</span>
+        <span class="c1"># except AssertionError as e:</span>
+        <span class="c1">#     raise e</span>
+        <span class="c1"># libfuncs_wrappers._rename(df, df.index.values[0], &quot;Value&quot;)</span>
+        <span class="c1"># df = df.transpose()</span>
+        <span class="c1"># df[&#39;Year&#39;] = df.index.strftime(&#39;%Y&#39;) # Convert datetimes to strings</span>
+        <span class="c1"># df[out_ser] = df[[&#39;Year&#39;, &#39;Value&#39;]] # Reorder</span>
+        <span class="c1">#</span>
+        <span class="c1">#</span>
+        <span class="c1"># with gdxpds.gdx.GdxFile() as gdxf:</span>
+        <span class="c1">#</span>
+        <span class="c1">#     # for out_ser, out_df in df.items():</span>
+        <span class="c1">#     # Create a new set with one dimension</span>
+        <span class="c1">#     gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=[&#39;Index&#39;]))</span>
+        <span class="c1">#     gdxf[-1].dataframe = df</span>
+        <span class="c1">#     gdxf.write(output_file) # Create a new parameter with one dimension</span>
 
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Exported to file </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2"> successfully.&quot;</span> <span class="o">%</span> <span class="n">output_file</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="n">out_obj</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
