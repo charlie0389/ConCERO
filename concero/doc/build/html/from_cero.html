@@ -53,7 +53,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <blockquote>
 <div><ul class="simple">
 <li>Numpy arrays - <code class="docutils literal notranslate"><span class="pre">npy</span></code></li>
-<li>GAMS Data eXchange format - <code class="docutils literal notranslate"><span class="pre">gdx</span></code> (temporarily unsupported)</li>
+<li>GAMS Data eXchange format - <code class="docutils literal notranslate"><span class="pre">gdx</span></code> (experimental)</li>
 <li>HAR files - <code class="docutils literal notranslate"><span class="pre">har</span></code></li>
 <li>Shock files - <code class="docutils literal notranslate"><span class="pre">shk</span></code></li>
 <li>Portable Network Graphics format - <code class="docutils literal notranslate"><span class="pre">png</span></code></li>
@@ -99,6 +99,7 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <li><code class="docutils literal notranslate"><span class="pre">outputs:</span> <span class="pre">list(str|list(str))</span></code> - a list of identifiers that are to be exported to the file. If outputs     are not specified, then ConCERO will export all <em>updated</em> inputs after all operations are performed. Read     <a class="reference internal" href="#output-process-flow"><span class="std std-ref">Description of the output process-flow</span></a> to understand what is meant by <em>updated</em> inputs. If it is desirable that none of the data     series be exported to a file in a conventional manner, which is the case if - for example - plotting output,     then specify <code class="docutils literal notranslate"><span class="pre">outputs</span></code>, but leave the corresponding value blank to indicate a value of <code class="docutils literal notranslate"><span class="pre">None</span></code>.     If an item of the list is a string with one or more commas, or is itself a list, then the item will be     interpreted as a tuple-form identifier. See <a class="reference internal" href="cero.html#cero-ids"><span class="std std-ref">CERO Identifiers</span></a>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">operations:</span> <span class="pre">list[operations</span> <span class="pre">objects]</span></code> - to mutate the <code class="docutils literal notranslate"><span class="pre">inputs</span></code> into a desirable form for export,     operations must be applied to mutate the data. <code class="docutils literal notranslate"><span class="pre">operations</span></code> is a list of <em>operations objects</em>, which     modify the data in a sequential manner. See <a class="reference internal" href="#operations-objects"><span class="std std-ref">Operations Objects</span></a> for more information.</li>
 <li><code class="docutils literal notranslate"><span class="pre">libfuncs:</span> <span class="pre">(str|list[str])</span></code> - Identical in meaning to the equivalent <code class="docutils literal notranslate"><span class="pre">FromCERO</span></code> object option. Is inherited from a <code class="docutils literal notranslate"><span class="pre">FromCERO</span></code> object if not given.</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_kwargs:</span> <span class="pre">(dict)</span></code> - this is a dictionary of key-value pairs that is passed to the underlying library/program used to generate the format. Consequently, the suitable options will be format dependent. Please see <a class="reference internal" href="#kwargs"><span class="std std-ref">Output Keyword-Arguments</span></a> for an outline of available options.</li>
 </ul>
 </div></blockquote>
 <p>Below is a shell showing the two different procedure object types:</p>
@@ -263,6 +264,63 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 </li>
 </ol>
 </div></blockquote>
+<div class="section" id="output-keyword-arguments">
+<span id="kwargs"></span><h3>Output Keyword-Arguments<a class="headerlink" href="#output-keyword-arguments" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="gdx-files">
+<h4>GDX files<a class="headerlink" href="#gdx-files" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">output_kwargs</span></code> is a dict that must include:</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">arg <cite>str</cite> id:</th><td class="field-body">where <code class="docutils literal notranslate"><span class="pre">id</span></code> is the GAMS symbol (a string identifying the data set).</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>And may include:</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">arg Union[str, List[str]] index_col:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">is an <cite>int</cite>, or a <cite>list</cite> of <cite>int</cite> that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">arg Union[str, List[str]] index_names:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">if provided, must be of the same length as <code class="docutils literal notranslate"><span class="pre">index_col</span></code>. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>For example, to export the CERO:</p>
+<blockquote>
+<div>2017-01-01  2018-01-01  2019-01-01</div></blockquote>
+<p>(a_redundant_identifier, solar)         4.0         5.0         8.0
+(a_redundant_identifier, wind)         1.0         2.0         3.0
+(a_redundant_identifier, oil)         6.0         4.0         5.0
+(a_redundant_identifier, gas)         9.0        10.0        12.0</p>
+<p>An example FromCERO configuration could be:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>procedures:</dt>
+<dd><ul class="first last">
+<li><p class="first">file: gdx_file.gdx
+output_kwargs:</p>
+<blockquote>
+<div><p>id: fuel_export
+index_col: 1
+index_names: fuel_type</p>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<p>Where by specifying <code class="docutils literal notranslate"><span class="pre">index_col:</span> <span class="pre">1</span></code>, the field of the identifiers corresponding to the strings <code class="docutils literal notranslate"><span class="pre">a_redundant_identifier</span></code> is dropped (and <code class="docutils literal notranslate"><span class="pre">&quot;solar&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;wind&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;oil&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gas&quot;</span></code> are kept). <code class="docutils literal notranslate"><span class="pre">index_names:</span> <span class="pre">fuel_type</span></code> means the  solar, wind, oil, gas identifers are the <code class="docutils literal notranslate"><span class="pre">fuel_type</span></code> in the GDX file.</p>
+</div>
+</div>
 </div>
 <div class="section" id="fromcero-technical-specification">
 <h2>FromCERO Technical Specification<a class="headerlink" href="#fromcero-technical-specification" title="Permalink to this headline">¶</a></h2>
@@ -385,7 +443,13 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#description-of-the-output-process-flow">Description of the output process-flow</a></li>
+<li><a class="reference internal" href="#description-of-the-output-process-flow">Description of the output process-flow</a><ul>
+<li><a class="reference internal" href="#output-keyword-arguments">Output Keyword-Arguments</a><ul>
+<li><a class="reference internal" href="#gdx-files">GDX files</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#fromcero-technical-specification">FromCERO Technical Specification</a></li>
 </ul>
 </li>

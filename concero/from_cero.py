@@ -37,7 +37,7 @@ It is *recommended* that the following option be specified:
      the exported file type. Supported file types are:
 
         * Numpy arrays - ``npy``
-        * GAMS Data eXchange format - ``gdx`` (temporarily unsupported)
+        * GAMS Data eXchange format - ``gdx`` (experimental)
         * HAR files - ``har``
         * Shock files - ``shk``
         * Portable Network Graphics format - ``png``
@@ -104,6 +104,7 @@ procedure object is provided as the (``str``) ``ser_obj``, it is immediately con
     operations must be applied to mutate the data. ``operations`` is a list of *operations objects*, which \
     modify the data in a sequential manner. See :ref:`operations_objects` for more information.
     * ``libfuncs: (str|list[str])`` - Identical in meaning to the equivalent ``FromCERO`` object option. Is inherited from a ``FromCERO`` object if not given.
+    * ``output_kwargs: (dict)`` - this is a dictionary of key-value pairs that is passed to the underlying library/program used to generate the format. Consequently, the suitable options will be format dependent. Please see :ref:`kwargs` for an outline of available options.
 
 Below is a shell showing the two different procedure object types:
 
@@ -276,6 +277,41 @@ to an output file, the general process flow is:
         #. ``file`` as defined in the FromCERO object, *if specified*, or
         #. ``output.csv`` if ``file`` is unspecified in either the procedure or FromCERO objects.
 
+.. _kwargs:
+
+Output Keyword-Arguments
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+GDX files
+#########
+
+``output_kwargs`` is a dict that must include:
+
+    :arg `str` id: where ``id`` is the GAMS symbol (a string identifying the data set).
+
+And may include:
+
+    :arg Union[str, List[str]] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.
+    :arg Union[str, List[str]] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.
+
+For example, to export the CERO:
+
+                             2017-01-01  2018-01-01  2019-01-01
+(a_redundant_identifier, solar)         4.0         5.0         8.0
+(a_redundant_identifier, wind)         1.0         2.0         3.0
+(a_redundant_identifier, oil)         6.0         4.0         5.0
+(a_redundant_identifier, gas)         9.0        10.0        12.0
+
+An example FromCERO configuration could be:
+
+    procedures:
+        - file: gdx_file.gdx
+          output_kwargs:
+            id: fuel_export
+            index_col: 1
+            index_names: fuel_type
+
+Where by specifying ``index_col: 1``, the field of the identifiers corresponding to the strings ``a_redundant_identifier`` is dropped (and ``"solar"``, ``"wind"``, ``"oil"`` and ``"gas"`` are kept). ``index_names: fuel_type`` means the  solar, wind, oil, gas identifers are the ``fuel_type`` in the GDX file.
 
 FromCERO Technical Specification
 --------------------------------
@@ -298,6 +334,7 @@ from collections import OrderedDict
 import warnings
 import getpass
 import importlib.util
+import typing
 from types import ModuleType
 import subprocess
 
