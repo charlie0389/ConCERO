@@ -409,7 +409,7 @@
 <span class="kn">from</span> <span class="nn">concero.cero</span> <span class="k">import</span> <span class="n">CERO</span>
 
 
-<div class="viewcode-block" id="ToCERO"><a class="viewcode-back" href="../reference.html#to_cero.ToCERO">[docs]</a><span class="k">class</span> <span class="nc">ToCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="ToCERO"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO">[docs]</a><span class="k">class</span> <span class="nc">ToCERO</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 
     <span class="n">_logger</span> <span class="o">=</span> <span class="n">concero</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
@@ -1017,7 +1017,7 @@
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Loaded ToCERO configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span>
         <span class="n">ToCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ToCERO.create_cero"><a class="viewcode-back" href="../reference.html#to_cero.ToCERO.create_cero">[docs]</a>    <span class="k">def</span> <span class="nf">create_cero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ToCERO.create_cero"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.create_cero">[docs]</a>    <span class="k">def</span> <span class="nf">create_cero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a CERO from the configuration (defined by ``self``).</span>
 
@@ -1032,7 +1032,7 @@
         <span class="n">cero</span> <span class="o">=</span> <span class="n">CERO</span><span class="o">.</span><span class="n">combine_ceros</span><span class="p">(</span><span class="n">cero_series</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="p">[</span><span class="n">fo</span><span class="p">[</span><span class="s2">&quot;overwrite&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">fo</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">cero</span></div>
 
-<div class="viewcode-block" id="ToCERO.load_config"><a class="viewcode-back" href="../reference.html#to_cero.ToCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.load_config"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.load_config">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
@@ -1091,7 +1091,7 @@
 
         <span class="k">return</span> <span class="n">_conf</span></div>
 
-<div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../reference.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.is_valid"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.is_valid">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs static validity checks on ``conf`` as a ``ToCERO`` object.</span>
@@ -1128,7 +1128,7 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="ToCERO.run_checks"><a class="viewcode-back" href="../reference.html#to_cero.ToCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ToCERO.run_checks"><a class="viewcode-back" href="../to_cero.html#to_cero.ToCERO.run_checks">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs dynamic validity checks on ``conf`` as a ``ToCERO`` object.</span>

@@ -296,11 +296,11 @@ And may include:
 
 For example, to export the CERO:
 
-                             2017-01-01  2018-01-01  2019-01-01
-(a_redundant_identifier, solar)         4.0         5.0         8.0
+                                2017-01-01  2018-01-01  2019-01-01
+(a_redundant_identifier, solar)        4.0         5.0         8.0
 (a_redundant_identifier, wind)         1.0         2.0         3.0
-(a_redundant_identifier, oil)         6.0         4.0         5.0
-(a_redundant_identifier, gas)         9.0        10.0        12.0
+(a_redundant_identifier, oil)          6.0         4.0         5.0
+(a_redundant_identifier, gas)          9.0        10.0        12.0
 
 An example FromCERO configuration could be:
 
