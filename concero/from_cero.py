@@ -299,6 +299,7 @@ import warnings
 import getpass
 import importlib.util
 from types import ModuleType
+import subprocess
 
 import numpy as np
 import pandas as pd
@@ -318,7 +319,8 @@ class FromCERO(dict):
     class _Procedure(dict):
         """_Procedure object class."""
 
-        _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png', 'pdf', 'ps', 'eps', 'svg'} # "gdx"
+        _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png',
+                                       'pdf', 'ps', 'eps', 'svg', "gdx"}
 
         def __init__(self, proc_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
 
@@ -978,39 +980,78 @@ class FromCERO(dict):
     @staticmethod
     def _gdx_out(df: 'Dict[str, pd.DataFrame]', output_file: str, output_kwargs: dict=None):
         """
-        Note: output_kwargs is in signature for compatibility with other output functions. output_kwargs could be \
-        implemented but is not currently.
+        Exports a CERO to a GDX file, using the utility CSV2GDX.
 
-        :param df:
-        :param output_file:
-        :param output_kwargs:
-        :return:
+        :param df: The CERO to be exported.
+        :param output_file: The file to export to.
+        :param dict output_kwargs: ``output_kwargs`` must have:
+                :param str id: where ``id`` is the name of the GAMS symbol.
+                :param List[int] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.
+                :param List[str] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.
         """
-        if output_file[-4:] != '.gdx':
-            output_file += '.gdx' # Add file extension if necessary
 
-        # out_obj = copy.deepcopy(out_obj)
+        #TODO: Insert check that CSV2GDX exists
 
-        # for out_ser, out_df in df.items():
-        try:
-            assert (issubclass(type(df), pd.DataFrame))
-        except AssertionError as e:
-            raise e
-        libfuncs_wrappers._rename(df, df.index.values[0], "Value")
-        df = df.transpose()
-        df['Year'] = df.index.strftime('%Y') # Convert datetimes to strings
-        df[out_ser] = df[['Year', 'Value']] # Reorder
+        defaults = {"index_names": [],
+                    "id": "",
+                    "index_col": []}
+        if output_kwargs is None:
+            output_kwargs = {}
+        defaults.update(output_kwargs)
 
+        if not defaults["id"] and issubclass(type(defaults["id"]), str):
+            msg = "Symbol name must be provided with 'id' keyword, which must be provided with the 'output_kwargs' dict."
+            FromCERO._logger.error(msg)
+            raise TypeError(msg)
 
-        with gdxpds.gdx.GdxFile() as gdxf:
+        df.index = pd.Index(df.index.tolist())
 
-            # for out_ser, out_df in df.items():
-            # Create a new set with one dimension
-            gdxf.append(gdxpds.gdx.GdxSymbol(out_ser, gdxpds.gdx.GamsDataType.Parameter, dims=['Index']))
-            gdxf[-1].dataframe = df
-            gdxf.write(output_file) # Create a new parameter with one dimension
+        if issubclass(type(defaults["index_col"]), int):
+            defaults["index_col"] = [defaults["index_col"]]
+        if not defaults["index_col"]:
+            defaults["index_col"] = [i for i in range(df.index.nlevels)]
+        if not issubclass(type(defaults["index_col"]), list):
+            msg = "'index_col' must be provided as an int, or a list of ints ('index_col' is %s instead)." % defaults["index_col"]
+            FromCERO._logger.error(msg)
+            raise TypeError(msg)
+        if not all([issubclass(type(i), int) for i in defaults["index_col"]]):
+            msg = "Not all 'index_col' have been specified as integers."
+            raise ValueError(msg)
+        if len(defaults["index_col"]) > df.index.nlevels:
+            msg = "Too many 'index_col' specified. The maximum number is %d." % df.index.nlevels
+            FromCERO._logger.error(msg)
+            raise ValueError(msg)
+
+        defaults["index_col"] = [i+1 for i in defaults["index_col"]] # Change to 1-index referencing for CSV2GDX
+
+        if not defaults["index_names"]:
+            # Attach default names if none specified
+            defaults["index_names"] = ["col_%d" % i for i in defaults["index_col"]]
+
+        if len(defaults["index_col"]) != len(defaults["index_names"]):
+            msg = ("There must be exactly %d 'index_names'. Instead, %d provided: %s." % (df.index.nlevels,
+                                                                                          len(defaults["index_names"]),
+                                                                                          defaults["index_names"]))
+            FromCERO._logger.error(msg)
+            raise ValueError(msg)
+
+        df.index.set_names(defaults["index_names"])
+        df.to_csv(output_file + ".csv") # Temporary file to use GDX2CSV
+
+        args = ["csv2gdx",
+                output_file + ".csv",
+                "Output=%s"     % output_file,
+                "ID=%s"         % defaults["id"],
+                "Index=(%s)"    % ','.join([str(x) for x in defaults["index_col"]]),
+                "Value=%d"      % (df.index.nlevels + 1),
+                "UseHeader=Y",
+                "StoreZERO=Y"]
+
+        subprocess.run(args)
 
         FromCERO._logger.info("Exported to file \'%s\' successfully." % output_file)
+
+        os.remove(output_file + ".csv")
 
     @staticmethod
     def _plot(out_obj: pd.DataFrame, output_file: str, output_kwargs: dict=None):
