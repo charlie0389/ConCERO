@@ -288,37 +288,26 @@ It is <strong>necessary</strong> (for the configuration to output anything meani
 <tr class="field-odd field"><th class="field-name" colspan="2">arg Union[str, List[str]] index_col:</th></tr>
 <tr class="field-odd field"><td>&#160;</td><td class="field-body">is an <cite>int</cite>, or a <cite>list</cite> of <cite>int</cite> that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">arg Union[str, List[str]] index_names:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body">if provided, must be of the same length as <code class="docutils literal notranslate"><span class="pre">index_col</span></code>. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.</td>
-</tr>
 </tbody>
 </table>
 </div></blockquote>
 <p>For example, to export the CERO:</p>
-<blockquote>
-<div>2017-01-01  2018-01-01  2019-01-01</div></blockquote>
-<p>(a_redundant_identifier, solar)        4.0         5.0         8.0
-(a_redundant_identifier, wind)         1.0         2.0         3.0
-(a_redundant_identifier, oil)          6.0         4.0         5.0
-(a_redundant_identifier, gas)          9.0        10.0        12.0</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre>                                <span class="mi">2017</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>  <span class="mi">2018</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>  <span class="mi">2019</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+<span class="p">(</span><span class="n">a_redundant_identifier</span><span class="p">,</span> <span class="n">solar</span><span class="p">)</span>        <span class="mf">4.0</span>         <span class="mf">5.0</span>         <span class="mf">8.0</span>
+<span class="p">(</span><span class="n">a_redundant_identifier</span><span class="p">,</span> <span class="n">wind</span><span class="p">)</span>         <span class="mf">1.0</span>         <span class="mf">2.0</span>         <span class="mf">3.0</span>
+<span class="p">(</span><span class="n">a_redundant_identifier</span><span class="p">,</span> <span class="n">oil</span><span class="p">)</span>          <span class="mf">6.0</span>         <span class="mf">4.0</span>         <span class="mf">5.0</span>
+<span class="p">(</span><span class="n">a_redundant_identifier</span><span class="p">,</span> <span class="n">gas</span><span class="p">)</span>          <span class="mf">9.0</span>        <span class="mf">10.0</span>        <span class="mf">12.0</span>
+</pre></div>
+</div>
 <p>An example FromCERO configuration could be:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>procedures:</dt>
-<dd><ul class="first last">
-<li><p class="first">file: gdx_file.gdx
-output_kwargs:</p>
-<blockquote>
-<div><p>id: fuel_export
-index_col: 1
-index_names: fuel_type</p>
-</div></blockquote>
-</li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-<p>Where by specifying <code class="docutils literal notranslate"><span class="pre">index_col:</span> <span class="pre">1</span></code>, the field of the identifiers corresponding to the strings <code class="docutils literal notranslate"><span class="pre">a_redundant_identifier</span></code> is dropped (and <code class="docutils literal notranslate"><span class="pre">&quot;solar&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;wind&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;oil&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gas&quot;</span></code> are kept). <code class="docutils literal notranslate"><span class="pre">index_names:</span> <span class="pre">fuel_type</span></code> means the  solar, wind, oil, gas identifers are the <code class="docutils literal notranslate"><span class="pre">fuel_type</span></code> in the GDX file.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">procedures</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">gdx_file.gdx</span>
+      <span class="l l-Scalar l-Scalar-Plain">output_kwargs</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fuel_export</span>
+        <span class="l l-Scalar l-Scalar-Plain">index_col</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+</pre></div>
+</div>
+<p>Where by specifying <code class="docutils literal notranslate"><span class="pre">index_col:</span> <span class="pre">1</span></code>, the field of the identifiers corresponding to the strings <code class="docutils literal notranslate"><span class="pre">a_redundant_identifier</span></code> is dropped (and <code class="docutils literal notranslate"><span class="pre">&quot;solar&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;wind&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;oil&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gas&quot;</span></code> are kept).</p>
 </div>
 </div>
 </div>

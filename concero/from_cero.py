@@ -292,17 +292,20 @@ GDX files
 And may include:
 
     :arg Union[str, List[str]] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.
-    :arg Union[str, List[str]] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.
 
 For example, to export the CERO:
+::
 
-                                2017-01-01  2018-01-01  2019-01-01
-(a_redundant_identifier, solar)        4.0         5.0         8.0
-(a_redundant_identifier, wind)         1.0         2.0         3.0
-(a_redundant_identifier, oil)          6.0         4.0         5.0
-(a_redundant_identifier, gas)          9.0        10.0        12.0
+                                    2017-01-01  2018-01-01  2019-01-01
+    (a_redundant_identifier, solar)        4.0         5.0         8.0
+    (a_redundant_identifier, wind)         1.0         2.0         3.0
+    (a_redundant_identifier, oil)          6.0         4.0         5.0
+    (a_redundant_identifier, gas)          9.0        10.0        12.0
+
 
 An example FromCERO configuration could be:
+
+.. code-block:: yaml
 
     procedures:
         - file: gdx_file.gdx
@@ -1042,9 +1045,9 @@ class FromCERO(dict):
         :param df: The CERO to be exported.
         :param output_file: The file to export to.
         :param dict output_kwargs: ``output_kwargs`` must have:
+        
                 :param str id: where ``id`` is the name of the GAMS symbol.
                 :param List[int] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.
-                :param List[str] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.
         """
 
         #TODO: Insert check that CSV2GDX exists

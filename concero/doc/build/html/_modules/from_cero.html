@@ -325,26 +325,28 @@
 <span class="sd">And may include:</span>
 
 <span class="sd">    :arg Union[str, List[str]] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.</span>
-<span class="sd">    :arg Union[str, List[str]] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.</span>
 
 <span class="sd">For example, to export the CERO:</span>
+<span class="sd">::</span>
 
-<span class="sd">                                2017-01-01  2018-01-01  2019-01-01</span>
-<span class="sd">(a_redundant_identifier, solar)        4.0         5.0         8.0</span>
-<span class="sd">(a_redundant_identifier, wind)         1.0         2.0         3.0</span>
-<span class="sd">(a_redundant_identifier, oil)          6.0         4.0         5.0</span>
-<span class="sd">(a_redundant_identifier, gas)          9.0        10.0        12.0</span>
+<span class="sd">                                    2017-01-01  2018-01-01  2019-01-01</span>
+<span class="sd">    (a_redundant_identifier, solar)        4.0         5.0         8.0</span>
+<span class="sd">    (a_redundant_identifier, wind)         1.0         2.0         3.0</span>
+<span class="sd">    (a_redundant_identifier, oil)          6.0         4.0         5.0</span>
+<span class="sd">    (a_redundant_identifier, gas)          9.0        10.0        12.0</span>
+
 
 <span class="sd">An example FromCERO configuration could be:</span>
+
+<span class="sd">.. code-block:: yaml</span>
 
 <span class="sd">    procedures:</span>
 <span class="sd">        - file: gdx_file.gdx</span>
 <span class="sd">          output_kwargs:</span>
 <span class="sd">            id: fuel_export</span>
 <span class="sd">            index_col: 1</span>
-<span class="sd">            index_names: fuel_type</span>
 
-<span class="sd">Where by specifying ``index_col: 1``, the field of the identifiers corresponding to the strings ``a_redundant_identifier`` is dropped (and ``&quot;solar&quot;``, ``&quot;wind&quot;``, ``&quot;oil&quot;`` and ``&quot;gas&quot;`` are kept). ``index_names: fuel_type`` means the  solar, wind, oil, gas identifers are the ``fuel_type`` in the GDX file.</span>
+<span class="sd">Where by specifying ``index_col: 1``, the field of the identifiers corresponding to the strings ``a_redundant_identifier`` is dropped (and ``&quot;solar&quot;``, ``&quot;wind&quot;``, ``&quot;oil&quot;`` and ``&quot;gas&quot;`` are kept).</span>
 
 <span class="sd">FromCERO Technical Specification</span>
 <span class="sd">--------------------------------</span>
@@ -391,6 +393,9 @@
 
         <span class="n">_sup_procedure_output_types</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;excel&#39;</span><span class="p">,</span> <span class="s1">&#39;npy&#39;</span><span class="p">,</span> <span class="s1">&#39;har&#39;</span><span class="p">,</span> <span class="s1">&#39;shk&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">,</span> <span class="s1">&#39;eps&#39;</span><span class="p">,</span> <span class="s1">&#39;svg&#39;</span><span class="p">,</span> <span class="s2">&quot;gdx&quot;</span><span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">InvalidProcedure</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
 
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s1">&#39;FromCERO&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -704,6 +709,24 @@
 
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_check_permissions</span><span class="p">(</span><span class="n">proc</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span> <span class="n">raise_exception</span><span class="o">=</span><span class="n">raise_exception</span><span class="p">):</span>
                     <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># This test is disabled, because it prohibits specifying operations after loading</span>
+            <span class="c1"># if (not proc.get(&quot;file&quot;)) and (not proc.get(&quot;operations&quot;)):</span>
+            <span class="c1">#     msg = &quot;Neither &#39;file&#39;, or &#39;operations&#39;, specified for procedure &#39;%s&#39;.&quot; % proc[&quot;name&quot;]</span>
+            <span class="c1">#     FromCERO._logger.error(msg)</span>
+            <span class="c1">#     if raise_exception:</span>
+            <span class="c1">#         raise FromCERO._Procedure.InvalidProcedure(msg)</span>
+            <span class="c1">#     print(msg)</span>
+            <span class="c1">#     return False</span>
+
+            <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;procedures&quot;</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;procedures&#39; keyword used in a procedure &#39;</span><span class="si">%s</span><span class="s2">&#39;, which is invalid.&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">raise_exception</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FromCERO</span><span class="o">.</span><span class="n">_Procedure</span><span class="o">.</span><span class="n">InvalidProcedure</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
 
             <span class="k">return</span> <span class="kc">True</span>
 
@@ -1055,9 +1078,9 @@
 <span class="sd">        :param df: The CERO to be exported.</span>
 <span class="sd">        :param output_file: The file to export to.</span>
 <span class="sd">        :param dict output_kwargs: ``output_kwargs`` must have:</span>
+<span class="sd">        </span>
 <span class="sd">                :param str id: where ``id`` is the name of the GAMS symbol.</span>
 <span class="sd">                :param List[int] index_col: is an `int`, or a `list` of `int` that specify the (zero-indexed) fields of the identifiers in the index (that label the data). If not specified, all fields are used.</span>
-<span class="sd">                :param List[str] index_names: if provided, must be of the same length as ``index_col``. This option names the index columns, and if not provided, will name them col_1, col_2, col_3 etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1">#TODO: Insert check that CSV2GDX exists</span>
@@ -1094,30 +1117,18 @@
 
         <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]</span> <span class="c1"># Change to 1-index referencing for CSV2GDX</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]:</span>
-            <span class="c1"># Attach default names if none specified</span>
-            <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;col_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;There must be exactly </span><span class="si">%d</span><span class="s2"> &#39;index_names&#39;. Instead, </span><span class="si">%d</span><span class="s2"> provided: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span><span class="p">,</span>
-                                                                                          <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]),</span>
-                                                                                          <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">]))</span>
-            <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_names&quot;</span><span class="p">])</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span> <span class="c1"># Temporary file to use GDX2CSV</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">)</span> <span class="c1"># Temporary file to use GDX2CSV</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;csv2gdx&quot;</span><span class="p">,</span>
                 <span class="n">output_file</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Output=</span><span class="si">%s</span><span class="s2">&quot;</span>     <span class="o">%</span> <span class="n">output_file</span><span class="p">,</span>
-                <span class="s2">&quot;ID=</span><span class="si">%s</span><span class="s2">&quot;</span>         <span class="o">%</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;Index=(</span><span class="si">%s</span><span class="s2">)&quot;</span>    <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]),</span>
-                <span class="s2">&quot;Value=</span><span class="si">%d</span><span class="s2">&quot;</span>      <span class="o">%</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s2">&quot;Output=</span><span class="si">%s</span><span class="s2">&quot;</span>             <span class="o">%</span> <span class="n">output_file</span><span class="p">,</span>
+                <span class="s2">&quot;ID=</span><span class="si">%s</span><span class="s2">&quot;</span>                 <span class="o">%</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;Index=(</span><span class="si">%s</span><span class="s2">)&quot;</span>            <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;index_col&quot;</span><span class="p">]]),</span>
+                <span class="s2">&quot;Values=(</span><span class="si">%d</span><span class="s2">..LastCol)&quot;</span>  <span class="o">%</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
                 <span class="s2">&quot;UseHeader=Y&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;StoreZERO=Y&quot;</span><span class="p">]</span>
 
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
         <span class="n">FromCERO</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Exported to file </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2"> successfully.&quot;</span> <span class="o">%</span> <span class="n">output_file</span><span class="p">)</span>
 
