@@ -1052,8 +1052,7 @@ class FromCERO(dict):
 
         #TODO: Insert check that CSV2GDX exists
 
-        defaults = {"index_names": [],
-                    "id": "",
+        defaults = {"id": "",
                     "index_col": []}
         if output_kwargs is None:
             output_kwargs = {}
@@ -1090,8 +1089,8 @@ class FromCERO(dict):
                 output_file + ".csv",
                 "Output=%s"             % output_file,
                 "ID=%s"                 % defaults["id"],
-                "Index=(%s)"            % ','.join([str(x) for x in defaults["index_col"]]),
-                "Values=(%d..LastCol)"  % (df.index.nlevels + 1),
+                "Index='(%s)'"            % ','.join([str(x) for x in defaults["index_col"]]),
+                "Values='(%d..%d)'"  % ((df.index.nlevels + 1), (df.index.nlevels + df.columns.size)),
                 "UseHeader=Y",
                 "StoreZERO=Y"]
 
