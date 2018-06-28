@@ -309,9 +309,8 @@ An example FromCERO configuration could be:
           output_kwargs:
             id: fuel_export
             index_col: 1
-            index_names: fuel_type
 
-Where by specifying ``index_col: 1``, the field of the identifiers corresponding to the strings ``a_redundant_identifier`` is dropped (and ``"solar"``, ``"wind"``, ``"oil"`` and ``"gas"`` are kept). ``index_names: fuel_type`` means the  solar, wind, oil, gas identifers are the ``fuel_type`` in the GDX file.
+Where by specifying ``index_col: 1``, the field of the identifiers corresponding to the strings ``a_redundant_identifier`` is dropped (and ``"solar"``, ``"wind"``, ``"oil"`` and ``"gas"`` are kept).
 
 FromCERO Technical Specification
 --------------------------------
@@ -1082,7 +1081,7 @@ class FromCERO(dict):
 
         defaults["index_col"] = [i+1 for i in defaults["index_col"]] # Change to 1-index referencing for CSV2GDX
 
-        df.to_csv(output_file + ".csv") # Temporary file to use GDX2CSV
+        df.to_csv(output_file + ".csv", date_format="%Y") # Temporary file to use GDX2CSV
 
         args = ["csv2gdx",
                 output_file + ".csv",
