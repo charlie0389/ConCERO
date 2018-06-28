@@ -118,6 +118,12 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         self.assertTrue(FromCERO._Procedure.is_valid(proc))
 
+        # Test accidental passing of FromCERO object
+        proc = {"procedures": [{"operations": [{"func": "replace_har_header_in_file"}], "name": "test_proc", "libfuncs": [libfuncs]}]}
+        with self.assertRaises(FromCERO._Procedure.InvalidProcedure):
+            FromCERO._Procedure.is_valid(FromCERO._Procedure(proc))
+        self.assertFalse(FromCERO._Procedure.is_valid(proc, raise_exception=False))
+
     def test_export_to_csv(self):
 
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3], "D": [4], "E": [5], "F": [6], }, orient='index',
@@ -160,6 +166,8 @@ class TestFromCERO_Procedure(DefaultTestCase):
     @unittest.skipIf(not cfg.gdxpds_installed, "Library 'gdxpds' not installed.")
     def test_export_to_gdx(self):
 
+        import gdxpds
+
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3], "D": [4], "E": [5], "F": [6], }, orient='index',
                                       dtype=pd.np.float32)
         cero.sort_index(inplace=True)
@@ -170,7 +178,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
         proc.exec_ops(cero)
 
         # Read gdx
-        import gdxpds
         dfs = gdxpds.to_dataframes("gdx_export.gdx")
 
         self.assertEqual(len(dfs), 2)
@@ -186,6 +193,50 @@ class TestFromCERO_Procedure(DefaultTestCase):
         self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
 
         os.remove("gdx_export.gdx")
+
+        # Test 2
+
+        # Setup test dataframe
+        df = pd.DataFrame(data=[[1, 2, 3],
+                                [6, 4, 5],
+                                [4, 5, 8],
+                                [9, 10, 12]], dtype=pd.np.float32)
+        df.columns = pd.DatetimeIndex(pd.to_datetime([2017, 2018, 2019], format="%Y"))
+        df.index = pd.Index([("a_redundant_identifier", "solar"),
+                             ("a_redundant_identifier", "wind"),
+                             ("a_redundant_identifier", "oil"),
+                             ("a_redundant_identifier", "gas")], tupleize_cols=False)
+        df.sort_index(inplace=True)
+
+        # Export dataframe
+        proc = FromCERO._Procedure({"file": "gdx_file.gdx",
+                                    "output_kwargs": {"id": "fuel_export",
+                                                      "index_col": 1}})
+        proc.exec_ops(df)
+
+        # Read in created file
+        dfs = gdxpds.to_dataframes("gdx_file.gdx")
+
+        # Disect the created file
+        self.assertEqual(len(dfs), 3) # One more dimension than previous test, given variability by year
+        self.assertTrue("fuel_export" in dfs)
+        df1 = dfs["fuel_export"]
+        df1.columns = ["Col1", "Year", "Values"]
+        df1.set_index(["Col1"], inplace=True)
+        df1 = df1.pivot(columns="Year", values="Values")
+        df1 = df1.astype(int)
+
+        # Perform tests...
+
+        test_list = [[9, 10, 12], [4, 5, 8], [1, 2, 3], [6, 4, 5]]
+        df1_vals = df1.values.tolist()
+        self.assertTrue(test_list == df1_vals)
+
+        test_list = ["gas", "oil", "solar", "wind"]
+        self.assertTrue(test_list == df1.index.tolist())
+
+        os.remove("gdx_file.gdx")
+
 
     def test_auto_export(self):
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]},

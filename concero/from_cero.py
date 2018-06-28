@@ -359,6 +359,9 @@ class FromCERO(dict):
         _sup_procedure_output_types = {'csv', 'xlsx', 'excel', 'npy', 'har', 'shk', 'png',
                                        'pdf', 'ps', 'eps', 'svg', "gdx"}
 
+        class InvalidProcedure(TypeError):
+            pass
+
         def __init__(self, proc_dict: dict, *args, parent: 'FromCERO' = None, **kwargs):
 
             proc = FromCERO._Procedure.load_config(proc_dict, parent=parent)
@@ -671,6 +674,24 @@ class FromCERO(dict):
 
                 if not FromCERO._check_permissions(proc["file"], raise_exception=raise_exception):
                     return False
+
+            # This test is disabled, because it prohibits specifying operations after loading
+            # if (not proc.get("file")) and (not proc.get("operations")):
+            #     msg = "Neither 'file', or 'operations', specified for procedure '%s'." % proc["name"]
+            #     FromCERO._logger.error(msg)
+            #     if raise_exception:
+            #         raise FromCERO._Procedure.InvalidProcedure(msg)
+            #     print(msg)
+            #     return False
+
+            if proc.get("procedures"):
+                msg = "'procedures' keyword used in a procedure '%s', which is invalid." % proc["name"]
+                FromCERO._logger.error(msg)
+                if raise_exception:
+                    raise FromCERO._Procedure.InvalidProcedure(msg)
+                print(msg)
+                return False
+
 
             return True
 
@@ -1061,30 +1082,18 @@ class FromCERO(dict):
 
         defaults["index_col"] = [i+1 for i in defaults["index_col"]] # Change to 1-index referencing for CSV2GDX
 
-        if not defaults["index_names"]:
-            # Attach default names if none specified
-            defaults["index_names"] = ["col_%d" % i for i in defaults["index_col"]]
-
-        if len(defaults["index_col"]) != len(defaults["index_names"]):
-            msg = ("There must be exactly %d 'index_names'. Instead, %d provided: %s." % (df.index.nlevels,
-                                                                                          len(defaults["index_names"]),
-                                                                                          defaults["index_names"]))
-            FromCERO._logger.error(msg)
-            raise ValueError(msg)
-
-        df.index.set_names(defaults["index_names"])
         df.to_csv(output_file + ".csv") # Temporary file to use GDX2CSV
 
         args = ["csv2gdx",
                 output_file + ".csv",
-                "Output=%s"     % output_file,
-                "ID=%s"         % defaults["id"],
-                "Index=(%s)"    % ','.join([str(x) for x in defaults["index_col"]]),
-                "Value=%d"      % (df.index.nlevels + 1),
+                "Output=%s"             % output_file,
+                "ID=%s"                 % defaults["id"],
+                "Index=(%s)"            % ','.join([str(x) for x in defaults["index_col"]]),
+                "Values=(%d..LastCol)"  % (df.index.nlevels + 1),
                 "UseHeader=Y",
                 "StoreZERO=Y"]
 
-        subprocess.run(args)
+        subprocess.check_output(args)
 
         FromCERO._logger.info("Exported to file \'%s\' successfully." % output_file)
 
