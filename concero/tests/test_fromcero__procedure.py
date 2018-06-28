@@ -157,36 +157,6 @@ class TestFromCERO_Procedure(DefaultTestCase):
 
         os.remove("xlsx_export.xlsx")
 
-    @unittest.skipIf(not cfg.gdxpds_installed, "Library 'gdxpds' not installed.")
-    def test_export_to_gdx(self):
-
-        cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3], "D": [4], "E": [5], "F": [6], }, orient='index',
-                                      dtype=pd.np.float32)
-        cero.sort_index(inplace=True)
-        cero.columns = pd.DatetimeIndex(data=pd.to_datetime([2018], format="%Y"))
-
-        proc = FromCERO._Procedure({"file": "gdx_export.gdx",
-                                    "output_kwargs": {"id": "test_gdx"}})
-        proc.exec_ops(cero)
-
-        # Read gdx
-        import gdxpds
-        dfs = gdxpds.to_dataframes("gdx_export.gdx")
-
-        self.assertEqual(len(dfs), 2)
-        self.assertTrue("test_gdx" in dfs)
-        df1 = dfs["test_gdx"]
-        df1.columns = ["Col1", "Values"]
-        df1.set_index("Col1", inplace=True)
-
-        test_list = [1, 2, 3, 4, 5, 6]
-        df1_vals = df1.values.tolist()
-        self.assertTrue(all([np.isclose(x, y) for (x, y) in zip(test_list, df1_vals)]))
-        test_list = ["A", "B", "C", "D", "E", "F"]
-        self.assertTrue(all([x == y for (x, y) in zip(test_list, df1.index.tolist())]))
-
-        os.remove("gdx_export.gdx")
-
     def test_auto_export(self):
         cero = pd.DataFrame.from_dict({"A": [1], "B": [2], "C": [3]},
                                       orient='index',

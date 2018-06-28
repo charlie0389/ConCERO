@@ -2,9 +2,6 @@
 
 ## [0.6 - Unreleased]
 
-### Added
-
- * Experimental support for *exporting* into GDX data files (alongside experimental import support).
  * Improved error messages for incorrectly specified `orientation` and `usecols`.
 
 ## [0.5] - 2018-06-22:
