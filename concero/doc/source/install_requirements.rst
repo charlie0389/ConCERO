@@ -80,6 +80,12 @@ The instructions in this section are only relevant if it is necessary to interac
 
 You may get warnings regarding the python version mismatch.
 
+**IMPORTANT:** It is assumed that after installing GAMS, the GAMS tool ``csv2gdx`` is also installed on your system, and can be run from the command line, that is
+
+    ``csv2gdx``
+
+successfully prints a help message.
+
 .. _pyqt-install:
 
 Installing PyQt4 (necessary to use in-built plotting)

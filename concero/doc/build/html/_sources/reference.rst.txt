@@ -7,6 +7,7 @@ This page serves as 'one place' to find all technical reference documentation. O
 
 .. autoclass:: cero.CERO
     :members:
+    :noindex:
 .. autoclass:: to_cero.ToCERO
     :members:
     :noindex:

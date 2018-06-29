@@ -36,53 +36,54 @@
 <span id="reference"></span><h1>Technical Reference<a class="headerlink" href="#technical-reference" title="Permalink to this headline">¶</a></h1>
 <p>This page serves as ‘one place’ to find all technical reference documentation. Other documentation pages provide examples (unlike this page).</p>
 <dl class="class">
-<dt id="cero.CERO">
-<em class="property">class </em><code class="descclassname">cero.</code><code class="descname">CERO</code><a class="reference internal" href="_modules/cero.html#CERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">class </em><code class="descclassname">cero.</code><code class="descname">CERO</code><a class="reference internal" href="_modules/cero.html#CERO"><span class="viewcode-link">[source]</span></a></dt>
 <dd><dl class="exception">
-<dt id="cero.CERO.CEROIndexConflict">
-<em class="property">exception </em><code class="descname">CEROIndexConflict</code><a class="reference internal" href="_modules/cero.html#CERO.CEROIndexConflict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.CEROIndexConflict" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">exception </em><code class="descname">CEROIndexConflict</code><a class="reference internal" href="_modules/cero.html#CERO.CEROIndexConflict"><span class="viewcode-link">[source]</span></a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="cero.CERO.EmptyCERO">
-<em class="property">exception </em><code class="descname">EmptyCERO</code><a class="reference internal" href="_modules/cero.html#CERO.EmptyCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.EmptyCERO" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">exception </em><code class="descname">EmptyCERO</code><a class="reference internal" href="_modules/cero.html#CERO.EmptyCERO"><span class="viewcode-link">[source]</span></a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="cero.CERO.InvalidCERO">
-<em class="property">exception </em><code class="descname">InvalidCERO</code><a class="reference internal" href="_modules/cero.html#CERO.InvalidCERO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.InvalidCERO" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">exception </em><code class="descname">InvalidCERO</code><a class="reference internal" href="_modules/cero.html#CERO.InvalidCERO"><span class="viewcode-link">[source]</span></a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.combine_ceros">
-<em class="property">static </em><code class="descname">combine_ceros</code><span class="sig-paren">(</span><em>ceros: list</em>, <em>overwrite=True</em>, <em>verify_cero=True</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/cero.html#CERO.combine_ceros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.combine_ceros" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">combine_ceros</code><span class="sig-paren">(</span><em>ceros: list</em>, <em>overwrite: bool = True</em>, <em>verify_cero: bool = True</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/cero.html#CERO.combine_ceros"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Combine multiple CEROs (provided as a <code class="docutils literal notranslate"><span class="pre">list</span></code>) into a common CERO. If <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> is True, a CERO         that is later in <code class="docutils literal notranslate"><span class="pre">ceros</span></code> (i.e. has a higher index) will overwrite the merger of all preceding CEROs. If         <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> is False and duplicate indices are detected, an <code class="docutils literal notranslate"><span class="pre">CERO.CEROIndexConflict</span></code> exception         will be raised.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">verify_cero</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then a check is performed before and after combination to ensure that         only CEROs are combined with other CEROs, to form a CERO. By disabling this, <code class="docutils literal notranslate"><span class="pre">combine_ceros</span></code> can be         applied to <code class="docutils literal notranslate"><span class="pre">pandas.DataFrames</span></code> as well.</p>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.create_cero_index">
-<em class="property">static </em><code class="descname">create_cero_index</code><span class="sig-paren">(</span><em>values: List[str, tuple]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_cero_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.create_cero_index" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">create_cero_index</code><span class="sig-paren">(</span><em>values: List[Union[str, tuple]]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_cero_index"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Creates pandas.Index object that adheres to CERO constraints.</p>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.create_empty">
-<em class="property">static </em><code class="descname">create_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.create_empty" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">create_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.create_empty"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Returns empty CERO.</p>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.is_cero">
-<em class="property">static </em><code class="descname">is_cero</code><span class="sig-paren">(</span><em>obj</em>, <em>raise_exception=True</em>, <em>empty_ok=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.is_cero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.is_cero" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dt>
+<em class="property">static </em><code class="descname">is_cero</code><span class="sig-paren">(</span><em>obj</em>, <em>raise_exception=True</em>, <em>empty_ok=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.is_cero"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Tests <code class="docutils literal notranslate"><span class="pre">obj</span></code> to identify if it has all the properties of a CERO.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>obj</strong> – The object that may or may not be a CERO.</li>
-<li><strong>raise_exception</strong> – If <cite>True</cite> will raise an exception on the event that obj is not a CERO.</li>
-<li><strong>empty_ok</strong> – If <cite>True</cite>, <code class="docutils literal notranslate"><span class="pre">obj</span></code> must have at least one value that is not an NaN to qualify as a CERO. <cite>False</cite> by default.</li>
+<li><strong>raise_exception</strong> – If <cite>True</cite> will raise an exception on the event that obj is not a CERO (the default behaviour). Otherwise, <cite>False</cite> is returned in the event <code class="docutils literal notranslate"><span class="pre">obj</span></code> is not a CERO.</li>
+<li><strong>empty_ok</strong> – If <cite>False</cite>, <code class="docutils literal notranslate"><span class="pre">obj</span></code> must have at least one value that is not an NaN to qualify as a CERO. <cite>True</cite> by default.</li>
 </ul>
 </td>
 </tr>
@@ -94,8 +95,8 @@
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.read_csv">
-<em class="property">static </em><code class="descname">read_csv</code><span class="sig-paren">(</span><em>csv_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.read_csv" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">read_csv</code><span class="sig-paren">(</span><em>csv_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_csv"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Reads CEROs that have been exported to csv file. It is assumed that ‘;’ are used to seperate the fields (if more than one) of the identifier.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -111,8 +112,8 @@
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.read_xlsx">
-<em class="property">static </em><code class="descname">read_xlsx</code><span class="sig-paren">(</span><em>xlsx_file</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_xlsx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.read_xlsx" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">read_xlsx</code><span class="sig-paren">(</span><em>xlsx_file</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.read_xlsx"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Reads CEROs that have been exported to xlsx files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -125,8 +126,8 @@
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="cero.CERO.rename_index_values">
-<em class="property">static </em><code class="descname">rename_index_values</code><span class="sig-paren">(</span><em>cero: pandas.core.frame.DataFrame</em>, <em>map_dict: dict</em>, <em>inplace: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.rename_index_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cero.CERO.rename_index_values" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">static </em><code class="descname">rename_index_values</code><span class="sig-paren">(</span><em>cero: pandas.core.frame.DataFrame</em>, <em>map_dict: dict</em>, <em>inplace: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cero.html#CERO.rename_index_values"><span class="viewcode-link">[source]</span></a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

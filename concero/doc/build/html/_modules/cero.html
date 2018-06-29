@@ -126,12 +126,21 @@
 <span class="sd">.. The CERO provides methods for use with a pandas dataframe. Subclassing \</span>
 <span class="sd">.. ``pandas.DataFrame`` is not a trivial exercise.</span>
 
+<span class="sd">Technical Reference</span>
+<span class="sd">-------------------</span>
+
+<span class="sd">The functions listed below may be of interest if users wish to directly interact with a CERO (a ``pandas.DataFrame`` with additional constraints).</span>
+
+<span class="sd">.. autoclass:: CERO</span>
+<span class="sd">    :members:</span>
+
 <span class="sd">Created on Wed Dec 20 10:20:32 2017</span>
 
 <span class="sd">@author: Lyle Collins</span>
 <span class="sd">@email: Lyle.Collins@csiro.au</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -168,10 +177,11 @@
 <div class="viewcode-block" id="CERO.is_cero"><a class="viewcode-back" href="../reference.html#cero.CERO.is_cero">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_cero</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">empty_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests ``obj`` to identify if it has all the properties of a CERO.</span>
 
 <span class="sd">        :param obj: The object that may or may not be a CERO.</span>
-<span class="sd">        :param raise_exception: If `True` will raise an exception on the event that obj is not a CERO.</span>
-<span class="sd">        :param empty_ok: If `True`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `False` by default.</span>
+<span class="sd">        :param raise_exception: If `True` will raise an exception on the event that obj is not a CERO (the default behaviour). Otherwise, `False` is returned in the event ``obj`` is not a CERO.</span>
+<span class="sd">        :param empty_ok: If `False`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `True` by default.</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -238,7 +248,7 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="CERO.create_cero_index"><a class="viewcode-back" href="../reference.html#cero.CERO.create_cero_index">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">create_cero_index</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="s1">&#39;List[str, tuple]&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_cero_index</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]]):</span>
         <span class="sd">&quot;&quot;&quot;Creates pandas.Index object that adheres to CERO constraints.&quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">_Identifier</span><span class="o">.</span><span class="n">tupleize_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">tupleize_cols</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
@@ -283,7 +293,7 @@
         <span class="k">return</span> <span class="n">cero</span></div>
 
 <div class="viewcode-block" id="CERO.combine_ceros"><a class="viewcode-back" href="../reference.html#cero.CERO.combine_ceros">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_cero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">combine_ceros</span><span class="p">(</span><span class="n">ceros</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_cero</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Combine multiple CEROs (provided as a ``list``) into a common CERO. If ``overwrite`` is True, a CERO \</span>
 <span class="sd">        that is later in ``ceros`` (i.e. has a higher index) will overwrite the merger of all preceding CEROs. If \</span>
 <span class="sd">        ``overwrite`` is False and duplicate indices are detected, an ``CERO.CEROIndexConflict`` exception \</span>
@@ -364,8 +374,9 @@
 
 <span class="sd">        This includes transforming multiindex entries separately.</span>
 <span class="sd">        Only apply function to one level of the MultiIndex if level is specified.</span>
+
+<span class="sd">        A copy of ``pandas.core.internals._transform_index()`` with minor modification in response to pandas bug #19497.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Copied from pandas.core.internals._transform_index() with minor modification in response to pandas bug #19497</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">level</span> <span class="k">else</span> <span class="n">y</span>

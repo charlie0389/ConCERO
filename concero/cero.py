@@ -93,12 +93,21 @@ as opposed to all the identifiers.
 .. The CERO provides methods for use with a pandas dataframe. Subclassing \
 .. ``pandas.DataFrame`` is not a trivial exercise.
 
+Technical Reference
+-------------------
+
+The functions listed below may be of interest if users wish to directly interact with a CERO (a ``pandas.DataFrame`` with additional constraints).
+
+.. autoclass:: CERO
+    :members:
+
 Created on Wed Dec 20 10:20:32 2017
 
 @author: Lyle Collins
 @email: Lyle.Collins@csiro.au
 """
 import os
+from typing import List, Union
 
 import pandas as pd
 import numpy as np
@@ -135,10 +144,11 @@ class CERO(object):
     @staticmethod
     def is_cero(obj, raise_exception=True, empty_ok=True):
         """
+        Tests ``obj`` to identify if it has all the properties of a CERO.
 
         :param obj: The object that may or may not be a CERO.
-        :param raise_exception: If `True` will raise an exception on the event that obj is not a CERO.
-        :param empty_ok: If `True`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `False` by default.
+        :param raise_exception: If `True` will raise an exception on the event that obj is not a CERO (the default behaviour). Otherwise, `False` is returned in the event ``obj`` is not a CERO.
+        :param empty_ok: If `False`, ``obj`` must have at least one value that is not an NaN to qualify as a CERO. `True` by default.
         :return:
         """
 
@@ -205,7 +215,7 @@ class CERO(object):
         return True
 
     @staticmethod
-    def create_cero_index(values: 'List[str, tuple]'):
+    def create_cero_index(values: List[Union[str, tuple]]):
         """Creates pandas.Index object that adheres to CERO constraints."""
         values = [_Identifier.tupleize_name(value) for value in values]
         return pd.Index(values, tupleize_cols=False)
@@ -250,7 +260,7 @@ class CERO(object):
         return cero
 
     @staticmethod
-    def combine_ceros(ceros: list, overwrite=True, verify_cero=True) -> pd.DataFrame:
+    def combine_ceros(ceros: list, overwrite: bool=True, verify_cero: bool=True) -> pd.DataFrame:
         """Combine multiple CEROs (provided as a ``list``) into a common CERO. If ``overwrite`` is True, a CERO \
         that is later in ``ceros`` (i.e. has a higher index) will overwrite the merger of all preceding CEROs. If \
         ``overwrite`` is False and duplicate indices are detected, an ``CERO.CEROIndexConflict`` exception \
@@ -331,8 +341,9 @@ class CERO(object):
 
         This includes transforming multiindex entries separately.
         Only apply function to one level of the MultiIndex if level is specified.
+
+        A copy of ``pandas.core.internals._transform_index()`` with minor modification in response to pandas bug #19497.
         """
-        # Copied from pandas.core.internals._transform_index() with minor modification in response to pandas bug #19497
         if isinstance(index, pd.MultiIndex):
             if level is not None:
                 items = [tuple(func(y) if i == level else y
